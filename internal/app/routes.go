@@ -3,6 +3,9 @@ package app
 import (
 	"database/sql"
 	"net/http"
+
+	"github.com/YelzhanWeb/uno-spicchio/internal/controllers/rest"
+	"github.com/go-chi/chi/v5"
 )
 
 // func Routes(db *sql.DB) *http.ServeMux {
@@ -34,5 +37,11 @@ import (
 // }
 
 func Routes(db *sql.DB) *http.ServeMux {
+	r := chi.NewRouter()
+
+	handler := rest.NewHandler()
+
+	r.Post("/user")
+
 	return http.NewServeMux()
 }
