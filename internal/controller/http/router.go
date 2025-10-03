@@ -1,11 +1,9 @@
-package app
+package http
 
 import (
-	"database/sql"
 	"net/http"
 
-	"github.com/YelzhanWeb/uno-spicchio/internal/controllers/rest"
-	"github.com/go-chi/chi/v5"
+	"github.com/YelzhanWeb/uno-spicchio/internal/ports"
 )
 
 // func Routes(db *sql.DB) *http.ServeMux {
@@ -36,12 +34,12 @@ import (
 // 	return mux
 // }
 
-func Routes(db *sql.DB) *http.ServeMux {
-	r := chi.NewRouter()
+func Router(service ports.Service) http.Handler {
+	// r := chi.NewRouter()
 
-	handler := rest.NewHandler()
+	// handler := NewHandler(service)
 
-	r.Post("/user")
+	// r.Post("/user")
 
 	return http.NewServeMux()
 }

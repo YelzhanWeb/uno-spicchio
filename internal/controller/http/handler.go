@@ -1,15 +1,14 @@
-package rest
+package http
 
 import (
-	"github.com/YelzhanWeb/uno-spicchio/internal/domain"
 	"github.com/YelzhanWeb/uno-spicchio/internal/ports"
 )
 
 type Handlers struct {
-	Service domain.Service
+	Service ports.Service
 }
 
-func NewHandler(service domain.Service) ports.HttpHandlers {
+func NewHandler(service ports.Service) ports.HttpHandlers {
 	return &Handlers{
 		Service: service,
 	}

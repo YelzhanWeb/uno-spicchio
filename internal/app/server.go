@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-func StartServerWithShutdown(addr string, mux *http.ServeMux) {
+func StartServerWithShutdown(addr string, mux http.Handler) {
 	logged := loggingMiddleware(mux)
 
 	server := &http.Server{
