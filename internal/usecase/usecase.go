@@ -11,8 +11,3 @@ func NewService(pool ports.Postgres) ports.Service {
 		pool: pool,
 	}
 }
-
-func (s *Service) CreateUser(userName string, password string, role string) (int, error) {
-	// TO DO Validate
-	return s.pool.CreateUser(userName, password, role)
-}
