@@ -23,6 +23,7 @@ func StartServerWithShutdown(addr string, mux http.Handler) {
 	go func() {
 		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			slog.Error("Start server error")
+			return
 		}
 	}()
 

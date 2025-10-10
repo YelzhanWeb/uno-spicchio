@@ -35,7 +35,7 @@ func main() {
 	}
 	defer db.Close()
 
-	addr := fmt.Sprintf(":%s", 8080)
+	addr := fmt.Sprintf(":%s", "8080")
 	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
 	slog.SetDefault(logger)
 

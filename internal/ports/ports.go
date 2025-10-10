@@ -8,6 +8,12 @@ type Postgres interface {
 	GetAllUsers() ([]domain.User, error)
 	UpdateUser(id int, username, passwordHash, role, photoKey string) error
 	DeleteUser(id int) error
+
+	CreateCategory(name string) (int, error)
+	GetCategoryByID(id int) (*domain.Category, error)
+	GetAllCategories() ([]domain.Category, error)
+	UpdateCategory(id int, name string) error
+	DeleteCategory(id int) error
 }
 type Service interface {
 	CreateUser(username, password, role, photoKey string) (int, error)
@@ -15,6 +21,12 @@ type Service interface {
 	GetAllUsers() ([]domain.User, error)
 	UpdateUser(id int, username, password, role, photoKey string) error
 	DeleteUser(id int) error
+
+	CreateCategory(name string) (int, error)
+	GetCategoryByID(id int) (*domain.Category, error)
+	GetAllCategories() ([]domain.Category, error)
+	UpdateCategory(id int, name string) error
+	DeleteCategory(id int) error
 }
 
 type HttpHandlers interface {
