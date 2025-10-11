@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="" />
+    <link rel="stylesheet" as="style" onload="this.rel='stylesheet'"
+        href="https://fonts.googleapis.com/css2?display=swap&family=Work+Sans%3Awght%40400%3B500%3B700%3B900" />
+    <title>UNO Spicchio - Новый заказ</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+</head>
+
+<body class="bg-[#fcf8f8]">
+    <div class="relative flex h-auto min-h-screen w-full flex-col"
+        style='font-family: "Work Sans", "Noto Sans", sans-serif;'>
+        <div class="layout-container flex h-full grow flex-col">
+            <header
+                class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#f3e7e8] px-10 py-3">
+                <a href="/static/active-orders.html" class="flex items-center gap-4 text-[#1b0e0e]">
+                    <h2 class="text-[#1b0e0e] text-lg font-bold leading-tight tracking-[-0.015em]">UNO Spicchio</h2>
+                </a>
+                <div class="flex items-center gap-9">
+                    <a class="text-[#1b0e0e] text-sm font-medium leading-normal" href="#">Меню</a>
+                    <a class="text-[#1b0e0e] text-sm font-medium leading-normal"
+                        href="/static/active-orders.html">Заказы</a>
+                    <a class="text-[#1b0e0e] text-sm font-medium leading-normal" href="#">Столы</a>
+                    <a class="text-[#1b0e0e] text-sm font-medium leading-normal" href="#">Персонал</a>
+                </div>
+            </header>
+
+            <main class="flex flex-1 flex-col gap-4 p-4 lg:flex-row lg:gap-8 lg:p-8">
+
+                <div class="flex flex-col gap-4 w-full lg:max-w-md">
+                    <div>
+                        <p class="text-[#1b0e0e] text-2xl font-bold">Стол 1 - Заказ #<span
+                                id="order-id-display">Новый</span></p>
+                        <input type="hidden" id="table-id-input" value="1">
+                        <input type="hidden" id="waiter-id-input" value="1">
+                    </div>
+                    <div class="flex flex-col rounded-lg border border-[#e7d0d1] bg-white p-4">
+                        <h3 class="text-[#1b0e0e] text-lg font-bold mb-4">Позиции заказа</h3>
+                        <table class="w-full">
+                            <thead>
+                                <tr class="border-b border-[#e7d0d1]">
+                                    <th class="py-2 text-left text-sm font-medium text-[#1b0e0e]">Позиция</th>
+                                    <th class="py-2 text-center text-sm font-medium text-[#1b0e0e]">Кол-во</th>
+                                    <th class="py-2 text-right text-sm font-medium text-[#1b0e0e]">Сумма</th>
+                                </tr>
+                            </thead>
+                            <tbody id="order-items-table-body">
+                                <tr>
+                                    <td colspan="3" class="text-center text-gray-400 py-8">Заказ пуст</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="flex flex-col rounded-lg border border-[#e7d0d1] bg-white p-4">
+                        <h3 class="text-[#1b0e0e] text-lg font-bold mb-4">Итого</h3>
+                        <div class="flex justify-between py-2">
+                            <p class="text-[#994d51]">Подытог</p>
+                            <p class="text-[#1b0e0e]" id="order-subtotal">$0.00</p>
+                        </div>
+                        <div class="flex justify-between py-2 text-lg font-bold">
+                            <p class="text-[#1b0e0e]">Итого</p>
+                            <p class="text-[#1b0e0e]" id="order-total">$0.00</p>
+                        </div>
+                    </div>
+                    <button id="create-order-btn"
+                        class="flex items-center justify-center rounded-lg h-12 px-5 bg-[#ea2a33] text-white text-base font-bold">
+                        Создать заказ
+                    </button>
+                </div>
+
+                <div class="flex-1 flex flex-col">
+                    <h3 class="text-[#1b0e0e] text-lg font-bold mb-4">Добавить позиции</h3>
+                    <div class="border-b border-[#e7d0d1]">
+                        <div id="menu-tabs-container" class="flex gap-8 px-4"></div>
+                    </div>
+                    <div id="menu-items-container" class="py-4 flex flex-col gap-2"></div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // =======================================================================
+        // 1. СОСТОЯНИЕ ПРИЛОЖЕНИЯ
+        // =======================================================================
+        let menuData = [];
+        let currentOrder = {
+            items: new Map()
+        };
+        let activeCategoryId = null;
+
+        // =======================================================================
+        // 2. DOM-ЭЛЕМЕНТЫ
+        // =======================================================================
+        const menuTabsContainer = document.getElementById('menu-tabs-container');
+        const menuItemsContainer = document.getElementById('menu-items-container');
+        const orderItemsBody = document.getElementById('order-items-table-body');
+        const orderSubtotalEl = document.getElementById('order-subtotal');
+        const orderTotalEl = document.getElementById('order-total');
+        const createOrderBtn = document.getElementById('create-order-btn');
+
+        // =======================================================================
+        // 3. ФУНКЦИИ ОТОБРАЖЕНИЯ (RENDER)
+        // =======================================================================
+
+        function renderTabs() {
+            menuTabsContainer.innerHTML = '';
+            menuData.forEach(category => {
+                const isActive = category.id === activeCategoryId;
+                const tab = document.createElement('a');
+                tab.href = '#';
+                tab.className = `flex flex-col items-center justify-center border-b-[3px] pb-[13px] pt-4 ${isActive ? 'border-b-[#ea2a33] text-[#1b0e0e]' : 'border-b-transparent text-[#994d51]'}`;
+                tab.innerHTML = `<p class="text-sm font-bold">${category.name}</p>`;
+                tab.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    activeCategoryId = category.id;
+                    renderTabs();
+                    renderMenu();
+                });
+                menuTabsContainer.appendChild(tab);
+            });
+        }
+
+        function renderMenu() {
+            menuItemsContainer.innerHTML = '';
+            const activeCategory = menuData.find(c => c.id === activeCategoryId);
+            if (!activeCategory || !activeCategory.dishes) {
+                menuItemsContainer.innerHTML = '<p class="text-gray-500 p-4">В этой категории нет блюд.</p>';
+                return;
+            }
+
+            activeCategory.dishes.forEach(dish => {
+                const menuItem = document.createElement('div');
+                menuItem.className = 'flex items-center gap-4 px-4 min-h-[72px] py-2 justify-between';
+                menuItem.innerHTML = `
+                <div class="flex flex-col justify-center overflow-hidden">
+                    <p class="text-[#1b0e0e] text-base font-medium truncate">${dish.name}</p>
+                    <p class="text-[#994d51] text-sm font-normal truncate">${dish.description || ''}</p>
+                </div>
+                <div class="shrink-0">
+                    <button class="add-dish-btn flex min-w-[84px] cursor-pointer items-center justify-center rounded-lg h-8 px-4 bg-[#f3e7e8] text-[#1b0e0e] text-sm font-medium">
+                        Добавить
+                    </button>
+                </div>
+                `;
+                menuItem.querySelector('.add-dish-btn').addEventListener('click', () => addToOrder(dish));
+                menuItemsContainer.appendChild(menuItem);
+            });
+        }
+
+        function renderCurrentOrder() {
+            orderItemsBody.innerHTML = '';
+            if (currentOrder.items.size === 0) {
+                orderItemsBody.innerHTML = '<tr><td colspan="3" class="text-center text-gray-400 py-8">Заказ пуст</td></tr>';
+                updateTotals();
+                return;
+            }
+
+            currentOrder.items.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = 'border-b border-t-[#e7d0d1]';
+                const itemTotal = item.price * item.quantity;
+                tr.innerHTML = `
+                <td class="py-3 px-2 text-sm">${item.name}</td>
+                <td class="py-3 px-2 text-sm text-center">
+                    <div class="flex items-center justify-center gap-2">
+                        <button class="decrement-btn text-lg font-bold text-red-500">-</button>
+                        <span>${item.quantity}</span>
+                        <button class="increment-btn text-lg font-bold text-green-500">+</button>
+                    </div>
+                </td>
+                <td class="py-3 px-2 text-sm text-right">$${itemTotal.toFixed(2)}</td>
+                `;
+                tr.querySelector('.decrement-btn').addEventListener('click', () => decrementItem(item.dish_id));
+                tr.querySelector('.increment-btn').addEventListener('click', () => incrementItem(item.dish_id));
+                orderItemsBody.appendChild(tr);
+            });
+            updateTotals();
+        }
+
+        function updateTotals() {
+            let subtotal = 0;
+            currentOrder.items.forEach(item => {
+                subtotal += item.price * item.quantity;
+            });
+            orderSubtotalEl.textContent = `$${subtotal.toFixed(2)}`;
+            orderTotalEl.textContent = `$${subtotal.toFixed(2)}`; // Пока без скидок
+        }
+
+        // =======================================================================
+        // 4. ЛОГИКА УПРАВЛЕНИЯ ЗАКАЗОМ
+        // =======================================================================
+
+        function addToOrder(dish) {
+            if (currentOrder.items.has(dish.id)) {
+                incrementItem(dish.id);
+            } else {
+                currentOrder.items.set(dish.id, {
+                    dish_id: dish.id,
+                    name: dish.name,
+                    price: dish.price,
+                    quantity: 1
+                });
+            }
+            renderCurrentOrder();
+        }
+
+        function incrementItem(dishId) {
+            if (currentOrder.items.has(dishId)) {
+                currentOrder.items.get(dishId).quantity++;
+                renderCurrentOrder();
+            }
+        }
+
+        function decrementItem(dishId) {
+            if (currentOrder.items.has(dishId)) {
+                const item = currentOrder.items.get(dishId);
+                item.quantity--;
+                if (item.quantity === 0) {
+                    currentOrder.items.delete(dishId);
+                }
+                renderCurrentOrder();
+            }
+        }
+
+        async function submitOrder() {
+            if (currentOrder.items.size === 0) {
+                alert('Нельзя создать пустой заказ.');
+                return;
+            }
+
+            const payload = {
+                table_id: parseInt(document.getElementById('table-id-input').value),
+                waiter_id: parseInt(document.getElementById('waiter-id-input').value),
+                notes: "",
+                items: Array.from(currentOrder.items.values()).map(item => ({
+                    dish_id: item.dish_id,
+                    qty: item.quantity,
+                    notes: ""
+                }))
+            };
+
+            createOrderBtn.disabled = true;
+            createOrderBtn.textContent = 'Создание...';
+
+            try {
+                const response = await fetch('/api/v1/orders', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    alert('Заказ успешно создан!');
+                    window.location.href = '/static/active-orders.html';
+                } else {
+                    const errorText = await response.text();
+                    alert('Ошибка при создании заказа: ' + errorText);
+                    createOrderBtn.disabled = false;
+                    createOrderBtn.textContent = 'Создать заказ';
+                }
+            } catch (error) {
+                alert('Сетевая ошибка. Не удалось отправить заказ.');
+                console.error(error);
+                createOrderBtn.disabled = false;
+                createOrderBtn.textContent = 'Создать заказ';
+            }
+        }
+
+        createOrderBtn.addEventListener('click', submitOrder);
+
+        // =======================================================================
+        // 5. ИНИЦИАЛИЗАЦИЯ
+        // =======================================================================
+        async function init() {
+            try {
+                const response = await fetch('/api/v1/menu');
+                menuData = await response.json();
+
+                if (menuData && menuData.length > 0) {
+                    activeCategoryId = menuData[0].id;
+                    renderTabs();
+                    renderMenu();
+                } else {
+                    menuItemsContainer.innerHTML = '<p class="text-gray-500 p-4">Меню пусто. Добавьте категории и блюда через API.</p>';
+                }
+                renderCurrentOrder();
+            } catch (error) {
+                console.error("Не удалось загрузить меню:", error);
+                menuItemsContainer.innerHTML = '<p class="text-red-500 p-4">Ошибка загрузки меню. Проверьте, запущен ли сервер.</p>';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+
+</html>

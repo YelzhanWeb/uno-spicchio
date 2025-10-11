@@ -1,62 +1,91 @@
+// file: internal/adapters/postgre/dishes.go
+
 package postgre
 
-import "github.com/YelzhanWeb/uno-spicchio/internal/domain"
+import (
+	"context"
+	"fmt"
 
-// CreateDish - добавить новое блюдо
-func (r *Pool) CreateDish(categoryID int, name, description string, price float64, photoURL string) (int, error) {
-	stmt := `INSERT INTO dishes (category_id, name, description, price, photo_url)
-	         VALUES ($1, $2, $3, $4, $5) RETURNING id`
-	var id int
-	err := r.DB.QueryRow(stmt, categoryID, name, description, price, photoURL).Scan(&id)
-	return id, err
+	"github.com/YelzhanWeb/uno-spicchio/internal/domain"
+	"github.com/jmoiron/sqlx"
+)
+
+// DishRepository - это реализация порта DishRepository для PostgreSQL.
+type DishRepository struct {
+	db *sqlx.DB
 }
 
-// GetDishByID - получить блюдо по id
-func (r *Pool) GetDishByID(id int) (*domain.Dish, error) {
-	stmt := `SELECT id, category_id, name, description, price, photo_url 
-	         FROM dishes WHERE id = $1`
-	row := r.DB.QueryRow(stmt, id)
+// NewDishRepository создает новый экземпляр репозитория для блюд.
+func NewDishRepository(db *sqlx.DB) *DishRepository {
+	return &DishRepository{db: db}
+}
 
+// GetDishByID - получить блюдо по id.
+func (r *DishRepository) GetDishByID(ctx context.Context, id int) (*domain.Dish, error) {
 	var dish domain.Dish
-	err := row.Scan(&dish.ID, &dish.CategoryID, &dish.Name, &dish.Description, &dish.Price, &dish.PhotoURL)
-	if err != nil {
-		return nil, err
+	query := `SELECT id, category_id, name, description, price, photo_url, is_active
+              FROM dishes WHERE id = $1`
+
+	if err := r.db.GetContext(ctx, &dish, query, id); err != nil {
+		return nil, fmt.Errorf("failed to get dish by id %d: %w", id, err)
 	}
 	return &dish, nil
 }
 
-// GetAllDishes - получить все блюда
-func (r *Pool) GetAllDishes() ([]domain.Dish, error) {
-	stmt := `SELECT id, category_id, name, description, price, photo_url FROM dishes`
-	rows, err := r.DB.Query(stmt)
-	if err != nil {
-		return nil, err
+// GetDishesByIDs - получить несколько блюд по списку их ID.
+// Этот метод нужен для проверки цен при создании заказа.
+func (r *DishRepository) GetDishesByIDs(ctx context.Context, ids []int) ([]domain.Dish, error) {
+	if len(ids) == 0 {
+		return []domain.Dish{}, nil
 	}
-	defer rows.Close()
+
+	query, args, err := sqlx.In(`
+		SELECT id, category_id, name, description, price, photo_url, is_active
+		FROM dishes WHERE id IN (?)`, ids)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create IN query for dish ids: %w", err)
+	}
+
+	// sqlx.In возвращает query для конкретной СУБД, нужно его переделать под PostgreSQL.
+	query = r.db.Rebind(query)
 
 	var dishes []domain.Dish
-	for rows.Next() {
-		var d domain.Dish
-		if err := rows.Scan(&d.ID, &d.CategoryID, &d.Name, &d.Description, &d.Price, &d.PhotoURL); err != nil {
-			return nil, err
-		}
-		dishes = append(dishes, d)
+	if err := r.db.SelectContext(ctx, &dishes, query, args...); err != nil {
+		return nil, fmt.Errorf("failed to get dishes by ids: %w", err)
+	}
+
+	return dishes, nil
+}
+
+// GetAllDishes - получить все блюда (оставил ваш код, адаптировав под sqlx)
+func (r *DishRepository) GetAllDishes(ctx context.Context) ([]domain.Dish, error) {
+	var dishes []domain.Dish
+	query := `SELECT id, category_id, name, description, price, photo_url, is_active FROM dishes`
+	if err := r.db.SelectContext(ctx, &dishes, query); err != nil {
+		return nil, fmt.Errorf("failed to get all dishes: %w", err)
 	}
 	return dishes, nil
 }
 
-// UpdateDish - обновить блюдо по id
-func (r *Pool) UpdateDish(id int, categoryID int, name, description string, price float64, photoURL string) error {
-	stmt := `UPDATE dishes 
-	         SET category_id=$1, name=$2, description=$3, price=$4, photo_url=$5 
-	         WHERE id=$6`
-	_, err := r.DB.Exec(stmt, categoryID, name, description, price, photoURL, id)
-	return err
-}
+// Остальные ваши методы (Create, Update, Delete) можно добавить сюда по аналогии.
 
-// DeleteDish - удалить блюдо по id
-func (r *Pool) DeleteDish(id int) error {
-	stmt := `DELETE FROM dishes WHERE id=$1`
-	_, err := r.DB.Exec(stmt, id)
-	return err
+func (r *DishRepository) Create(ctx context.Context, dish domain.Dish) (int, error) {
+	query := `INSERT INTO dishes (category_id, name, description, price, photo_url, is_active)
+	          VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`
+	var id int
+	err := r.db.QueryRowxContext(
+		ctx,
+		query,
+		dish.CategoryID,
+		dish.Name,
+		dish.Description,
+		dish.Price,
+		dish.PhotoURL,
+		dish.IsActive,
+	).Scan(&id)
+
+	if err != nil {
+		return 0, fmt.Errorf("failed to create dish: %w", err)
+	}
+	return id, nil
 }

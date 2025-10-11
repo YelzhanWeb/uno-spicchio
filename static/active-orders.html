@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="" />
+    <link rel="stylesheet" as="style" onload="this.rel='stylesheet'"
+        href="https://fonts.googleapis.com/css2?display=swap&family=Work+Sans%3Awght%40400%3B500%3B700%3B900" />
+    <title>UNO Spicchio - Активные Заказы</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+</head>
+
+<body class="bg-[#fcf8f8]">
+    <div class="relative flex h-auto min-h-screen w-full flex-col"
+        style='font-family: "Work Sans", "Noto Sans", sans-serif;'>
+        <div class="layout-container flex h-full grow flex-col">
+            <header
+                class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#f3e7e8] px-10 py-3">
+                <div class="flex items-center gap-4 text-[#1b0e0e]">
+                    <h2 class="text-[#1b0e0e] text-lg font-bold leading-tight tracking-[-0.015em]">UNO Spicchio</h2>
+                </div>
+
+                <div class="flex items-center gap-4">
+                    <button class="flex items-center justify-center rounded-lg h-10 w-10 hover:bg-[#f3e7e8]">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor"
+                            viewBox="0 0 256 256">
+                            <path
+                                d="M221.8,175.94C216.25,166.38,208,139.33,208,104a80,80,0,1,0-160,0c0,35.34-8.26,62.38-13.81,71.94A16,16,0,0,0,48,200H88.81a40,40,0,0,0,78.38,0H208a16,16,0,0,0,13.8-24.06ZM128,216a24,24,0,0,1-22.62-16h45.24A24,24,0,0,1,128,216ZM48,184c7.7-13.24,16-43.92,16-80a64,64,0,1,1,128,0c0,36.05,8.28,66.73,16,80Z">
+                            </path>
+                        </svg>
+                    </button>
+                    <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-10 w-10"
+                        style='background-image: url("https://i.pravatar.cc/40");'>
+                    </div>
+                </div>
+            </header>
+
+            <main class="flex flex-1 gap-4 p-4 lg:gap-8 lg:p-8">
+
+                <aside class="flex flex-col gap-4 w-full max-w-[280px] p-4 rounded-lg bg-white border border-[#e7d0d1]">
+                    <h1 class="text-[#1b0e0e] text-base font-medium leading-normal">UNO Spicchio</h1>
+                    <div class="flex flex-col gap-2">
+                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#f3e7e8]">
+                            <p class="text-[#1b0e0e] text-sm font-medium leading-normal">Меню</p>
+                        </a>
+                        <a href="/static/active-orders.html"
+                            class="flex items-center gap-3 px-3 py-2 rounded-lg bg-[#f3e7e8]">
+                            <p class="text-[#1b0e0e] text-sm font-medium leading-normal">Заказы</p>
+                        </a>
+                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#f3e7e8]">
+                            <p class="text-[#1b0e0e] text-sm font-medium leading-normal">Столы</p>
+                        </a>
+                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#f3e7e8]">
+                            <p class="text-[#1b0e0e] text-sm font-medium leading-normal">Персонал</p>
+                        </a>
+                    </div>
+                </aside>
+
+                <div class="flex-1 flex flex-col">
+                    <div class="flex flex-wrap justify-between items-center gap-3 p-4">
+                        <div class="flex min-w-72 flex-col gap-3">
+                            <h1 class="text-[#1b0e0e] tracking-light text-[32px] font-bold leading-tight">Активные
+                                заказы</h1>
+                            <p class="text-[#994d51] text-sm font-normal leading-normal">Просмотр всех текущих заказов в
+                                реальном времени</p>
+                        </div>
+                        <a href="/static/create-order.html"
+                            class="flex items-center justify-center rounded-lg h-12 px-5 bg-[#ea2a33] text-white text-base font-bold">
+                            + Новый заказ
+                        </a>
+                    </div>
+
+                    <div class="pb-3">
+                        <div id="tabs" class="flex border-b border-[#e7d0d1] px-4 gap-8">
+                            <a href="#" data-status="all"
+                                class="tab-link flex flex-col items-center justify-center border-b-[3px] border-b-[#ea2a33] text-[#1b0e0e] pb-[13px] pt-4">
+                                <p class="text-sm font-bold">Все заказы</p>
+                            </a>
+                            <a href="#" data-status="in_progress"
+                                class="tab-link flex flex-col items-center justify-center border-b-[3px] border-b-transparent text-[#994d51] pb-[13px] pt-4">
+                                <p class="text-sm font-bold">В процессе</p>
+                            </a>
+                            <a href="#" data-status="ready"
+                                class="tab-link flex flex-col items-center justify-center border-b-[3px] border-b-transparent text-[#994d51] pb-[13px] pt-4">
+                                <p class="text-sm font-bold">Готово</p>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="px-4 py-3">
+                        <div class="flex overflow-hidden rounded-lg border border-[#e7d0d1] bg-white">
+                            <table class="w-full">
+                                <thead class="bg-[#fcf8f8]">
+                                    <tr>
+                                        <th class="p-3 text-left text-sm font-medium text-[#1b0e0e] w-[20%]">Номер
+                                            заказа</th>
+                                        <th class="p-3 text-left text-sm font-medium text-[#1b0e0e] w-[25%]">Статус</th>
+                                        <th class="p-3 text-left text-sm font-medium text-[#1b0e0e] w-[15%]">Время</th>
+                                        <th class="p-3 text-left text-sm font-medium text-[#1b0e0e] w-[40%]">Детали</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="orders-table-body">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // Этот JavaScript-код полностью идентичен тому, что мы настраивали раньше для этой страницы
+        const ordersTableBody = document.getElementById('orders-table-body');
+        const tabsContainer = document.getElementById('tabs');
+        let allOrders = [];
+        let currentFilter = 'all';
+
+        function getStatusInfo(status) {
+            switch (status) {
+                case 'new':
+                    return { text: 'Ожидание', colorClass: 'bg-blue-100 text-blue-800' };
+                case 'in_progress':
+                    return { text: 'В процессе', colorClass: 'bg-yellow-100 text-yellow-800' };
+                case 'ready':
+                    return { text: 'Готово', colorClass: 'bg-green-100 text-green-800' };
+                default:
+                    return { text: status, colorClass: 'bg-gray-100 text-gray-800' };
+            }
+        }
+
+        function renderOrders() {
+            ordersTableBody.innerHTML = '';
+            const filteredOrders = allOrders.filter(order => {
+                if (currentFilter === 'all') return true;
+                return order.status === currentFilter;
+            });
+
+            if (filteredOrders.length === 0) {
+                ordersTableBody.innerHTML = `<tr><td colspan="4" class="text-center p-8 text-gray-500">Нет заказов в этой категории.</td></tr>`;
+                return;
+            }
+
+            filteredOrders.forEach(order => {
+                const tr = document.createElement('tr');
+                tr.className = 'border-t border-t-[#e7d0d1]';
+                const statusInfo = getStatusInfo(order.status);
+                const timeDiff = Math.round((new Date() - new Date(order.created_at)) / 60000);
+                const timeAgo = `${timeDiff} мин`;
+                const details = order.items && order.items.length > 0 ? order.items.map(item => item.dish_name).join(', ') : 'Нет деталей';
+
+                tr.innerHTML = `
+                    <td class="p-3 text-sm font-medium">#${order.id}</td>
+                    <td class="p-3">
+                        <div class="inline-flex items-center justify-center rounded-full h-8 px-4 text-sm font-medium ${statusInfo.colorClass}">
+                            ${statusInfo.text}
+                        </div>
+                    </td>
+                    <td class="p-3 text-sm text-[#994d51]">${timeAgo}</td>
+                    <td class="p-3 text-sm text-[#994d51] truncate">${details}</td>
+                `;
+                ordersTableBody.appendChild(tr);
+            });
+        }
+
+        async function fetchOrders() {
+            try {
+                const response = await fetch('/api/v1/orders');
+                if (!response.ok) {
+                    console.error('Ошибка при загрузке заказов:', response.statusText);
+                    return;
+                }
+                const data = await response.json();
+                allOrders = data || [];
+                renderOrders();
+            } catch (error) {
+                console.error('Не удалось подключиться к серверу:', error);
+                ordersTableBody.innerHTML = `<tr><td colspan="4" class="text-center p-8 text-red-600">Не удалось загрузить данные.</td></tr>`;
+            }
+        }
+
+        tabsContainer.addEventListener('click', (event) => {
+            const clickedTab = event.target.closest('.tab-link');
+            if (!clickedTab) return;
+            event.preventDefault();
+
+            tabsContainer.querySelectorAll('.tab-link').forEach(tab => {
+                tab.classList.remove('border-b-[#ea2a33]', 'text-[#1b0e0e]');
+                tab.classList.add('border-b-transparent', 'text-[#994d51]');
+            });
+
+            clickedTab.classList.add('border-b-[#ea2a33]', 'text-[#1b0e0e]');
+            clickedTab.classList.remove('border-b-transparent', 'text-[#994d51]');
+
+            currentFilter = clickedTab.dataset.status;
+            renderOrders();
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchOrders();
+            setInterval(fetchOrders, 5000);
+        });
+    </script>
+</body>
+
+</html>

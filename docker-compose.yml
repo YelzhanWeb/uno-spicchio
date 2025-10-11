@@ -10,10 +10,11 @@ services:
       POSTGRES_PASSWORD: admin123
       POSTGRES_DB: restaurant_db
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
       - pgdata:/var/lib/postgresql/data
 
 volumes:
   pgdata:
+
