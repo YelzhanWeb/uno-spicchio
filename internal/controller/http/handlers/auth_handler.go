@@ -5,8 +5,8 @@ import (
 	"net/http"
 
 	"github.com/YelzhanWeb/uno-spicchio/internal/controller/http/middleware"
+	"github.com/YelzhanWeb/uno-spicchio/internal/domain"
 	"github.com/YelzhanWeb/uno-spicchio/internal/ports"
-	"github.com/YelzhanWeb/uno-spicchio/internal/usecase"
 	"github.com/YelzhanWeb/uno-spicchio/pkg/response"
 )
 
@@ -37,7 +37,7 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 
 	token, user, err := h.authService.Login(r.Context(), req.Username, req.Password)
 	if err != nil {
-		if err == usecase.ErrInvalidCredentials || err == usecase.ErrUserNotActive {
+		if err == domain.ErrInvalidCredentials || err == domain.ErrUserNotActive {
 			response.Unauthorized(w, err.Error())
 			return
 		}

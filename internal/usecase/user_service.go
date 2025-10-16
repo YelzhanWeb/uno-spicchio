@@ -2,16 +2,10 @@ package usecase
 
 import (
 	"context"
-	"errors"
 
 	"github.com/YelzhanWeb/uno-spicchio/internal/domain"
 	"github.com/YelzhanWeb/uno-spicchio/internal/ports"
 	"github.com/YelzhanWeb/uno-spicchio/pkg/hash"
-)
-
-var (
-	ErrUserExists   = errors.New("user already exists")
-	ErrUserNotFound = errors.New("user not found")
 )
 
 type UserService struct {
@@ -28,7 +22,7 @@ func (s *UserService) Create(ctx context.Context, user *domain.User, password st
 		return err
 	}
 	if existing != nil {
-		return ErrUserExists
+		return domain.ErrUserExists
 	}
 
 	passwordHash, err := hash.Hash(password)
@@ -52,7 +46,7 @@ func (s *UserService) GetByID(ctx context.Context, id int) (*domain.User, error)
 		return nil, err
 	}
 	if user == nil {
-		return nil, ErrUserNotFound
+		return nil, domain.ErrUserNotFound
 	}
 	return user, nil
 }
@@ -63,7 +57,7 @@ func (s *UserService) Update(ctx context.Context, user *domain.User) error {
 		return err
 	}
 	if existing == nil {
-		return ErrUserNotFound
+		return domain.ErrUserNotFound
 	}
 
 	return s.userRepo.Update(ctx, user)
@@ -75,7 +69,7 @@ func (s *UserService) UpdatePassword(ctx context.Context, userID int, newPasswor
 		return err
 	}
 	if user == nil {
-		return ErrUserNotFound
+		return domain.ErrUserNotFound
 	}
 
 	passwordHash, err := hash.Hash(newPassword)
@@ -93,7 +87,7 @@ func (s *UserService) Delete(ctx context.Context, id int) error {
 		return err
 	}
 	if user == nil {
-		return ErrUserNotFound
+		return domain.ErrUserNotFound
 	}
 
 	return s.userRepo.Delete(ctx, id)

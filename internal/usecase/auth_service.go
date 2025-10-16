@@ -2,17 +2,11 @@ package usecase
 
 import (
 	"context"
-	"errors"
 
 	"github.com/YelzhanWeb/uno-spicchio/internal/domain"
 	"github.com/YelzhanWeb/uno-spicchio/internal/ports"
 	"github.com/YelzhanWeb/uno-spicchio/pkg/hash"
 	"github.com/YelzhanWeb/uno-spicchio/pkg/jwt"
-)
-
-var (
-	ErrInvalidCredentials = errors.New("invalid credentials")
-	ErrUserNotActive      = errors.New("user is not active")
 )
 
 type AuthService struct {
@@ -34,11 +28,11 @@ func (s *AuthService) Login(ctx context.Context, username, password string) (str
 	}
 
 	if user == nil || !hash.Verify(password, user.PasswordHash) {
-		return "", nil, ErrInvalidCredentials
+		return "", nil, domain.ErrInvalidCredentials
 	}
 
 	if !user.IsActive {
-		return "", nil, ErrUserNotActive
+		return "", nil, domain.ErrUserNotActive
 	}
 
 	token, err := s.tokenManager.Generate(user.ID, user.Username, user.Role)

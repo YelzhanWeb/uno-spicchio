@@ -2,13 +2,10 @@ package usecase
 
 import (
 	"context"
-	"errors"
 
 	"github.com/YelzhanWeb/uno-spicchio/internal/domain"
 	"github.com/YelzhanWeb/uno-spicchio/internal/ports"
 )
-
-var ErrCategoryNotFound = errors.New("category not found")
 
 type CategoryService struct {
 	categoryRepo ports.CategoryRepository
@@ -28,7 +25,7 @@ func (s *CategoryService) GetByID(ctx context.Context, id int) (*domain.Category
 		return nil, err
 	}
 	if category == nil {
-		return nil, ErrCategoryNotFound
+		return nil, domain.ErrCategoryNotFound
 	}
 	return category, nil
 }
@@ -43,7 +40,7 @@ func (s *CategoryService) Update(ctx context.Context, category *domain.Category)
 		return err
 	}
 	if existing == nil {
-		return ErrCategoryNotFound
+		return domain.ErrCategoryNotFound
 	}
 	return s.categoryRepo.Update(ctx, category)
 }
@@ -54,7 +51,7 @@ func (s *CategoryService) Delete(ctx context.Context, id int) error {
 		return err
 	}
 	if existing == nil {
-		return ErrCategoryNotFound
+		return domain.ErrCategoryNotFound
 	}
 	return s.categoryRepo.Delete(ctx, id)
 }

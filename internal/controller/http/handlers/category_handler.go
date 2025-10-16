@@ -8,7 +8,6 @@ import (
 
 	"github.com/YelzhanWeb/uno-spicchio/internal/domain"
 	"github.com/YelzhanWeb/uno-spicchio/internal/ports"
-	"github.com/YelzhanWeb/uno-spicchio/internal/usecase"
 	"github.com/YelzhanWeb/uno-spicchio/pkg/response"
 	"github.com/go-chi/chi/v5"
 )
@@ -41,7 +40,7 @@ func (h *CategoryHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 
 	category, err := h.categoryService.GetByID(r.Context(), id)
 	if err != nil {
-		if err == usecase.ErrCategoryNotFound {
+		if err == domain.ErrCategoryNotFound {
 			response.NotFound(w, "category not found")
 			return
 		}
@@ -83,7 +82,7 @@ func (h *CategoryHandler) Update(w http.ResponseWriter, r *http.Request) {
 
 	category.ID = id
 	if err := h.categoryService.Update(r.Context(), &category); err != nil {
-		if err == usecase.ErrCategoryNotFound {
+		if err == domain.ErrCategoryNotFound {
 			response.NotFound(w, "category not found")
 			return
 		}
@@ -103,7 +102,7 @@ func (h *CategoryHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := h.categoryService.Delete(r.Context(), id); err != nil {
-		if err == usecase.ErrCategoryNotFound {
+		if err == domain.ErrCategoryNotFound {
 			response.NotFound(w, "category not found")
 			return
 		}

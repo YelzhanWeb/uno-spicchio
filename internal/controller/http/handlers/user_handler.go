@@ -8,7 +8,6 @@ import (
 
 	"github.com/YelzhanWeb/uno-spicchio/internal/domain"
 	"github.com/YelzhanWeb/uno-spicchio/internal/ports"
-	"github.com/YelzhanWeb/uno-spicchio/internal/usecase"
 	"github.com/YelzhanWeb/uno-spicchio/pkg/response"
 	"github.com/go-chi/chi/v5"
 )
@@ -48,7 +47,7 @@ func (h *UserHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 
 	user, err := h.userService.GetByID(r.Context(), id)
 	if err != nil {
-		if err == usecase.ErrUserNotFound {
+		if err == domain.ErrUserNotFound {
 			response.NotFound(w, "user not found")
 			return
 		}
@@ -73,7 +72,7 @@ func (h *UserHandler) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := h.userService.Create(r.Context(), user, req.Password); err != nil {
-		if err == usecase.ErrUserExists {
+		if err == domain.ErrUserExists {
 			response.BadRequest(w, "user already exists")
 			return
 		}
@@ -100,7 +99,7 @@ func (h *UserHandler) Update(w http.ResponseWriter, r *http.Request) {
 
 	user.ID = id
 	if err := h.userService.Update(r.Context(), &user); err != nil {
-		if err == usecase.ErrUserNotFound {
+		if err == domain.ErrUserNotFound {
 			response.NotFound(w, "user not found")
 			return
 		}
@@ -120,7 +119,7 @@ func (h *UserHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := h.userService.Delete(r.Context(), id); err != nil {
-		if err == usecase.ErrUserNotFound {
+		if err == domain.ErrUserNotFound {
 			response.NotFound(w, "user not found")
 			return
 		}

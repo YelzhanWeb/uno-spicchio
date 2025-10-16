@@ -3,13 +3,10 @@ package usecase
 
 import (
 	"context"
-	"errors"
 
 	"github.com/YelzhanWeb/uno-spicchio/internal/domain"
 	"github.com/YelzhanWeb/uno-spicchio/internal/ports"
 )
-
-var ErrDishNotFound = errors.New("dish not found")
 
 type DishService struct {
 	dishRepo ports.DishRepository
@@ -29,7 +26,7 @@ func (s *DishService) GetByID(ctx context.Context, id int) (*domain.Dish, error)
 		return nil, err
 	}
 	if dish == nil {
-		return nil, ErrDishNotFound
+		return nil, domain.ErrDishNotFound
 	}
 	return dish, nil
 }
@@ -49,7 +46,7 @@ func (s *DishService) Update(ctx context.Context, dish *domain.Dish) error {
 		return err
 	}
 	if existing == nil {
-		return ErrDishNotFound
+		return domain.ErrDishNotFound
 	}
 
 	return s.dishRepo.Update(ctx, dish)

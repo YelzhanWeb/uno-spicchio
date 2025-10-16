@@ -8,7 +8,6 @@ import (
 
 	"github.com/YelzhanWeb/uno-spicchio/internal/domain"
 	"github.com/YelzhanWeb/uno-spicchio/internal/ports"
-	"github.com/YelzhanWeb/uno-spicchio/internal/usecase"
 	"github.com/YelzhanWeb/uno-spicchio/pkg/response"
 	"github.com/go-chi/chi/v5"
 )
@@ -43,7 +42,7 @@ func (h *DishHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 
 	dish, err := h.dishService.GetByID(r.Context(), id)
 	if err != nil {
-		if err == usecase.ErrDishNotFound {
+		if err == domain.ErrDishNotFound {
 			response.NotFound(w, "dish not found")
 			return
 		}
@@ -85,7 +84,7 @@ func (h *DishHandler) Update(w http.ResponseWriter, r *http.Request) {
 
 	dish.ID = id
 	if err := h.dishService.Update(r.Context(), &dish); err != nil {
-		if err == usecase.ErrDishNotFound {
+		if err == domain.ErrDishNotFound {
 			response.NotFound(w, "dish not found")
 			return
 		}

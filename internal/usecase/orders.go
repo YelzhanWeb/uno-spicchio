@@ -2,16 +2,9 @@ package usecase
 
 import (
 	"context"
-	"errors"
 
 	"github.com/YelzhanWeb/uno-spicchio/internal/domain"
 	"github.com/YelzhanWeb/uno-spicchio/internal/ports"
-)
-
-var (
-	ErrOrderNotFound       = errors.New("order not found")
-	ErrInsufficientStock   = errors.New("insufficient stock for ingredient")
-	ErrInvalidStatusChange = errors.New("invalid status change")
 )
 
 type OrderService struct {
@@ -51,7 +44,7 @@ func (s *OrderService) Create(ctx context.Context, order *domain.Order, items []
 			}
 
 			if ingredient.Qty < needed {
-				return ErrInsufficientStock
+				return domain.ErrInsufficientStock
 			}
 		}
 	}
@@ -104,7 +97,7 @@ func (s *OrderService) GetByID(ctx context.Context, id int) (*domain.Order, erro
 		return nil, err
 	}
 	if order == nil {
-		return nil, ErrOrderNotFound
+		return nil, domain.ErrOrderNotFound
 	}
 
 	items, err := s.orderRepo.GetItems(ctx, id)
@@ -126,7 +119,7 @@ func (s *OrderService) UpdateStatus(ctx context.Context, id int, newStatus domai
 		return err
 	}
 	if order == nil {
-		return ErrOrderNotFound
+		return domain.ErrOrderNotFound
 	}
 
 	// Validate status transitions
@@ -145,7 +138,7 @@ func (s *OrderService) UpdateStatus(ctx context.Context, id int, newStatus domai
 	}
 
 	if !valid && newStatus != order.Status {
-		return ErrInvalidStatusChange
+		return domain.ErrInvalidStatusChange
 	}
 
 	return s.orderRepo.UpdateStatus(ctx, id, newStatus)
@@ -157,7 +150,7 @@ func (s *OrderService) CloseOrder(ctx context.Context, id int) error {
 		return err
 	}
 	if order == nil {
-		return ErrOrderNotFound
+		return domain.ErrOrderNotFound
 	}
 
 	// Update order status to paid

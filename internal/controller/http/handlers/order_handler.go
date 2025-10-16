@@ -9,7 +9,6 @@ import (
 	"github.com/YelzhanWeb/uno-spicchio/internal/controller/http/middleware"
 	"github.com/YelzhanWeb/uno-spicchio/internal/domain"
 	"github.com/YelzhanWeb/uno-spicchio/internal/ports"
-	"github.com/YelzhanWeb/uno-spicchio/internal/usecase"
 	"github.com/YelzhanWeb/uno-spicchio/pkg/response"
 	"github.com/go-chi/chi/v5"
 )
@@ -61,7 +60,7 @@ func (h *OrderHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 
 	order, err := h.orderService.GetByID(r.Context(), id)
 	if err != nil {
-		if err == usecase.ErrOrderNotFound {
+		if err == domain.ErrOrderNotFound {
 			response.NotFound(w, "order not found")
 			return
 		}
@@ -101,7 +100,7 @@ func (h *OrderHandler) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := h.orderService.Create(r.Context(), order, items); err != nil {
-		if err == usecase.ErrInsufficientStock {
+		if err == domain.ErrInsufficientStock {
 			response.BadRequest(w, "insufficient stock for order")
 			return
 		}
@@ -129,11 +128,11 @@ func (h *OrderHandler) UpdateStatus(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := h.orderService.UpdateStatus(r.Context(), id, req.Status); err != nil {
-		if err == usecase.ErrOrderNotFound {
+		if err == domain.ErrOrderNotFound {
 			response.NotFound(w, "order not found")
 			return
 		}
-		if err == usecase.ErrInvalidStatusChange {
+		if err == domain.ErrInvalidStatusChange {
 			response.BadRequest(w, "invalid status change")
 			return
 		}
@@ -153,7 +152,7 @@ func (h *OrderHandler) CloseOrder(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := h.orderService.CloseOrder(r.Context(), id); err != nil {
-		if err == usecase.ErrOrderNotFound {
+		if err == domain.ErrOrderNotFound {
 			response.NotFound(w, "order not found")
 			return
 		}
