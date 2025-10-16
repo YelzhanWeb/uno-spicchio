@@ -1,79 +1,101 @@
-// file: internal/adapters/postgre/inventory.go
-
 package postgre
 
 import (
 	"context"
-	"fmt"
+	"database/sql"
 
 	"github.com/YelzhanWeb/uno-spicchio/internal/domain"
-	"github.com/jmoiron/sqlx"
 )
 
-// IngredientRepository - это реализация репозитория для ингредиентов.
 type IngredientRepository struct {
-	db *sqlx.DB
+	db *sql.DB
 }
 
-// NewIngredientRepository создает новый экземпляр репозитория.
-func NewIngredientRepository(db *sqlx.DB) *IngredientRepository {
+func NewIngredientRepository(db *sql.DB) *IngredientRepository {
 	return &IngredientRepository{db: db}
 }
 
-// CreateIngredient - добавление нового ингредиента
-func (r *IngredientRepository) CreateIngredient(ctx context.Context, ingredient domain.Ingredient) (int, error) {
-	query := `INSERT INTO ingredients (name, unit, qty, min_qty)
-	          VALUES ($1, $2, $3, $4) RETURNING id`
-	var id int
-	err := r.db.QueryRowxContext(ctx, query, ingredient.Name, ingredient.Unit, ingredient.Qty, ingredient.MinQty).Scan(&id)
+func (r *IngredientRepository) GetAll(ctx context.Context) ([]domain.Ingredient, error) {
+	query := `SELECT id, name, unit, qty, min_qty FROM ingredients ORDER BY name`
+
+	rows, err := r.db.QueryContext(ctx, query)
 	if err != nil {
-		return 0, fmt.Errorf("failed to create ingredient: %w", err)
+		return nil, err
 	}
-	return id, nil
+	defer rows.Close()
+
+	var ingredients []domain.Ingredient
+	for rows.Next() {
+		var ing domain.Ingredient
+		if err := rows.Scan(&ing.ID, &ing.Name, &ing.Unit, &ing.Qty, &ing.MinQty); err != nil {
+			return nil, err
+		}
+		ingredients = append(ingredients, ing)
+	}
+
+	return ingredients, rows.Err()
 }
 
-// GetIngredientByID - получить ингредиент по id
-func (r *IngredientRepository) GetIngredientByID(ctx context.Context, id int) (*domain.Ingredient, error) {
-	var ingredient domain.Ingredient
+func (r *IngredientRepository) GetByID(ctx context.Context, id int) (*domain.Ingredient, error) {
 	query := `SELECT id, name, unit, qty, min_qty FROM ingredients WHERE id = $1`
 
-	err := r.db.GetContext(ctx, &ingredient, query, id)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get ingredient by id %d: %w", id, err)
+	ing := &domain.Ingredient{}
+	err := r.db.QueryRowContext(ctx, query, id).Scan(&ing.ID, &ing.Name, &ing.Unit, &ing.Qty, &ing.MinQty)
+
+	if err == sql.ErrNoRows {
+		return nil, nil
 	}
-	return &ingredient, nil
+	return ing, err
 }
 
-// GetAllIngredients - получить все ингредиенты
-func (r *IngredientRepository) GetAllIngredients(ctx context.Context) ([]domain.Ingredient, error) {
+func (r *IngredientRepository) GetLowStock(ctx context.Context) ([]domain.Ingredient, error) {
+	query := `SELECT id, name, unit, qty, min_qty FROM ingredients WHERE qty <= min_qty ORDER BY name`
+
+	rows, err := r.db.QueryContext(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
 	var ingredients []domain.Ingredient
-	query := `SELECT id, name, unit, qty, min_qty FROM ingredients`
-
-	err := r.db.SelectContext(ctx, &ingredients, query)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get all ingredients: %w", err)
+	for rows.Next() {
+		var ing domain.Ingredient
+		if err := rows.Scan(&ing.ID, &ing.Name, &ing.Unit, &ing.Qty, &ing.MinQty); err != nil {
+			return nil, err
+		}
+		ingredients = append(ingredients, ing)
 	}
-	return ingredients, nil
+
+	return ingredients, rows.Err()
 }
 
-// UpdateIngredient - обновить ингредиент
-func (r *IngredientRepository) UpdateIngredient(ctx context.Context, ingredient domain.Ingredient) error {
-	query := `UPDATE ingredients
-	          SET name=$1, unit=$2, qty=$3, min_qty=$4
-	          WHERE id=$5`
-	_, err := r.db.ExecContext(ctx, query, ingredient.Name, ingredient.Unit, ingredient.Qty, ingredient.MinQty, ingredient.ID)
-	if err != nil {
-		return fmt.Errorf("failed to update ingredient with id %d: %w", ingredient.ID, err)
-	}
-	return nil
+func (r *IngredientRepository) Create(ctx context.Context, ing *domain.Ingredient) error {
+	query := `
+		INSERT INTO ingredients (name, unit, qty, min_qty)
+		VALUES ($1, $2, $3, $4)
+		RETURNING id`
+
+	return r.db.QueryRowContext(ctx, query, ing.Name, ing.Unit, ing.Qty, ing.MinQty).Scan(&ing.ID)
 }
 
-// DeleteIngredient - удалить ингредиент по id
-func (r *IngredientRepository) DeleteIngredient(ctx context.Context, id int) error {
-	query := `DELETE FROM ingredients WHERE id=$1`
+func (r *IngredientRepository) Update(ctx context.Context, ing *domain.Ingredient) error {
+	query := `
+		UPDATE ingredients 
+		SET name = $1, unit = $2, qty = $3, min_qty = $4
+		WHERE id = $5`
+
+	_, err := r.db.ExecContext(ctx, query, ing.Name, ing.Unit, ing.Qty, ing.MinQty, ing.ID)
+	return err
+}
+
+func (r *IngredientRepository) UpdateQuantity(ctx context.Context, id int, qty float64) error {
+	query := `UPDATE ingredients SET qty = qty + $1 WHERE id = $2`
+	_, err := r.db.ExecContext(ctx, query, qty, id)
+	return err
+}
+
+func (r *IngredientRepository) Delete(ctx context.Context, id int) error {
+	query := `DELETE FROM ingredients WHERE id = $1`
 	_, err := r.db.ExecContext(ctx, query, id)
-	if err != nil {
-		return fmt.Errorf("failed to delete ingredient with id %d: %w", id, err)
-	}
-	return nil
+	return err
 }

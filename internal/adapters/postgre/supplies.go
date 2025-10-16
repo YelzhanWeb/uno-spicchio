@@ -1,75 +1,124 @@
-// file: internal/adapters/postgre/supplies.go
-
 package postgre
 
 import (
 	"context"
-	"fmt"
+	"database/sql"
 
 	"github.com/YelzhanWeb/uno-spicchio/internal/domain"
-	"github.com/jmoiron/sqlx"
 )
 
-// SupplyRepository - это реализация репозитория для поставок.
 type SupplyRepository struct {
-	db *sqlx.DB
+	db *sql.DB
 }
 
-// NewSupplyRepository создает новый экземпляр репозитория.
-func NewSupplyRepository(db *sqlx.DB) *SupplyRepository {
+func NewSupplyRepository(db *sql.DB) *SupplyRepository {
 	return &SupplyRepository{db: db}
 }
 
-// AddSupply - добавить поставку и обновить склад в рамках одной транзакции.
-func (r *SupplyRepository) AddSupply(ctx context.Context, supply domain.Supply) (int, error) {
-	tx, err := r.db.BeginTxx(ctx, nil)
+func (r *SupplyRepository) Create(ctx context.Context, supply *domain.Supply) error {
+	tx, err := r.db.BeginTx(ctx, nil)
 	if err != nil {
-		return 0, fmt.Errorf("failed to begin transaction: %w", err)
+		return err
 	}
-	defer tx.Rollback() // Безопасный откат в случае любой ошибки
+	defer tx.Rollback()
 
-	// 1. Создаем запись о поставке
-	var supplyID int
-	stmtSupply := `INSERT INTO supplies (ingredient_id, qty, supplier_name)
-	               VALUES ($1, $2, $3) RETURNING id`
-	err = tx.QueryRowxContext(ctx, stmtSupply, supply.IngredientID, supply.Qty, supply.SupplierName).Scan(&supplyID)
-	if err != nil {
-		return 0, fmt.Errorf("failed to create supply record: %w", err)
-	}
+	// Insert supply
+	query := `
+		INSERT INTO supplies (ingredient_id, qty, supplier_name)
+		VALUES ($1, $2, $3)
+		RETURNING id, created_at`
 
-	// 2. Обновляем количество на складе
-	stmtIngredient := `UPDATE ingredients SET qty = qty + $1 WHERE id=$2`
-	_, err = tx.ExecContext(ctx, stmtIngredient, supply.Qty, supply.IngredientID)
+	err = tx.QueryRowContext(ctx, query,
+		supply.IngredientID, supply.Qty, supply.SupplierName,
+	).Scan(&supply.ID, &supply.CreatedAt)
 	if err != nil {
-		return 0, fmt.Errorf("failed to update ingredient stock: %w", err)
+		return err
 	}
 
-	// Если все успешно, коммитим транзакцию
-	return supplyID, tx.Commit()
+	// Update ingredient quantity
+	updateQuery := `UPDATE ingredients SET qty = qty + $1 WHERE id = $2`
+	_, err = tx.ExecContext(ctx, updateQuery, supply.Qty, supply.IngredientID)
+	if err != nil {
+		return err
+	}
+
+	return tx.Commit()
 }
 
-// GetSupplyByID - получить поставку по id
-func (r *SupplyRepository) GetSupplyByID(ctx context.Context, id int) (*domain.Supply, error) {
-	var s domain.Supply
-	query := `SELECT id, ingredient_id, qty, supplier_name, created_at FROM supplies WHERE id=$1`
-	err := r.db.GetContext(ctx, &s, query, id)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get supply by id %d: %w", id, err)
-	}
-	return &s, nil
-}
+func (r *SupplyRepository) GetAll(ctx context.Context) ([]domain.Supply, error) {
+	query := `
+		SELECT s.id, s.ingredient_id, s.qty, s.supplier_name, s.created_at,
+		       i.name, i.unit
+		FROM supplies s
+		JOIN ingredients i ON s.ingredient_id = i.id
+		ORDER BY s.created_at DESC`
 
-// GetAllSupplies - получить все поставки
-func (r *SupplyRepository) GetAllSupplies(ctx context.Context) ([]domain.Supply, error) {
+	rows, err := r.db.QueryContext(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
 	var supplies []domain.Supply
-	query := `SELECT id, ingredient_id, qty, supplier_name, created_at
-	          FROM supplies ORDER BY created_at DESC`
-	err := r.db.SelectContext(ctx, &supplies, query)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get all supplies: %w", err)
+	for rows.Next() {
+		var supply domain.Supply
+		supply.Ingredient = &domain.Ingredient{}
+
+		if err := rows.Scan(
+			&supply.ID, &supply.IngredientID, &supply.Qty, &supply.SupplierName, &supply.CreatedAt,
+			&supply.Ingredient.Name, &supply.Ingredient.Unit,
+		); err != nil {
+			return nil, err
+		}
+		supplies = append(supplies, supply)
 	}
-	return supplies, nil
+
+	return supplies, rows.Err()
 }
 
-// Функции UpdateSupply и DeleteSupply также должны быть здесь, переписанные под sqlx.
-// Пока оставим их, чтобы не усложнять. Главное, что ошибка компиляции исчезнет.
+func (r *SupplyRepository) GetByID(ctx context.Context, id int) (*domain.Supply, error) {
+	query := `
+		SELECT s.id, s.ingredient_id, s.qty, s.supplier_name, s.created_at,
+		       i.name, i.unit
+		FROM supplies s
+		JOIN ingredients i ON s.ingredient_id = i.id
+		WHERE s.id = $1`
+
+	supply := &domain.Supply{Ingredient: &domain.Ingredient{}}
+	err := r.db.QueryRowContext(ctx, query, id).Scan(
+		&supply.ID, &supply.IngredientID, &supply.Qty, &supply.SupplierName, &supply.CreatedAt,
+		&supply.Ingredient.Name, &supply.Ingredient.Unit,
+	)
+
+	if err == sql.ErrNoRows {
+		return nil, nil
+	}
+	return supply, err
+}
+
+func (r *SupplyRepository) GetByIngredientID(ctx context.Context, ingredientID int) ([]domain.Supply, error) {
+	query := `
+		SELECT id, ingredient_id, qty, supplier_name, created_at
+		FROM supplies
+		WHERE ingredient_id = $1
+		ORDER BY created_at DESC`
+
+	rows, err := r.db.QueryContext(ctx, query, ingredientID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var supplies []domain.Supply
+	for rows.Next() {
+		var supply domain.Supply
+		if err := rows.Scan(
+			&supply.ID, &supply.IngredientID, &supply.Qty, &supply.SupplierName, &supply.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		supplies = append(supplies, supply)
+	}
+
+	return supplies, rows.Err()
+}

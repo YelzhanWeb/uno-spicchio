@@ -1,153 +1,181 @@
-// file: internal/adapters/postgre/orders.go
-
 package postgre
 
 import (
 	"context"
-	"fmt"
+	"database/sql"
+	"time"
 
 	"github.com/YelzhanWeb/uno-spicchio/internal/domain"
-	"github.com/jmoiron/sqlx"
 )
 
-// OrderRepository - это реализация порта OrderRepository для PostgreSQL.
 type OrderRepository struct {
-	db *sqlx.DB
+	db *sql.DB
 }
 
-// NewOrderRepository создает новый экземпляр репозитория для заказов.
-func NewOrderRepository(db *sqlx.DB) *OrderRepository {
+func NewOrderRepository(db *sql.DB) *OrderRepository {
 	return &OrderRepository{db: db}
 }
 
-// Create создает новую запись заказа и все его позиции в рамках одной транзакции.
-func (r *OrderRepository) Create(ctx context.Context, order domain.Order) (int, error) {
-	// Начинаем транзакцию
-	tx, err := r.db.BeginTxx(ctx, nil)
-	if err != nil {
-		return 0, fmt.Errorf("failed to begin transaction: %w", err)
-	}
-	// Используем defer для отката транзакции в случае любой ошибки.
-	// Если мы успешно выполним Commit в конце, Rollback не будет иметь эффекта.
-	defer tx.Rollback()
+func (r *OrderRepository) Create(ctx context.Context, order *domain.Order) error {
+	query := `
+		INSERT INTO orders (waiter_id, table_number, status, total, notes)
+		VALUES ($1, $2, $3, $4, $5)
+		RETURNING id, created_at, updated_at`
 
-	// 1. Создаем основную запись в таблице 'orders'
-	// Обратите внимание, что мы не вставляем total, так как он должен быть рассчитан.
-	// Статус по умолчанию будет 'new' согласно схеме БД.
-	createOrderQuery := `
-		INSERT INTO orders (waiter_id, table_number, notes, total)
-		VALUES ($1, $2, $3, $4)
-		RETURNING id
-	`
-	var orderID int
-	err = tx.QueryRowxContext(
-		ctx,
-		createOrderQuery,
-		order.WaiterID,
-		order.TableID,
-		order.Notes,
-		order.Total, // total должен быть рассчитан на слое usecase
-	).Scan(&orderID)
-	if err != nil {
-		return 0, fmt.Errorf("failed to create order record: %w", err)
+	return r.db.QueryRowContext(ctx, query,
+		order.WaiterID, order.TableNumber, order.Status, order.Total, order.Notes,
+	).Scan(&order.ID, &order.CreatedAt, &order.UpdatedAt)
+}
+
+func (r *OrderRepository) GetByID(ctx context.Context, id int) (*domain.Order, error) {
+	query := `
+		SELECT o.id, o.waiter_id, o.table_number, o.status, o.total, o.notes, o.created_at, o.updated_at,
+		       u.id, u.username, u.role, u.photo_key, u.is_active, u.created_at,
+		       t.id, t.name, t.status
+		FROM orders o
+		LEFT JOIN users u ON o.waiter_id = u.id
+		LEFT JOIN tables t ON o.table_number = t.id
+		WHERE o.id = $1`
+
+	order := &domain.Order{
+		Waiter: &domain.User{},
+		Table:  &domain.Table{},
 	}
 
-	// 2. Создаем записи для каждой позиции заказа в 'order_items'
-	createItemQuery := `
+	err := r.db.QueryRowContext(ctx, query, id).Scan(
+		&order.ID, &order.WaiterID, &order.TableNumber, &order.Status, &order.Total, &order.Notes,
+		&order.CreatedAt, &order.UpdatedAt,
+		&order.Waiter.ID, &order.Waiter.Username, &order.Waiter.Role, &order.Waiter.PhotoKey,
+		&order.Waiter.IsActive, &order.Waiter.CreatedAt,
+		&order.Table.ID, &order.Table.Name, &order.Table.Status,
+	)
+
+	if err == sql.ErrNoRows {
+		return nil, nil
+	}
+	return order, err
+}
+
+func (r *OrderRepository) GetAll(ctx context.Context, status *domain.OrderStatus) ([]domain.Order, error) {
+	query := `
+		SELECT o.id, o.waiter_id, o.table_number, o.status, o.total, o.notes, o.created_at, o.updated_at,
+		       u.username, t.name
+		FROM orders o
+		LEFT JOIN users u ON o.waiter_id = u.id
+		LEFT JOIN tables t ON o.table_number = t.id`
+
+	args := []interface{}{}
+	if status != nil {
+		query += ` WHERE o.status = $1`
+		args = append(args, *status)
+	}
+	query += ` ORDER BY o.created_at DESC`
+
+	rows, err := r.db.QueryContext(ctx, query, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var orders []domain.Order
+	for rows.Next() {
+		var order domain.Order
+		var waiterUsername, tableName string
+
+		if err := rows.Scan(
+			&order.ID, &order.WaiterID, &order.TableNumber, &order.Status, &order.Total,
+			&order.Notes, &order.CreatedAt, &order.UpdatedAt,
+			&waiterUsername, &tableName,
+		); err != nil {
+			return nil, err
+		}
+
+		order.Waiter = &domain.User{Username: waiterUsername}
+		order.Table = &domain.Table{Name: tableName}
+		orders = append(orders, order)
+	}
+
+	return orders, rows.Err()
+}
+
+func (r *OrderRepository) UpdateStatus(ctx context.Context, id int, status domain.OrderStatus) error {
+	query := `UPDATE orders SET status = $1, updated_at = $2 WHERE id = $3`
+	_, err := r.db.ExecContext(ctx, query, status, time.Now(), id)
+	return err
+}
+
+func (r *OrderRepository) Update(ctx context.Context, order *domain.Order) error {
+	query := `
+		UPDATE orders 
+		SET waiter_id = $1, table_number = $2, status = $3, total = $4, notes = $5, updated_at = $6
+		WHERE id = $7`
+
+	_, err := r.db.ExecContext(ctx, query,
+		order.WaiterID, order.TableNumber, order.Status, order.Total, order.Notes, time.Now(), order.ID,
+	)
+	return err
+}
+
+func (r *OrderRepository) Delete(ctx context.Context, id int) error {
+	query := `DELETE FROM orders WHERE id = $1`
+	_, err := r.db.ExecContext(ctx, query, id)
+	return err
+}
+
+func (r *OrderRepository) AddItem(ctx context.Context, item *domain.OrderItem) error {
+	query := `
 		INSERT INTO order_items (order_id, dish_id, qty, price, notes)
 		VALUES ($1, $2, $3, $4, $5)
-	`
-	for _, item := range order.Items {
-		_, err := tx.ExecContext(
-			ctx,
-			createItemQuery,
-			orderID, // Используем ID, полученный на предыдущем шаге
-			item.DishID,
-			item.Qty,
-			item.Price, // Цена должна быть установлена на слое usecase
-			item.Notes,
-		)
-		if err != nil {
-			return 0, fmt.Errorf("failed to create order item for dish %d: %w", item.DishID, err)
-		}
-	}
+		RETURNING id`
 
-	// Если все прошло без ошибок, подтверждаем транзакцию
-	if err := tx.Commit(); err != nil {
-		return 0, fmt.Errorf("failed to commit transaction: %w", err)
-	}
-
-	return orderID, nil
+	return r.db.QueryRowContext(ctx, query,
+		item.OrderID, item.DishID, item.Qty, item.Price, item.Notes,
+	).Scan(&item.ID)
 }
-func (r *OrderRepository) GetActiveWithItems(ctx context.Context) ([]domain.Order, error) {
-	// 1. Сначала получаем все активные заказы (все, кроме оплаченных)
-	var orders []domain.Order
-	queryOrders := `SELECT * FROM orders WHERE status != 'paid' ORDER BY created_at ASC`
-	if err := r.db.SelectContext(ctx, &orders, queryOrders); err != nil {
-		return nil, fmt.Errorf("failed to get active orders: %w", err)
-	}
 
-	// Если активных заказов нет, возвращаем пустой срез
-	if len(orders) == 0 {
-		return []domain.Order{}, nil
-	}
-
-	// 2. Собираем ID всех найденных заказов
-	orderIDs := make([]int, len(orders))
-	for i, order := range orders {
-		orderIDs[i] = order.ID
-	}
-
-	// 3. Одним запросом получаем ВСЕ позиции для ВСЕХ найденных заказов,
-	//    сразу объединяя с таблицей блюд, чтобы получить их названия.
-	var items []domain.OrderItem
-	queryItems, args, err := sqlx.In(`
-		SELECT oi.*, d.name as dish_name 
+func (r *OrderRepository) GetItems(ctx context.Context, orderID int) ([]domain.OrderItem, error) {
+	query := `
+		SELECT oi.id, oi.order_id, oi.dish_id, oi.qty, oi.price, oi.notes,
+		       d.name, d.price, d.photo_url
 		FROM order_items oi
 		JOIN dishes d ON oi.dish_id = d.id
-		WHERE oi.order_id IN (?)`, orderIDs)
+		WHERE oi.order_id = $1`
+
+	rows, err := r.db.QueryContext(ctx, query, orderID)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create IN query for items: %w", err)
+		return nil, err
 	}
+	defer rows.Close()
 
-	queryItems = r.db.Rebind(queryItems)
-	if err := r.db.SelectContext(ctx, &items, queryItems, args...); err != nil {
-		return nil, fmt.Errorf("failed to get order items: %w", err)
-	}
+	var items []domain.OrderItem
+	for rows.Next() {
+		var item domain.OrderItem
+		item.Dish = &domain.Dish{}
 
-	// 4. Распределяем найденные позиции по их заказам для удобного доступа
-	itemsByOrderID := make(map[int][]domain.OrderItem)
-	for _, item := range items {
-		itemsByOrderID[item.OrderID] = append(itemsByOrderID[item.OrderID], item)
-	}
-
-	// 5. Прикрепляем отсортированные позиции к соответствующим заказам
-	for i := range orders {
-		orderID := orders[i].ID
-		if orderItems, ok := itemsByOrderID[orderID]; ok {
-			orders[i].Items = orderItems
+		if err := rows.Scan(
+			&item.ID, &item.OrderID, &item.DishID, &item.Qty, &item.Price, &item.Notes,
+			&item.Dish.Name, &item.Dish.Price, &item.Dish.PhotoURL,
+		); err != nil {
+			return nil, err
 		}
+		items = append(items, item)
 	}
 
-	return orders, nil
+	return items, rows.Err()
 }
-func (r *OrderRepository) UpdateStatus(ctx context.Context, orderID int, status string) error {
-	query := `UPDATE orders SET status = $1, updated_at = NOW() WHERE id = $2`
 
-	res, err := r.db.ExecContext(ctx, query, status, orderID)
-	if err != nil {
-		return fmt.Errorf("failed to update order status: %w", err)
-	}
+func (r *OrderRepository) UpdateItem(ctx context.Context, item *domain.OrderItem) error {
+	query := `
+		UPDATE order_items 
+		SET dish_id = $1, qty = $2, price = $3, notes = $4
+		WHERE id = $5`
 
-	rowsAffected, err := res.RowsAffected()
-	if err != nil {
-		return fmt.Errorf("failed to check rows affected: %w", err)
-	}
+	_, err := r.db.ExecContext(ctx, query, item.DishID, item.Qty, item.Price, item.Notes, item.ID)
+	return err
+}
 
-	// Проверяем, что заказ с таким ID вообще существовал
-	if rowsAffected == 0 {
-		return fmt.Errorf("order with id %d not found", orderID)
-	}
-
-	return nil
+func (r *OrderRepository) DeleteItem(ctx context.Context, itemID int) error {
+	query := `DELETE FROM order_items WHERE id = $1`
+	_, err := r.db.ExecContext(ctx, query, itemID)
+	return err
 }

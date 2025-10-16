@@ -1,50 +1,60 @@
-// file: internal/usecase/categories.go
-
 package usecase
 
 import (
-	"context" // <-- Добавляем context
+	"context"
 	"errors"
 
 	"github.com/YelzhanWeb/uno-spicchio/internal/domain"
-	"github.com/YelzhanWeb/uno-spicchio/internal/ports" // <-- Добавляем ports
+	"github.com/YelzhanWeb/uno-spicchio/internal/ports"
 )
 
-// CategoryService реализует бизнес-логику для категорий.
+var ErrCategoryNotFound = errors.New("category not found")
+
 type CategoryService struct {
-	repo ports.CategoryRepository
+	categoryRepo ports.CategoryRepository
 }
 
-// NewCategoryService - конструктор для нашего сервиса категорий.
-func NewCategoryService(repo ports.CategoryRepository) *CategoryService {
-	return &CategoryService{repo: repo}
+func NewCategoryService(categoryRepo ports.CategoryRepository) *CategoryService {
+	return &CategoryService{categoryRepo: categoryRepo}
 }
 
-// Все методы теперь привязаны к (s *CategoryService) и принимают context
+func (s *CategoryService) GetAll(ctx context.Context) ([]domain.Category, error) {
+	return s.categoryRepo.GetAll(ctx)
+}
 
-func (s *CategoryService) CreateCategory(ctx context.Context, name string) (int, error) {
-	if name == "" {
-		return 0, errors.New("category name cannot be empty")
+func (s *CategoryService) GetByID(ctx context.Context, id int) (*domain.Category, error) {
+	category, err := s.categoryRepo.GetByID(ctx, id)
+	if err != nil {
+		return nil, err
 	}
-	// Вызываем метод репозитория: s.repo.CreateCategory
-	return s.repo.CreateCategory(ctx, name)
-}
-
-func (s *CategoryService) GetCategoryByID(ctx context.Context, id int) (*domain.Category, error) {
-	return s.repo.GetCategoryByID(ctx, id)
-}
-
-func (s *CategoryService) GetAllCategories(ctx context.Context) ([]domain.Category, error) {
-	return s.repo.GetAllCategories(ctx)
-}
-
-func (s *CategoryService) UpdateCategory(ctx context.Context, id int, name string) error {
-	if name == "" {
-		return errors.New("category name cannot be empty")
+	if category == nil {
+		return nil, ErrCategoryNotFound
 	}
-	return s.repo.UpdateCategory(ctx, id, name)
+	return category, nil
 }
 
-func (s *CategoryService) DeleteCategory(ctx context.Context, id int) error {
-	return s.repo.DeleteCategory(ctx, id)
+func (s *CategoryService) Create(ctx context.Context, category *domain.Category) error {
+	return s.categoryRepo.Create(ctx, category)
+}
+
+func (s *CategoryService) Update(ctx context.Context, category *domain.Category) error {
+	existing, err := s.categoryRepo.GetByID(ctx, category.ID)
+	if err != nil {
+		return err
+	}
+	if existing == nil {
+		return ErrCategoryNotFound
+	}
+	return s.categoryRepo.Update(ctx, category)
+}
+
+func (s *CategoryService) Delete(ctx context.Context, id int) error {
+	existing, err := s.categoryRepo.GetByID(ctx, id)
+	if err != nil {
+		return err
+	}
+	if existing == nil {
+		return ErrCategoryNotFound
+	}
+	return s.categoryRepo.Delete(ctx, id)
 }

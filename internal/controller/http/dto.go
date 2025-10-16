@@ -1,6 +1,6 @@
 // file: internal/controller/http/dto.go (или похожее место)
 
-package http
+package httpAdapter
 
 // CreateOrderItemRequest представляет одно блюдо в заказе
 type CreateOrderItemRequest struct {
