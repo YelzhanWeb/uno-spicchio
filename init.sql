@@ -155,3 +155,200 @@ VALUES
     'photo_cook',
     true
 );
+
+-- === EXISTING USERS TABLE (unchanged) ===
+-- см. твою вставку выше
+
+-- === TABLES SEED DATA ===
+INSERT INTO
+    tables (name, status)
+VALUES ('Table 1', 'free'),
+    ('Table 2', 'busy'),
+    ('Table 3', 'reserve'),
+    ('Table 4', 'free'),
+    ('Table 5', 'free');
+
+-- === CATEGORIES SEED DATA ===
+INSERT INTO
+    categories (name)
+VALUES ('Salads'),
+    ('Soups'),
+    ('Main Dishes'),
+    ('Desserts'),
+    ('Drinks');
+
+-- === DISHES SEED DATA ===
+INSERT INTO
+    dishes (
+        category_id,
+        name,
+        description,
+        price,
+        photo_url,
+        is_active
+    )
+VALUES (
+        1,
+        'Caesar Salad',
+        'Classic Caesar with chicken and parmesan',
+        2500,
+        'dishes/caesar.jpg',
+        true
+    ),
+    (
+        1,
+        'Greek Salad',
+        'Fresh vegetables, feta cheese and olives',
+        2200,
+        'dishes/greek.jpg',
+        true
+    ),
+    (
+        2,
+        'Tomato Soup',
+        'Homemade tomato soup with basil',
+        1800,
+        'dishes/tomato_soup.jpg',
+        true
+    ),
+    (
+        3,
+        'Beef Steak',
+        'Grilled beef steak with sauce',
+        7500,
+        'dishes/steak.jpg',
+        true
+    ),
+    (
+        3,
+        'Chicken Curry',
+        'Spicy chicken curry with rice',
+        6500,
+        'dishes/curry.jpg',
+        true
+    ),
+    (
+        4,
+        'Cheesecake',
+        'Classic New York cheesecake',
+        3000,
+        'dishes/cheesecake.jpg',
+        true
+    ),
+    (
+        5,
+        'Cappuccino',
+        'Espresso with milk foam',
+        1500,
+        'dishes/cappuccino.jpg',
+        true
+    ),
+    (
+        5,
+        'Orange Juice',
+        'Freshly squeezed orange juice',
+        1200,
+        'dishes/orange_juice.jpg',
+        true
+    );
+
+-- === INGREDIENTS SEED DATA ===
+INSERT INTO
+    ingredients (name, unit, qty, min_qty)
+VALUES ('Chicken Breast', 'kg', 10, 2),
+    ('Beef', 'kg', 8, 2),
+    ('Rice', 'kg', 15, 5),
+    ('Lettuce', 'kg', 5, 1),
+    ('Tomato', 'kg', 7, 2),
+    ('Cucumber', 'kg', 6, 2),
+    ('Cheese', 'kg', 4, 1),
+    ('Flour', 'kg', 12, 3),
+    ('Sugar', 'kg', 10, 3),
+    ('Milk', 'liter', 20, 5),
+    ('Coffee Beans', 'kg', 6, 2),
+    ('Orange', 'kg', 8, 3);
+
+-- === DISH_INGREDIENTS SEED DATA ===
+INSERT INTO
+    dish_ingredients (
+        dish_id,
+        ingredient_id,
+        qty_per_dish
+    )
+VALUES (1, 4, 0.2), -- Caesar Salad - Lettuce
+    (1, 1, 0.15), -- Chicken Breast
+    (1, 7, 0.05), -- Cheese
+    (2, 5, 0.1), -- Greek Salad - Tomato
+    (2, 6, 0.1), -- Cucumber
+    (2, 7, 0.05), -- Cheese
+    (3, 5, 0.15), -- Tomato Soup - Tomato
+    (4, 2, 0.3), -- Beef Steak - Beef
+    (5, 1, 0.25), -- Chicken Curry - Chicken
+    (5, 3, 0.1), -- Rice
+    (6, 8, 0.1), -- Cheesecake - Flour
+    (6, 9, 0.05), -- Sugar
+    (6, 10, 0.1), -- Milk
+    (7, 10, 0.2), -- Cappuccino - Milk
+    (7, 11, 0.05), -- Coffee Beans
+    (8, 12, 0.3);
+-- Orange Juice - Orange
+
+-- === ORDERS SEED DATA ===
+INSERT INTO
+    orders (
+        waiter_id,
+        table_number,
+        status,
+        total,
+        notes
+    )
+VALUES (
+        3,
+        2,
+        'in_progress',
+        9000,
+        'Customer allergic to nuts'
+    ),
+    (3, 3, 'new', 6500, NULL),
+    (
+        3,
+        1,
+        'paid',
+        12000,
+        'VIP guest'
+    );
+
+-- === ORDER_ITEMS SEED DATA ===
+INSERT INTO
+    order_items (
+        order_id,
+        dish_id,
+        qty,
+        price,
+        notes
+    )
+VALUES (1, 1, 1, 2500, NULL),
+    (1, 4, 1, 7500, 'Medium rare'),
+    (2, 5, 1, 6500, 'Less spicy'),
+    (3, 4, 1, 7500, NULL),
+    (
+        3,
+        6,
+        1,
+        3000,
+        'Extra topping'
+    );
+
+-- === SUPPLIES SEED DATA ===
+INSERT INTO
+    supplies (
+        ingredient_id,
+        qty,
+        supplier_name
+    )
+VALUES (1, 5, 'FreshMeat Co'),
+    (4, 3, 'GreenFarm'),
+    (5, 4, 'VeggieWorld'),
+    (10, 10, 'DairyBest'),
+    (11, 2, 'CoffeePlanet'),
+    (12, 5, 'CitrusHouse');
