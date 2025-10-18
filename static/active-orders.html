@@ -20,37 +20,24 @@
                 </div>
 
                 <div class="flex items-center gap-4">
-                    <button class="flex items-center justify-center rounded-lg h-10 w-10 hover:bg-[#f3e7e8]">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor"
-                            viewBox="0 0 256 256">
-                            <path
-                                d="M221.8,175.94C216.25,166.38,208,139.33,208,104a80,80,0,1,0-160,0c0,35.34-8.26,62.38-13.81,71.94A16,16,0,0,0,48,200H88.81a40,40,0,0,0,78.38,0H208a16,16,0,0,0,13.8-24.06ZM128,216a24,24,0,0,1-22.62-16h45.24A24,24,0,0,1,128,216ZM48,184c7.7-13.24,16-43.92,16-80a64,64,0,1,1,128,0c0,36.05,8.28,66.73,16,80Z">
-                            </path>
-                        </svg>
+                    <button onclick="logout()" class="text-sm font-medium text-[#994d51] hover:text-[#ea2a33]">
+                        Выход
                     </button>
                     <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-10 w-10"
-                        style='background-image: url("https://i.pravatar.cc/40");'>
-                    </div>
+                        style='background-image: url("https://i.pravatar.cc/40");'></div>
                 </div>
             </header>
 
             <main class="flex flex-1 gap-4 p-4 lg:gap-8 lg:p-8">
-
                 <aside class="flex flex-col gap-4 w-full max-w-[280px] p-4 rounded-lg bg-white border border-[#e7d0d1]">
                     <h1 class="text-[#1b0e0e] text-base font-medium leading-normal">UNO Spicchio</h1>
                     <div class="flex flex-col gap-2">
-                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#f3e7e8]">
-                            <p class="text-[#1b0e0e] text-sm font-medium leading-normal">Меню</p>
-                        </a>
-                        <a href="/static/active-orders.html"
-                            class="flex items-center gap-3 px-3 py-2 rounded-lg bg-[#f3e7e8]">
+                        <a href="active-orders.html" class="flex items-center gap-3 px-3 py-2 rounded-lg bg-[#f3e7e8]">
                             <p class="text-[#1b0e0e] text-sm font-medium leading-normal">Заказы</p>
                         </a>
-                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#f3e7e8]">
-                            <p class="text-[#1b0e0e] text-sm font-medium leading-normal">Столы</p>
-                        </a>
-                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#f3e7e8]">
-                            <p class="text-[#1b0e0e] text-sm font-medium leading-normal">Персонал</p>
+                        <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#f3e7e8]"
+                            id="dashboardLink">
+                            <p class="text-[#1b0e0e] text-sm font-medium leading-normal">Аналитика</p>
                         </a>
                     </div>
                 </aside>
@@ -63,7 +50,7 @@
                             <p class="text-[#994d51] text-sm font-normal leading-normal">Просмотр всех текущих заказов в
                                 реальном времени</p>
                         </div>
-                        <a href="/static/create-order.html"
+                        <a href="create-order.html" id="newOrderBtn"
                             class="flex items-center justify-center rounded-lg h-12 px-5 bg-[#ea2a33] text-white text-base font-bold">
                             + Новый заказ
                         </a>
@@ -74,6 +61,10 @@
                             <a href="#" data-status="all"
                                 class="tab-link flex flex-col items-center justify-center border-b-[3px] border-b-[#ea2a33] text-[#1b0e0e] pb-[13px] pt-4">
                                 <p class="text-sm font-bold">Все заказы</p>
+                            </a>
+                            <a href="#" data-status="new"
+                                class="tab-link flex flex-col items-center justify-center border-b-[3px] border-b-transparent text-[#994d51] pb-[13px] pt-4">
+                                <p class="text-sm font-bold">Новые</p>
                             </a>
                             <a href="#" data-status="in_progress"
                                 class="tab-link flex flex-col items-center justify-center border-b-[3px] border-b-transparent text-[#994d51] pb-[13px] pt-4">
@@ -91,15 +82,14 @@
                             <table class="w-full">
                                 <thead class="bg-[#fcf8f8]">
                                     <tr>
-                                        <th class="p-3 text-left text-sm font-medium text-[#1b0e0e] w-[20%]">Номер
-                                            заказа</th>
-                                        <th class="p-3 text-left text-sm font-medium text-[#1b0e0e] w-[25%]">Статус</th>
+                                        <th class="p-3 text-left text-sm font-medium text-[#1b0e0e] w-[15%]">Номер</th>
+                                        <th class="p-3 text-left text-sm font-medium text-[#1b0e0e] w-[15%]">Стол</th>
+                                        <th class="p-3 text-left text-sm font-medium text-[#1b0e0e] w-[20%]">Статус</th>
                                         <th class="p-3 text-left text-sm font-medium text-[#1b0e0e] w-[15%]">Время</th>
-                                        <th class="p-3 text-left text-sm font-medium text-[#1b0e0e] w-[40%]">Детали</th>
+                                        <th class="p-3 text-left text-sm font-medium text-[#1b0e0e] w-[35%]">Детали</th>
                                     </tr>
                                 </thead>
-                                <tbody id="orders-table-body">
-                                </tbody>
+                                <tbody id="orders-table-body"></tbody>
                             </table>
                         </div>
                     </div>
@@ -109,11 +99,68 @@
     </div>
 
     <script>
-        // Этот JavaScript-код полностью идентичен тому, что мы настраивали раньше для этой страницы
+        const API_BASE_URL = 'http://localhost:8080/api';
         const ordersTableBody = document.getElementById('orders-table-body');
         const tabsContainer = document.getElementById('tabs');
         let allOrders = [];
         let currentFilter = 'all';
+        let currentUser = null;
+
+        function checkAuth() {
+            const token = localStorage.getItem('auth_token');
+            if (!token) {
+                window.location.href = 'login.html';
+                return false;
+            }
+            return token;
+        }
+
+        async function loadUserData() {
+            const token = checkAuth();
+            if (!token) return;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth/me`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+
+                    // Поддержка разных форматов ответа
+                    if (result.success && result.data) {
+                        currentUser = result.data;
+                    } else if (result.id) {
+                        currentUser = result;
+                    }
+
+                    if (currentUser) {
+                        // Hide dashboard link if not admin/manager
+                        if (currentUser.role !== 'admin' && currentUser.role !== 'manager') {
+                            document.getElementById('dashboardLink').style.display = 'none';
+                        }
+
+                        // Hide new order button if not waiter/admin
+                        if (currentUser.role !== 'waiter' && currentUser.role !== 'admin') {
+                            document.getElementById('newOrderBtn').style.display = 'none';
+                        }
+                    }
+                } else {
+                    logout();
+                }
+            } catch (error) {
+                console.error('Error loading user data:', error);
+                logout();
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('auth_token');
+            localStorage.removeItem('user_data');
+            window.location.href = 'login.html';
+        }
 
         function getStatusInfo(status) {
             switch (status) {
@@ -123,6 +170,8 @@
                     return { text: 'В процессе', colorClass: 'bg-yellow-100 text-yellow-800' };
                 case 'ready':
                     return { text: 'Готово', colorClass: 'bg-green-100 text-green-800' };
+                case 'closed':
+                    return { text: 'Закрыт', colorClass: 'bg-gray-100 text-gray-800' };
                 default:
                     return { text: status, colorClass: 'bg-gray-100 text-gray-800' };
             }
@@ -131,12 +180,12 @@
         function renderOrders() {
             ordersTableBody.innerHTML = '';
             const filteredOrders = allOrders.filter(order => {
-                if (currentFilter === 'all') return true;
+                if (currentFilter === 'all') return order.status !== 'closed';
                 return order.status === currentFilter;
             });
 
             if (filteredOrders.length === 0) {
-                ordersTableBody.innerHTML = `<tr><td colspan="4" class="text-center p-8 text-gray-500">Нет заказов в этой категории.</td></tr>`;
+                ordersTableBody.innerHTML = `<tr><td colspan="5" class="text-center p-8 text-gray-500">Нет заказов в этой категории.</td></tr>`;
                 return;
             }
 
@@ -146,10 +195,13 @@
                 const statusInfo = getStatusInfo(order.status);
                 const timeDiff = Math.round((new Date() - new Date(order.created_at)) / 60000);
                 const timeAgo = `${timeDiff} мин`;
-                const details = order.items && order.items.length > 0 ? order.items.map(item => item.dish_name).join(', ') : 'Нет деталей';
+                const details = order.items && order.items.length > 0
+                    ? order.items.map(item => `${item.dish_name} (${item.qty})`).join(', ')
+                    : 'Нет деталей';
 
                 tr.innerHTML = `
                     <td class="p-3 text-sm font-medium">#${order.id}</td>
+                    <td class="p-3 text-sm">Стол ${order.table_id}</td>
                     <td class="p-3">
                         <div class="inline-flex items-center justify-center rounded-full h-8 px-4 text-sm font-medium ${statusInfo.colorClass}">
                             ${statusInfo.text}
@@ -163,18 +215,37 @@
         }
 
         async function fetchOrders() {
+            const token = checkAuth();
+            if (!token) return;
+
             try {
-                const response = await fetch('/api/v1/orders');
-                if (!response.ok) {
+                const response = await fetch(`${API_BASE_URL}/orders`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+
+                    // Поддержка разных форматов ответа
+                    if (result.success && result.data) {
+                        allOrders = result.data;
+                    } else if (Array.isArray(result)) {
+                        allOrders = result;
+                    } else {
+                        allOrders = [];
+                    }
+
+                    renderOrders();
+                } else if (response.status === 401) {
+                    logout();
+                } else {
                     console.error('Ошибка при загрузке заказов:', response.statusText);
-                    return;
                 }
-                const data = await response.json();
-                allOrders = data || [];
-                renderOrders();
             } catch (error) {
                 console.error('Не удалось подключиться к серверу:', error);
-                ordersTableBody.innerHTML = `<tr><td colspan="4" class="text-center p-8 text-red-600">Не удалось загрузить данные.</td></tr>`;
+                ordersTableBody.innerHTML = `<tr><td colspan="5" class="text-center p-8 text-red-600">Не удалось загрузить данные.</td></tr>`;
             }
         }
 
@@ -196,6 +267,7 @@
         });
 
         document.addEventListener('DOMContentLoaded', () => {
+            loadUserData();
             fetchOrders();
             setInterval(fetchOrders, 5000);
         });

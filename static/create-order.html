@@ -15,26 +15,28 @@
         <div class="layout-container flex h-full grow flex-col">
             <header
                 class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#f3e7e8] px-10 py-3">
-                <a href="/static/active-orders.html" class="flex items-center gap-4 text-[#1b0e0e]">
+                <a href="active-orders.html" class="flex items-center gap-4 text-[#1b0e0e]">
                     <h2 class="text-[#1b0e0e] text-lg font-bold leading-tight tracking-[-0.015em]">UNO Spicchio</h2>
                 </a>
                 <div class="flex items-center gap-9">
-                    <a class="text-[#1b0e0e] text-sm font-medium leading-normal" href="#">Меню</a>
-                    <a class="text-[#1b0e0e] text-sm font-medium leading-normal"
-                        href="/static/active-orders.html">Заказы</a>
-                    <a class="text-[#1b0e0e] text-sm font-medium leading-normal" href="#">Столы</a>
-                    <a class="text-[#1b0e0e] text-sm font-medium leading-normal" href="#">Персонал</a>
+                    <a class="text-[#1b0e0e] text-sm font-medium leading-normal" href="active-orders.html">Заказы</a>
+                    <a class="text-[#1b0e0e] text-sm font-medium leading-normal" href="dashboard.html"
+                        id="dashboardLink">Аналитика</a>
+                    <button onclick="logout()"
+                        class="text-sm font-medium text-[#994d51] hover:text-[#ea2a33]">Выход</button>
                 </div>
             </header>
 
             <main class="flex flex-1 flex-col gap-4 p-4 lg:flex-row lg:gap-8 lg:p-8">
-
                 <div class="flex flex-col gap-4 w-full lg:max-w-md">
                     <div>
-                        <p class="text-[#1b0e0e] text-2xl font-bold">Стол 1 - Заказ #<span
-                                id="order-id-display">Новый</span></p>
-                        <input type="hidden" id="table-id-input" value="1">
-                        <input type="hidden" id="waiter-id-input" value="1">
+                        <p class="text-[#1b0e0e] text-2xl font-bold">Новый заказ</p>
+                        <div class="mt-2">
+                            <label class="text-sm font-medium text-[#994d51]">Выберите стол:</label>
+                            <select id="table-select" class="mt-1 w-full rounded-lg border border-[#e7d0d1] p-2">
+                                <option value="">Загрузка столов...</option>
+                            </select>
+                        </div>
                     </div>
                     <div class="flex flex-col rounded-lg border border-[#e7d0d1] bg-white p-4">
                         <h3 class="text-[#1b0e0e] text-lg font-bold mb-4">Позиции заказа</h3>
@@ -77,34 +79,181 @@
                     </div>
                     <div id="menu-items-container" class="py-4 flex flex-col gap-2"></div>
                 </div>
-
             </main>
         </div>
     </div>
 
     <script>
-        // =======================================================================
-        // 1. СОСТОЯНИЕ ПРИЛОЖЕНИЯ
-        // =======================================================================
+        const API_BASE_URL = 'http://localhost:8080/api';
         let menuData = [];
-        let currentOrder = {
-            items: new Map()
-        };
+        let currentOrder = { items: new Map() };
         let activeCategoryId = null;
+        let currentUser = null;
+        let tables = [];
 
-        // =======================================================================
-        // 2. DOM-ЭЛЕМЕНТЫ
-        // =======================================================================
         const menuTabsContainer = document.getElementById('menu-tabs-container');
         const menuItemsContainer = document.getElementById('menu-items-container');
         const orderItemsBody = document.getElementById('order-items-table-body');
         const orderSubtotalEl = document.getElementById('order-subtotal');
         const orderTotalEl = document.getElementById('order-total');
         const createOrderBtn = document.getElementById('create-order-btn');
+        const tableSelect = document.getElementById('table-select');
 
-        // =======================================================================
-        // 3. ФУНКЦИИ ОТОБРАЖЕНИЯ (RENDER)
-        // =======================================================================
+        function checkAuth() {
+            const token = localStorage.getItem('auth_token');
+            if (!token) {
+                window.location.href = 'login.html';
+                return false;
+            }
+            return token;
+        }
+
+        async function loadUserData() {
+            const token = checkAuth();
+            if (!token) return;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth/me`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+
+                    // Поддержка разных форматов ответа
+                    if (result.success && result.data) {
+                        currentUser = result.data;
+                    } else if (result.id) {
+                        currentUser = result;
+                    }
+
+                    if (currentUser) {
+                        if (currentUser.role !== 'admin' && currentUser.role !== 'manager') {
+                            document.getElementById('dashboardLink').style.display = 'none';
+                        }
+
+                        if (currentUser.role !== 'waiter' && currentUser.role !== 'admin') {
+                            alert('У вас нет прав для создания заказов');
+                            window.location.href = 'active-orders.html';
+                        }
+                    }
+                } else {
+                    logout();
+                }
+            } catch (error) {
+                console.error('Error loading user data:', error);
+                logout();
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('auth_token');
+            localStorage.removeItem('user_data');
+            window.location.href = 'login.html';
+        }
+
+        async function loadTables() {
+            const token = checkAuth();
+            if (!token) return;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/tables`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+
+                    // Поддержка разных форматов ответа
+                    if (result.success && result.data) {
+                        tables = result.data;
+                    } else if (Array.isArray(result)) {
+                        tables = result;
+                    } else {
+                        tables = [];
+                    }
+
+                    tableSelect.innerHTML = '<option value="">Выберите стол</option>';
+                    tables.forEach(table => {
+                        const option = document.createElement('option');
+                        option.value = table.id;
+                        let statusText = table.status === 'free' ? 'Свободен' :
+                            table.status === 'reserve' ? 'Зарезервирован' :
+                                'Занят';
+                        option.textContent = `${table.name} - ${statusText}`;
+                        tableSelect.appendChild(option);
+                    });
+                } else {
+                    console.error('Ошибка загрузки столов');
+                }
+            } catch (error) {
+                console.error('Error loading tables:', error);
+            }
+        }
+
+        async function loadMenu() {
+            const token = checkAuth();
+            if (!token) return;
+
+            try {
+                const categoriesResponse = await fetch(`${API_BASE_URL}/categories`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!categoriesResponse.ok) {
+                    throw new Error('Failed to load categories');
+                }
+
+                const categoriesResult = await categoriesResponse.json();
+                let categories;
+
+                // Поддержка разных форматов ответа
+                if (categoriesResult.success && categoriesResult.data) {
+                    categories = categoriesResult.data;
+                } else if (Array.isArray(categoriesResult)) {
+                    categories = categoriesResult;
+                } else {
+                    categories = [];
+                }
+
+                const dishesResponse = await fetch(`${API_BASE_URL}/dishes`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!dishesResponse.ok) {
+                    throw new Error('Failed to load dishes');
+                }
+
+                const dishesResult = await dishesResponse.json();
+                let dishes;
+
+                // Поддержка разных форматов ответа
+                if (dishesResult.success && dishesResult.data) {
+                    dishes = dishesResult.data;
+                } else if (Array.isArray(dishesResult)) {
+                    dishes = dishesResult;
+                } else {
+                    dishes = [];
+                }
+
+                menuData = categories.map(category => ({
+                    id: category.id,
+                    name: category.name,
+                    dishes: dishes.filter(dish => dish.category_id === category.id)
+                }));
+
+                if (menuData.length > 0) {
+                    activeCategoryId = menuData[0].id;
+                    renderTabs();
+                    renderMenu();
+                } else {
+                    menuItemsContainer.innerHTML = '<p class="text-gray-500 p-4">Меню пусто.</p>';
+                }
+            } catch (error) {
+                console.error('Error loading menu:', error);
+                menuItemsContainer.innerHTML = '<p class="text-red-500 p-4">Ошибка загрузки меню.</p>';
+            }
+        }
 
         function renderTabs() {
             menuTabsContainer.innerHTML = '';
@@ -127,7 +276,7 @@
         function renderMenu() {
             menuItemsContainer.innerHTML = '';
             const activeCategory = menuData.find(c => c.id === activeCategoryId);
-            if (!activeCategory || !activeCategory.dishes) {
+            if (!activeCategory || !activeCategory.dishes || activeCategory.dishes.length === 0) {
                 menuItemsContainer.innerHTML = '<p class="text-gray-500 p-4">В этой категории нет блюд.</p>';
                 return;
             }
@@ -139,6 +288,7 @@
                 <div class="flex flex-col justify-center overflow-hidden">
                     <p class="text-[#1b0e0e] text-base font-medium truncate">${dish.name}</p>
                     <p class="text-[#994d51] text-sm font-normal truncate">${dish.description || ''}</p>
+                    <p class="text-[#1b0e0e] text-sm font-bold">${dish.price.toFixed(2)}</p>
                 </div>
                 <div class="shrink-0">
                     <button class="add-dish-btn flex min-w-[84px] cursor-pointer items-center justify-center rounded-lg h-8 px-4 bg-[#f3e7e8] text-[#1b0e0e] text-sm font-medium">
@@ -172,7 +322,7 @@
                         <button class="increment-btn text-lg font-bold text-green-500">+</button>
                     </div>
                 </td>
-                <td class="py-3 px-2 text-sm text-right">$${itemTotal.toFixed(2)}</td>
+                <td class="py-3 px-2 text-sm text-right">${itemTotal.toFixed(2)}</td>
                 `;
                 tr.querySelector('.decrement-btn').addEventListener('click', () => decrementItem(item.dish_id));
                 tr.querySelector('.increment-btn').addEventListener('click', () => incrementItem(item.dish_id));
@@ -186,13 +336,9 @@
             currentOrder.items.forEach(item => {
                 subtotal += item.price * item.quantity;
             });
-            orderSubtotalEl.textContent = `$${subtotal.toFixed(2)}`;
-            orderTotalEl.textContent = `$${subtotal.toFixed(2)}`; // Пока без скидок
+            orderSubtotalEl.textContent = `${subtotal.toFixed(2)}`;
+            orderTotalEl.textContent = `${subtotal.toFixed(2)}`;
         }
-
-        // =======================================================================
-        // 4. ЛОГИКА УПРАВЛЕНИЯ ЗАКАЗОМ
-        // =======================================================================
 
         function addToOrder(dish) {
             if (currentOrder.items.has(dish.id)) {
@@ -232,9 +378,18 @@
                 return;
             }
 
+            const tableId = parseInt(tableSelect.value);
+            if (!tableId) {
+                alert('Пожалуйста, выберите стол.');
+                return;
+            }
+
+            const token = checkAuth();
+            if (!token) return;
+
             const payload = {
-                table_id: parseInt(document.getElementById('table-id-input').value),
-                waiter_id: parseInt(document.getElementById('waiter-id-input').value),
+                table_id: tableId,
+                waiter_id: currentUser.id,
                 notes: "",
                 items: Array.from(currentOrder.items.values()).map(item => ({
                     dish_id: item.dish_id,
@@ -247,18 +402,21 @@
             createOrderBtn.textContent = 'Создание...';
 
             try {
-                const response = await fetch('/api/v1/orders', {
+                const response = await fetch(`${API_BASE_URL}/orders`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
                     body: JSON.stringify(payload)
                 });
 
                 if (response.ok) {
                     alert('Заказ успешно создан!');
-                    window.location.href = '/static/active-orders.html';
+                    window.location.href = 'active-orders.html';
                 } else {
-                    const errorText = await response.text();
-                    alert('Ошибка при создании заказа: ' + errorText);
+                    const errorData = await response.json();
+                    alert('Ошибка при создании заказа: ' + (errorData.error || response.statusText));
                     createOrderBtn.disabled = false;
                     createOrderBtn.textContent = 'Создать заказ';
                 }
@@ -272,29 +430,12 @@
 
         createOrderBtn.addEventListener('click', submitOrder);
 
-        // =======================================================================
-        // 5. ИНИЦИАЛИЗАЦИЯ
-        // =======================================================================
-        async function init() {
-            try {
-                const response = await fetch('/api/v1/menu');
-                menuData = await response.json();
-
-                if (menuData && menuData.length > 0) {
-                    activeCategoryId = menuData[0].id;
-                    renderTabs();
-                    renderMenu();
-                } else {
-                    menuItemsContainer.innerHTML = '<p class="text-gray-500 p-4">Меню пусто. Добавьте категории и блюда через API.</p>';
-                }
-                renderCurrentOrder();
-            } catch (error) {
-                console.error("Не удалось загрузить меню:", error);
-                menuItemsContainer.innerHTML = '<p class="text-red-500 p-4">Ошибка загрузки меню. Проверьте, запущен ли сервер.</p>';
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', init);
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadUserData();
+            await loadTables();
+            await loadMenu();
+            renderCurrentOrder();
+        });
     </script>
 </body>
 

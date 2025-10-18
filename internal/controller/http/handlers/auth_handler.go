@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/YelzhanWeb/uno-spicchio/internal/controller/http/middleware"
@@ -44,7 +45,7 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 		response.InternalError(w, "failed to login")
 		return
 	}
-
+	fmt.Println(token, user)
 	response.Success(w, LoginResponse{
 		Token: token,
 		User:  user,

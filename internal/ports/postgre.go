@@ -2,6 +2,7 @@ package ports
 
 import (
 	"context"
+	"time"
 
 	"github.com/YelzhanWeb/uno-spicchio/internal/domain"
 )
@@ -81,4 +82,16 @@ type SupplyRepository interface {
 	GetAll(ctx context.Context) ([]domain.Supply, error)
 	GetByID(ctx context.Context, id int) (*domain.Supply, error)
 	GetByIngredientID(ctx context.Context, ingredientID int) ([]domain.Supply, error)
+}
+
+type AnalyticsRepository interface {
+	GetSalesSummary(ctx context.Context, from, to time.Time) (*domain.SalesSummary, error)
+	GetPreviousPeriodSummary(ctx context.Context, from, to time.Time) (*domain.SalesSummary, error)
+	GetSalesByCategory(ctx context.Context, from, to time.Time) ([]domain.CategorySale, error)
+	GetPopularDishes(ctx context.Context, from, to time.Time, limit int) ([]domain.PopularDish, error)
+	GetWaiterPerformance(ctx context.Context, from, to time.Time) ([]domain.WaiterPerformance, error)
+	GetOrderStats(ctx context.Context, from, to time.Time) (*domain.OrderStats, error)
+	GetIngredientTurnover(ctx context.Context, from, to time.Time) ([]domain.IngredientTurnover, error)
+	GetTableUtilization(ctx context.Context, from, to time.Time) ([]domain.TableUtilization, error)
+	GetHourlyRevenue(ctx context.Context, date time.Time) ([]domain.HourlyRevenue, error)
 }

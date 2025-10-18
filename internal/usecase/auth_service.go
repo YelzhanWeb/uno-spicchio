@@ -30,7 +30,6 @@ func (s *AuthService) Login(ctx context.Context, username, password string) (str
 	if user == nil || !hash.Verify(password, user.PasswordHash) {
 		return "", nil, domain.ErrInvalidCredentials
 	}
-
 	if !user.IsActive {
 		return "", nil, domain.ErrUserNotActive
 	}
@@ -39,7 +38,6 @@ func (s *AuthService) Login(ctx context.Context, username, password string) (str
 	if err != nil {
 		return "", nil, err
 	}
-
 	return token, user, nil
 }
 

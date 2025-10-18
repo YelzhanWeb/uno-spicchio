@@ -2,6 +2,7 @@ package ports
 
 import (
 	"context"
+	"time"
 
 	"github.com/YelzhanWeb/uno-spicchio/internal/domain"
 )
@@ -76,4 +77,16 @@ type CategoryService interface {
 	Create(ctx context.Context, category *domain.Category) error
 	Update(ctx context.Context, category *domain.Category) error
 	Delete(ctx context.Context, id int) error
+}
+
+type AnalyticsService interface {
+	GetDashboard(ctx context.Context, period domain.PeriodType, from, to time.Time) (*domain.DashboardData, error)
+	GetSalesSummary(ctx context.Context, from, to time.Time) (*domain.SalesSummary, error)
+	GetSalesByCategory(ctx context.Context, from, to time.Time) ([]domain.CategorySale, error)
+	GetPopularDishes(ctx context.Context, from, to time.Time, limit int) ([]domain.PopularDish, error)
+	GetWaiterPerformance(ctx context.Context, from, to time.Time) ([]domain.WaiterPerformance, error)
+	GetOrderStats(ctx context.Context, from, to time.Time) (*domain.OrderStats, error)
+	GetIngredientTurnover(ctx context.Context, from, to time.Time) ([]domain.IngredientTurnover, error)
+	GetTableUtilization(ctx context.Context, from, to time.Time) ([]domain.TableUtilization, error)
+	GetHourlyRevenue(ctx context.Context, date time.Time) ([]domain.HourlyRevenue, error)
 }

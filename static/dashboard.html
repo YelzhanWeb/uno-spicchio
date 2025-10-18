@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>UNO Spicchio - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <style type="text/tailwindcss">
+        :root {
+            --primary-color: #C0392B;
+            --background-light: #F8F9FA;
+            --background-dark: #121212;
+            --card-light: #FFFFFF;
+            --card-dark: #1E1E1E;
+            --text-light: #212529;
+            --text-dark: #E9ECEF;
+            --subtext-light: #6C757D;
+            --subtext-dark: #ADB5BD;
+        }
+        .dark {
+            --primary-color: #E74C3C;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--background-light);
+            color: var(--text-light);
+        }
+        .dark body {
+            background-color: var(--background-dark);
+            color: var(--text-dark);
+        }
+        .chart-bar {
+            transition: width 0.3s ease-in-out;
+        }
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+    </style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark font-display">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <aside
+            class="w-64 bg-card-light dark:bg-card-dark p-6 flex-col hidden md:flex border-r border-gray-200 dark:border-gray-700">
+            <div class="flex items-center space-x-3 mb-10">
+                <span class="material-symbols-outlined text-[var(--primary-color)] text-4xl">pie_chart</span>
+                <h1 class="text-2xl font-bold text-text-light dark:text-text-dark">UNO Spicchio</h1>
+            </div>
+            <nav class="space-y-2 flex-1">
+                <a class="flex items-center space-x-3 px-4 py-3 text-subtext-light dark:text-subtext-dark rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-[var(--primary-color)] transition-colors"
+                    href="create-order.html" id="createOrderLink">
+                    <span class="material-symbols-outlined">add_shopping_cart</span>
+                    <span>Create Orders</span>
+                </a>
+                <a class="flex items-center space-x-3 px-4 py-3 text-subtext-light dark:text-subtext-dark rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-[var(--primary-color)] transition-colors"
+                    href="active-orders.html">
+                    <span class="material-symbols-outlined">receipt_long</span>
+                    <span>All Orders</span>
+                </a>
+                <a class="flex items-center space-x-3 px-4 py-3 rounded-lg bg-red-50 dark:bg-red-900/20 text-[var(--primary-color)] font-semibold"
+                    href="dashboard.html">
+                    <span class="material-symbols-outlined">analytics</span>
+                    <span>Dashboard</span>
+                </a>
+            </nav>
+            <div class="mt-auto">
+                <div class="flex items-center space-x-3 border-t border-gray-200 dark:border-gray-700 pt-6">
+                    <img alt="User avatar" class="w-10 h-10 rounded-full object-cover" src="https://i.pravatar.cc/40" />
+                    <div>
+                        <p class="font-semibold text-sm text-text-light dark:text-text-dark" id="userFullName">
+                            Loading...</p>
+                        <p class="text-xs text-subtext-light dark:text-subtext-dark" id="userRole">...</p>
+                    </div>
+                </div>
+                <button onclick="logout()"
+                    class="mt-4 w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors">
+                    Выйти
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-y-auto">
+            <!-- Header -->
+            <header
+                class="p-6 border-b border-gray-200 dark:border-gray-700 sticky top-0 bg-background-light dark:bg-background-dark z-10">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h2 class="text-2xl font-bold text-text-light dark:text-text-dark">Reports Dashboard</h2>
+                        <p class="text-subtext-light dark:text-subtext-dark mt-1">Buona giornata! Here's your
+                            restaurant's performance overview.</p>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <button id="darkModeToggle" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800">
+                            <span
+                                class="material-symbols-outlined text-subtext-light dark:text-subtext-dark">dark_mode</span>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main -->
+            <main class="flex-1 p-6" id="dashboardContent">
+                <!-- Period Selection -->
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6 space-y-4 md:space-y-0">
+                    <div class="flex items-center space-x-2">
+                        <button onclick="loadDashboard('yesterday')" id="btnYesterday"
+                            class="px-4 py-2 rounded-lg text-sm font-semibold bg-gray-100 dark:bg-gray-800 text-text-light dark:text-text-dark hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Yesterday</button>
+                        <button onclick="loadDashboard('today')" id="btnToday"
+                            class="px-4 py-2 rounded-lg text-sm font-semibold bg-[var(--primary-color)] text-white">Today</button>
+                        <button onclick="loadDashboard('current_month')" id="btnCurrentMonth"
+                            class="px-4 py-2 rounded-lg text-sm font-semibold bg-gray-100 dark:bg-gray-800 text-text-light dark:text-text-dark hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Current
+                            Month</button>
+                    </div>
+                </div>
+
+                <!-- Key Metrics -->
+                <div class="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-6">
+                    <div
+                        class="bg-card-light dark:bg-card-dark p-6 rounded-xl border border-gray-200 dark:border-gray-700 flex items-center space-x-4">
+                        <div class="p-3 bg-red-100 dark:bg-red-900/30 rounded-full">
+                            <span class="material-symbols-outlined text-3xl text-[var(--primary-color)]">paid</span>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-medium text-subtext-light dark:text-subtext-dark">Total Revenue</h3>
+                            <p class="text-3xl font-bold text-text-light dark:text-text-dark mt-1" id="totalRevenue">$0
+                            </p>
+                            <p class="text-xs mt-1" id="revenueChange">--</p>
+                        </div>
+                    </div>
+                    <div
+                        class="bg-card-light dark:bg-card-dark p-6 rounded-xl border border-gray-200 dark:border-gray-700 flex items-center space-x-4">
+                        <div class="p-3 bg-green-100 dark:bg-green-900/30 rounded-full">
+                            <span class="material-symbols-outlined text-3xl text-green-600">shopping_cart</span>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-medium text-subtext-light dark:text-subtext-dark">Total Orders</h3>
+                            <p class="text-3xl font-bold text-text-light dark:text-text-dark mt-1" id="totalOrders">0
+                            </p>
+                            <p class="text-xs mt-1" id="ordersChange">--</p>
+                        </div>
+                    </div>
+                    <div
+                        class="bg-card-light dark:bg-card-dark p-6 rounded-xl border border-gray-200 dark:border-gray-700 flex items-center space-x-4">
+                        <div class="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-full">
+                            <span class="material-symbols-outlined text-3xl text-blue-600">request_quote</span>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-medium text-subtext-light dark:text-subtext-dark">Average Order
+                                Value</h3>
+                            <p class="text-3xl font-bold text-text-light dark:text-text-dark mt-1" id="avgOrderValue">$0
+                            </p>
+                            <p class="text-xs mt-1" id="avgValueChange">--</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts -->
+                <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                    <!-- Sales by Category -->
+                    <div
+                        class="lg:col-span-3 bg-card-light dark:bg-card-dark p-6 rounded-xl border border-gray-200 dark:border-gray-700">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-semibold text-text-light dark:text-text-dark">Sales by Category</h3>
+                        </div>
+                        <div id="categorySales" class="flex-1 flex flex-col space-y-4">
+                            <!-- Will be populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Popular Dishes -->
+                    <div
+                        class="lg:col-span-2 bg-card-light dark:bg-card-dark p-6 rounded-xl border border-gray-200 dark:border-gray-700">
+                        <h3 class="text-lg font-semibold text-text-light dark:text-text-dark mb-4">Popular Dishes</h3>
+                        <ul id="popularDishes" class="space-y-4">
+                            <!-- Will be populated by JavaScript -->
+                        </ul>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:8080/api';
+        let currentPeriod = 'today';
+        let authToken = '';
+        let currentUser = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAuth();
+            setupEventListeners();
+        });
+
+        function checkAuth() {
+            authToken = localStorage.getItem('auth_token');
+            if (!authToken) {
+                window.location.href = 'login.html';
+                return;
+            }
+            loadUserInfo();
+            loadDashboard('today');
+        }
+
+        function logout() {
+            localStorage.removeItem('auth_token');
+            localStorage.removeItem('user_data');
+            window.location.href = 'login.html';
+        }
+
+        async function loadUserInfo() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth/me`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+
+                    // Поддержка разных форматов ответа
+                    if (result.success && result.data) {
+                        currentUser = result.data;
+                    } else if (result.id) {
+                        currentUser = result;
+                    }
+
+                    if (currentUser) {
+                        document.getElementById('userFullName').textContent = currentUser.username;
+                        document.getElementById('userRole').textContent = currentUser.role;
+
+                        if (currentUser.role !== 'waiter' && currentUser.role !== 'admin') {
+                            document.getElementById('createOrderLink').style.display = 'none';
+                        }
+
+                        if (currentUser.role !== 'admin' && currentUser.role !== 'manager') {
+                            alert('У вас нет прав для просмотра аналитики');
+                            window.location.href = 'active-orders.html';
+                        }
+                    }
+                } else {
+                    logout();
+                }
+            } catch (error) {
+                console.error('Error loading user info:', error);
+                logout();
+            }
+        }
+
+        async function loadDashboard(period) {
+            currentPeriod = period;
+            updatePeriodButtons();
+            showLoading();
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/analytics/dashboard?period=${period}`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+
+                    // Поддержка разных форматов ответа
+                    let data;
+                    if (result.success && result.data) {
+                        data = result.data;
+                    } else if (result.summary) {
+                        data = result;
+                    } else {
+                        showError('Invalid dashboard data format');
+                        return;
+                    }
+
+                    updateDashboard(data);
+                } else {
+                    showError('Failed to load dashboard data');
+                }
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+                showError('Error: ' + error.message);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function updateDashboard(data) {
+            updateSummary(data.summary || {});
+            updateCategorySales(data.category_sales || []);
+            updatePopularDishes(data.popular_dishes || []);
+        }
+
+        function updateSummary(summary) {
+            document.getElementById('totalRevenue').textContent = '$' + (summary.total_revenue || 0).toFixed(2);
+            document.getElementById('totalOrders').textContent = summary.total_orders || 0;
+            document.getElementById('avgOrderValue').textContent = '$' + (summary.average_order_value || 0).toFixed(2);
+
+            updateChangeIndicator('revenueChange', summary.revenue_change || 0);
+            updateChangeIndicator('ordersChange', summary.orders_change || 0);
+            updateChangeIndicator('avgValueChange', summary.avg_value_change || 0);
+        }
+
+        function updateChangeIndicator(elementId, change) {
+            const element = document.getElementById(elementId);
+            const isPositive = change >= 0;
+            const className = isPositive ?
+                'text-xs text-green-600 dark:text-green-400 mt-1' :
+                'text-xs text-red-600 dark:text-red-400 mt-1';
+
+            element.className = className;
+            element.textContent = `${isPositive ? '+' : ''}${change.toFixed(1)}% from last period`;
+        }
+
+        function updateCategorySales(sales) {
+            const container = document.getElementById('categorySales');
+            const colors = ['red', 'green', 'blue', 'yellow', 'purple', 'orange'];
+
+            if (sales.length === 0) {
+                container.innerHTML = '<p class="text-subtext-light dark:text-subtext-dark">No data available</p>';
+                return;
+            }
+
+            container.innerHTML = sales.map((sale, index) => {
+                const color = colors[index % colors.length];
+                const percentage = sale.percentage || 0;
+
+                return `
+                    <div class="flex items-center">
+                        <div class="w-24 text-sm text-subtext-light dark:text-subtext-dark">${sale.category_name}</div>
+                        <div class="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-4 mx-3">
+                            <div class="bg-${color}-500 h-4 rounded-full chart-bar" style="width: ${percentage}%;"></div>
+                        </div>
+                        <div class="w-20 text-right font-semibold text-text-light dark:text-text-dark">$${sale.revenue.toFixed(0)}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updatePopularDishes(dishes) {
+            const container = document.getElementById('popularDishes');
+            const icons = ['local_pizza', 'ramen_dining', 'tapas', 'cake', 'local_bar'];
+            const colors = ['red', 'green', 'blue', 'yellow', 'orange'];
+
+            if (dishes.length === 0) {
+                container.innerHTML = '<p class="text-subtext-light dark:text-subtext-dark">No data available</p>';
+                return;
+            }
+
+            container.innerHTML = dishes.map((dish, index) => {
+                const icon = icons[index % icons.length];
+                const color = colors[index % colors.length];
+
+                return `
+                    <li class="flex items-center">
+                        <div class="w-10 h-10 bg-${color}-100 dark:bg-${color}-900/30 rounded-full flex items-center justify-center mr-4">
+                            <span class="material-symbols-outlined text-${color}-500">${icon}</span>
+                        </div>
+                        <div class="flex-1">
+                            <span class="font-medium text-text-light dark:text-text-dark">${dish.dish_name}</span>
+                            <p class="text-sm text-subtext-light dark:text-subtext-dark">${dish.qty_sold} sold</p>
+                        </div>
+                        <span class="font-semibold text-text-light dark:text-text-dark">${dish.revenue.toFixed(0)}</span>
+                    </li>
+                `;
+            }).join('');
+        }
+
+        function updatePeriodButtons() {
+            const buttons = {
+                'yesterday': 'btnYesterday',
+                'today': 'btnToday',
+                'current_month': 'btnCurrentMonth'
+            };
+
+            Object.entries(buttons).forEach(([period, btnId]) => {
+                const btn = document.getElementById(btnId);
+                if (period === currentPeriod) {
+                    btn.className = 'px-4 py-2 rounded-lg text-sm font-semibold bg-[var(--primary-color)] text-white';
+                } else {
+                    btn.className = 'px-4 py-2 rounded-lg text-sm font-semibold bg-gray-100 dark:bg-gray-800 text-text-light dark:text-text-dark hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors';
+                }
+            });
+        }
+
+        function setupEventListeners() {
+            document.getElementById('darkModeToggle').addEventListener('click', () => {
+                document.documentElement.classList.toggle('dark');
+            });
+        }
+
+        function showLoading() {
+            document.getElementById('dashboardContent').classList.add('loading');
+        }
+
+        function hideLoading() {
+            document.getElementById('dashboardContent').classList.remove('loading');
+        }
+
+        function showError(message) {
+            alert(message);
+        }
+    </script>
+</body>
+
+</html>

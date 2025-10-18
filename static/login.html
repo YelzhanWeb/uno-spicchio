@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>UNO Spicchio - Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .gradient-bg {
+            background: linear-gradient(135deg, #C0392B 0%, #E74C3C 100%);
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+    <div class="min-h-screen flex">
+        <!-- Left Side - Branding -->
+        <div class="hidden lg:flex lg:w-1/2 gradient-bg items-center justify-center p-12">
+            <div class="max-w-md text-white">
+                <div class="flex items-center space-x-3 mb-8">
+                    <span class="material-symbols-outlined text-6xl">restaurant</span>
+                    <h1 class="text-5xl font-bold">UNO Spicchio</h1>
+                </div>
+                <h2 class="text-3xl font-semibold mb-4">Restaurant Management System</h2>
+                <p class="text-xl opacity-90">Manage your restaurant operations efficiently with our comprehensive CRM
+                    platform.</p>
+                <div class="mt-12 space-y-4">
+                    <div class="flex items-center space-x-3">
+                        <span class="material-symbols-outlined text-2xl">check_circle</span>
+                        <span>Order Management</span>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <span class="material-symbols-outlined text-2xl">check_circle</span>
+                        <span>Inventory Control</span>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <span class="material-symbols-outlined text-2xl">check_circle</span>
+                        <span>Analytics & Reports</span>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <span class="material-symbols-outlined text-2xl">check_circle</span>
+                        <span>Staff Management</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side - Login Form -->
+        <div class="w-full lg:w-1/2 flex items-center justify-center p-8">
+            <div class="max-w-md w-full">
+                <!-- Mobile Logo -->
+                <div class="lg:hidden text-center mb-8">
+                    <div class="inline-flex items-center space-x-2 text-red-600">
+                        <span class="material-symbols-outlined text-4xl">restaurant</span>
+                        <h1 class="text-3xl font-bold">UNO Spicchio</h1>
+                    </div>
+                </div>
+
+                <!-- Login Form -->
+                <div id="loginForm" class="bg-white rounded-2xl shadow-xl p-8">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-2">Welcome Back!</h2>
+                    <p class="text-gray-600 mb-8">Sign in to access your dashboard</p>
+
+                    <div id="alertContainer" class="mb-4"></div>
+
+                    <form onsubmit="handleLogin(event)">
+                        <div class="space-y-5">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Username</label>
+                                <div class="relative">
+                                    <span
+                                        class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">person</span>
+                                    <input type="text" id="loginUsername" value="admin"
+                                        class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none transition"
+                                        placeholder="Enter your username" required />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Password</label>
+                                <div class="relative">
+                                    <span
+                                        class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">lock</span>
+                                    <input type="password" id="loginPassword" value="admin123"
+                                        class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none transition"
+                                        placeholder="Enter your password" required />
+                                </div>
+                            </div>
+
+                            <div class="flex items-center justify-between">
+                                <label class="flex items-center">
+                                    <input type="checkbox"
+                                        class="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500">
+                                    <span class="ml-2 text-sm text-gray-600">Remember me</span>
+                                </label>
+                            </div>
+
+                            <button type="submit"
+                                class="w-full gradient-bg text-white py-3 rounded-lg font-semibold hover:opacity-90 transition duration-200 flex items-center justify-center space-x-2">
+                                <span>Sign In</span>
+                                <span class="material-symbols-outlined">arrow_forward</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <p class="text-center text-gray-500 text-sm mt-8">
+                    © 2024 UNO Spicchio. All rights reserved.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:8080/api';
+
+        function showAlert(message, type = 'error') {
+            const container = document.getElementById('alertContainer');
+            const alertClass = type === 'success' ? 'bg-green-100 text-green-800 border-green-200' : 'bg-red-100 text-red-800 border-red-200';
+
+            container.innerHTML = `
+                <div class="${alertClass} border px-4 py-3 rounded-lg flex items-center space-x-2">
+                    <span class="material-symbols-outlined">${type === 'success' ? 'check_circle' : 'error'}</span>
+                    <span>${message}</span>
+                </div>
+            `;
+
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 5000);
+        }
+
+        async function handleLogin(event) {
+            event.preventDefault();
+
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const result = await response.json();
+
+                // Поддержка разных форматов ответа
+                let token, user;
+
+                if (result.success && result.data) {
+                    // Формат: {success: true, data: {token, user}}
+                    token = result.data.token;
+                    user = result.data.user;
+                } else if (result.token) {
+                    // Формат: {token, user}
+                    token = result.token;
+                    user = result.user;
+                } else {
+                    showAlert(result.error || result.message || 'Login failed. Please check your credentials.');
+                    return;
+                }
+
+                if (response.ok && token) {
+                    localStorage.setItem('auth_token', token);
+                    localStorage.setItem('user_data', JSON.stringify(user));
+
+                    showAlert('Login successful! Redirecting...', 'success');
+
+                    setTimeout(() => {
+                        const userRole = user.role;
+                        if (userRole === 'admin' || userRole === 'manager') {
+                            window.location.href = 'dashboard.html';
+                        } else {
+                            window.location.href = 'active-orders.html';
+                        }
+                    }, 1000);
+                } else {
+                    showAlert('Login failed. Please check your credentials.');
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                showAlert('Connection error. Please try again.');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('auth_token');
+            if (token) {
+                fetch(`${API_BASE_URL}/auth/me`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                })
+                    .then(response => response.json())
+                    .then(result => {
+                        // Проверяем разные форматы ответа
+                        let user;
+                        if (result.success && result.data) {
+                            user = result.data;
+                        } else if (result.id) {
+                            user = result;
+                        }
+
+                        if (user && user.id) {
+                            const userRole = user.role;
+                            if (userRole === 'admin' || userRole === 'manager') {
+                                window.location.href = '/static/dashboard.html';
+                            } else {
+                                window.location.href = '/static/active-orders.html';
+                            }
+                        } else {
+                            localStorage.removeItem('auth_token');
+                            localStorage.removeItem('user_data');
+                        }
+                    })
+                    .catch(() => {
+                        localStorage.removeItem('auth_token');
+                        localStorage.removeItem('user_data');
+                    });
+            }
+        });
+    </script>
+</body>
+
+</html>

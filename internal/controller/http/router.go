@@ -19,6 +19,7 @@ type Router struct {
 	supplyHandler     *handlers.SupplyHandler
 	tableHandler      *handlers.TableHandler
 	categoryHandler   *handlers.CategoryHandler
+	analyticsHandler  *handlers.AnalyticsHandler
 	tokenManager      *jwt.TokenManager
 }
 
@@ -31,6 +32,7 @@ func NewRouter(
 	supplyService ports.SupplyService,
 	tableService ports.TableService,
 	categoryService ports.CategoryService,
+	analyticsService ports.AnalyticsService,
 	tokenManager *jwt.TokenManager,
 ) *Router {
 	return &Router{
@@ -42,6 +44,7 @@ func NewRouter(
 		supplyHandler:     handlers.NewSupplyHandler(supplyService),
 		tableHandler:      handlers.NewTableHandler(tableService),
 		categoryHandler:   handlers.NewCategoryHandler(categoryService),
+		analyticsHandler:  handlers.NewAnalyticsHandler(analyticsService),
 		tokenManager:      tokenManager,
 	}
 }
@@ -150,6 +153,35 @@ func (rt *Router) Setup() *chi.Mux {
 				r.Delete("/{id}", rt.tableHandler.Delete)
 			})
 		})
+
+		// Analytics routes (Admin and Manager only)
+		r.Route("/api/analytics", func(r chi.Router) {
+			r.Use(middleware.RequireRole(domain.RoleAdmin, domain.RoleManager))
+
+			// Dashboard - main endpoint
+			r.Get("/dashboard", rt.analyticsHandler.GetDashboard)
+
+			// Sales analytics
+			r.Get("/sales/summary", rt.analyticsHandler.GetSalesSummary)
+			r.Get("/sales/by-category", rt.analyticsHandler.GetSalesByCategory)
+			r.Get("/sales/hourly", rt.analyticsHandler.GetHourlyRevenue)
+
+			// Dishes analytics
+			r.Get("/dishes/popular", rt.analyticsHandler.GetPopularDishes)
+
+			// Orders analytics
+			r.Get("/orders/stats", rt.analyticsHandler.GetOrderStats)
+
+			// Staff analytics
+			r.Get("/waiters/performance", rt.analyticsHandler.GetWaiterPerformance)
+
+			// Inventory analytics
+			r.Get("/ingredients/turnover", rt.analyticsHandler.GetIngredientTurnover)
+
+			// Tables analytics
+			r.Get("/tables/utilization", rt.analyticsHandler.GetTableUtilization)
+		})
+
 	})
 
 	return r

@@ -66,6 +66,7 @@ func main() {
 	ingredientRepo := postgre.NewIngredientRepository(db)
 	orderRepo := postgre.NewOrderRepository(db)
 	supplyRepo := postgre.NewSupplyRepository(db)
+	analyticsRepo := postgre.NewAnalyticsRepository(db)
 
 	// Initialize JWT token manager
 	tokenManager := jwt.NewTokenManager(cfg.JWT.Secret, cfg.JWT.ExpirationDuration())
@@ -78,6 +79,7 @@ func main() {
 	ingredientService := usecase.NewIngredientService(ingredientRepo)
 	supplyService := usecase.NewSupplyService(supplyRepo)
 	tableService := usecase.NewTableService(tableRepo)
+	analyticsService := usecase.NewAnalyticsService(analyticsRepo)
 
 	// Setup router
 	router := httpAdapter.NewRouter(
@@ -89,6 +91,7 @@ func main() {
 		supplyService,
 		tableService,
 		categoryRepo,
+		analyticsService,
 		tokenManager,
 	)
 
