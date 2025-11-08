@@ -25,15 +25,8 @@
 ### 1. Замените файлы в проекте:
 
 ```bash
-# Создайте бэкап текущих файлов
-cp internal/controller/http/handlers/order_handler.go internal/controller/http/handlers/order_handler.go.backup
-cp internal/usecase/orders.go internal/usecase/orders.go.backup
-cp internal/controller/http/middleware/auth.go internal/controller/http/middleware/auth.go.backup
-cp internal/controller/http/router.go internal/controller/http/router.go.backup
+make docker-up
 ```
-
-Замените содержимое файлов на исправленные версии из артефактов выше.
-
 ### 2. Перезапустите сервер:
 
 ```bash

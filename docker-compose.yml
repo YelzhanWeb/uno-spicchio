@@ -7,6 +7,8 @@ services:
       POSTGRES_USER: restaurant_user
       POSTGRES_PASSWORD: restaurant_password
       POSTGRES_DB: restaurant_crm
+      TZ: Asia/Almaty               
+      PGTZ: Asia/Almaty   
     ports:
       - "5432:5432"
     volumes:
