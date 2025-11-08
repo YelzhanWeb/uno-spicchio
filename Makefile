@@ -7,10 +7,10 @@ help: ## Show this help message
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  %-15s %s\n", $1, $2}' $(MAKEFILE_LIST)
 
 build: ## Build the application
-	go build -o bin/restaurant-crm cmd/api/main.go
+	go build -o bin/restaurant-crm cmd/app
 
 run: ## Run the application
-	go run cmd/api/main.go
+	go run cmd/app/main.go
 
 test: ## Run tests
 	go test -v ./...

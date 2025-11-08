@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/YelzhanWeb/uno-spicchio/internal/domain"
 	"github.com/YelzhanWeb/uno-spicchio/internal/ports"
@@ -33,14 +34,14 @@ func (s *OrderService) Create(ctx context.Context, order *domain.Order, items []
 	for _, item := range items {
 		ingredients, err := s.dishRepo.GetIngredients(ctx, item.DishID)
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to get ingredients: %w", err)
 		}
 
 		for _, ing := range ingredients {
 			needed := ing.QtyPerDish * float64(item.Qty)
 			ingredient, err := s.ingredientRepo.GetByID(ctx, ing.IngredientID)
 			if err != nil {
-				return err
+				return fmt.Errorf("failed to get ingredient: %w", err)
 			}
 
 			if ingredient.Qty < needed {
@@ -54,7 +55,7 @@ func (s *OrderService) Create(ctx context.Context, order *domain.Order, items []
 	for _, item := range items {
 		dish, err := s.dishRepo.GetByID(ctx, item.DishID)
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to get dish: %w", err)
 		}
 		total += dish.Price * float64(item.Qty)
 	}
@@ -64,7 +65,7 @@ func (s *OrderService) Create(ctx context.Context, order *domain.Order, items []
 
 	// Create order
 	if err := s.orderRepo.Create(ctx, order); err != nil {
-		return err
+		return fmt.Errorf("failed to create order: %w", err)
 	}
 
 	// Add items
@@ -74,19 +75,23 @@ func (s *OrderService) Create(ctx context.Context, order *domain.Order, items []
 		item.Price = dish.Price
 
 		if err := s.orderRepo.AddItem(ctx, &item); err != nil {
-			return err
+			return fmt.Errorf("failed to add order item: %w", err)
 		}
 
 		// Deduct ingredients
 		ingredients, _ := s.dishRepo.GetIngredients(ctx, item.DishID)
 		for _, ing := range ingredients {
 			needed := ing.QtyPerDish * float64(item.Qty)
-			s.ingredientRepo.UpdateQuantity(ctx, ing.IngredientID, -needed)
+			if err := s.ingredientRepo.UpdateQuantity(ctx, ing.IngredientID, -needed); err != nil {
+				return fmt.Errorf("failed to update ingredient quantity: %w", err)
+			}
 		}
 	}
 
-	// Update table status
-	s.tableRepo.UpdateStatus(ctx, order.TableNumber, domain.TableBusy)
+	// Update table status to BUSY
+	if err := s.tableRepo.UpdateStatus(ctx, order.TableNumber, domain.TableBusy); err != nil {
+		return fmt.Errorf("failed to update table status: %w", err)
+	}
 
 	return nil
 }
@@ -110,7 +115,21 @@ func (s *OrderService) GetByID(ctx context.Context, id int) (*domain.Order, erro
 }
 
 func (s *OrderService) GetAll(ctx context.Context, status *domain.OrderStatus) ([]domain.Order, error) {
-	return s.orderRepo.GetAll(ctx, status)
+	orders, err := s.orderRepo.GetAll(ctx, status)
+	if err != nil {
+		return nil, err
+	}
+
+	// Load items for each order
+	for i := range orders {
+		items, err := s.orderRepo.GetItems(ctx, orders[i].ID)
+		if err != nil {
+			return nil, err
+		}
+		orders[i].Items = items
+	}
+
+	return orders, nil
 }
 
 func (s *OrderService) UpdateStatus(ctx context.Context, id int, newStatus domain.OrderStatus) error {
@@ -155,9 +174,29 @@ func (s *OrderService) CloseOrder(ctx context.Context, id int) error {
 
 	// Update order status to paid
 	if err := s.orderRepo.UpdateStatus(ctx, id, domain.OrderPaid); err != nil {
-		return err
+		return fmt.Errorf("failed to update order status: %w", err)
 	}
 
-	// Update table status to free
-	return s.tableRepo.UpdateStatus(ctx, order.TableNumber, domain.TableFree)
+	// Update table status to FREE
+	if err := s.tableRepo.UpdateStatus(ctx, order.TableNumber, domain.TableFree); err != nil {
+		return fmt.Errorf("failed to update table status: %w", err)
+	}
+
+	return nil
+}
+
+func (s *OrderService) DeleteOrder(ctx context.Context, id int) error {
+	order, err := s.orderRepo.GetByID(ctx, id)
+	if err != nil {
+		return err
+	}
+	if order == nil {
+		return domain.ErrOrderNotFound
+	}
+
+	if err := s.orderRepo.Delete(ctx, id); err != nil {
+		return fmt.Errorf("failed to delete order: %w", err)
+	}
+
+	return nil
 }

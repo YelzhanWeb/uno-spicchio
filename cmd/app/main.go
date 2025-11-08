@@ -27,6 +27,9 @@ func main() {
 		log.Fatalf("Failed to load config: %v", err)
 	}
 
+	log.Printf("Starting server with config: Host=%s, Port=%s, Env=%s",
+		cfg.Server.Host, cfg.Server.Port, cfg.Env)
+
 	// Connect to database
 	db, err := connectDB(cfg.Database)
 	if err != nil {
@@ -79,6 +82,7 @@ func main() {
 	ingredientService := usecase.NewIngredientService(ingredientRepo)
 	supplyService := usecase.NewSupplyService(supplyRepo)
 	tableService := usecase.NewTableService(tableRepo)
+	categoryService := usecase.NewCategoryService(categoryRepo)
 	analyticsService := usecase.NewAnalyticsService(analyticsRepo)
 
 	// Setup router
@@ -90,7 +94,7 @@ func main() {
 		ingredientService,
 		supplyService,
 		tableService,
-		categoryRepo,
+		categoryService,
 		analyticsService,
 		tokenManager,
 	)
@@ -107,6 +111,7 @@ func main() {
 	// Start server in a goroutine
 	go func() {
 		log.Printf("Server starting on %s:%s", cfg.Server.Host, cfg.Server.Port)
+		log.Printf("Frontend available at: http://localhost:%s/static/login.html", cfg.Server.Port)
 		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("Failed to start server: %v", err)
 		}
@@ -131,7 +136,10 @@ func main() {
 }
 
 func connectDB(cfg config.DatabaseConfig) (*sql.DB, error) {
-	db, err := sql.Open("pgx", cfg.DSN())
+	dsn := cfg.DSN()
+	log.Printf("Connecting to database: %s", dsn)
+
+	db, err := sql.Open("pgx", dsn)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open database: %w", err)
 	}

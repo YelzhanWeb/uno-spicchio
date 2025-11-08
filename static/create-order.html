@@ -59,11 +59,11 @@
                         <h3 class="text-[#1b0e0e] text-lg font-bold mb-4">Итого</h3>
                         <div class="flex justify-between py-2">
                             <p class="text-[#994d51]">Подытог</p>
-                            <p class="text-[#1b0e0e]" id="order-subtotal">$0.00</p>
+                            <p class="text-[#1b0e0e]" id="order-subtotal">₸0.00</p>
                         </div>
                         <div class="flex justify-between py-2 text-lg font-bold">
                             <p class="text-[#1b0e0e]">Итого</p>
-                            <p class="text-[#1b0e0e]" id="order-total">$0.00</p>
+                            <p class="text-[#1b0e0e]" id="order-total">₸0.00</p>
                         </div>
                     </div>
                     <button id="create-order-btn"
@@ -120,7 +120,6 @@
                 if (response.ok) {
                     const result = await response.json();
 
-                    // Поддержка разных форматов ответа
                     if (result.success && result.data) {
                         currentUser = result.data;
                     } else if (result.id) {
@@ -164,7 +163,6 @@
                 if (response.ok) {
                     const result = await response.json();
 
-                    // Поддержка разных форматов ответа
                     if (result.success && result.data) {
                         tables = result.data;
                     } else if (Array.isArray(result)) {
@@ -177,10 +175,11 @@
                     tables.forEach(table => {
                         const option = document.createElement('option');
                         option.value = table.id;
-                        let statusText = table.status === 'free' ? 'Свободен' :
-                            table.status === 'reserve' ? 'Зарезервирован' :
-                                'Занят';
+                        let statusText = table.status === 'free' ? '🟢 Свободен' :
+                            table.status === 'reserve' ? '🟡 Зарезервирован' :
+                                '🔴 Занят';
                         option.textContent = `${table.name} - ${statusText}`;
+                        option.disabled = table.status === 'busy';
                         tableSelect.appendChild(option);
                     });
                 } else {
@@ -207,7 +206,6 @@
                 const categoriesResult = await categoriesResponse.json();
                 let categories;
 
-                // Поддержка разных форматов ответа
                 if (categoriesResult.success && categoriesResult.data) {
                     categories = categoriesResult.data;
                 } else if (Array.isArray(categoriesResult)) {
@@ -216,7 +214,7 @@
                     categories = [];
                 }
 
-                const dishesResponse = await fetch(`${API_BASE_URL}/dishes`, {
+                const dishesResponse = await fetch(`${API_BASE_URL}/dishes?active=true`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
 
@@ -227,7 +225,6 @@
                 const dishesResult = await dishesResponse.json();
                 let dishes;
 
-                // Поддержка разных форматов ответа
                 if (dishesResult.success && dishesResult.data) {
                     dishes = dishesResult.data;
                 } else if (Array.isArray(dishesResult)) {
@@ -239,7 +236,7 @@
                 menuData = categories.map(category => ({
                     id: category.id,
                     name: category.name,
-                    dishes: dishes.filter(dish => dish.category_id === category.id)
+                    dishes: dishes.filter(dish => dish.category_id === category.id && dish.is_active)
                 }));
 
                 if (menuData.length > 0) {
@@ -288,10 +285,10 @@
                 <div class="flex flex-col justify-center overflow-hidden">
                     <p class="text-[#1b0e0e] text-base font-medium truncate">${dish.name}</p>
                     <p class="text-[#994d51] text-sm font-normal truncate">${dish.description || ''}</p>
-                    <p class="text-[#1b0e0e] text-sm font-bold">${dish.price.toFixed(2)}</p>
+                    <p class="text-[#1b0e0e] text-sm font-bold">₸${dish.price.toFixed(2)}</p>
                 </div>
                 <div class="shrink-0">
-                    <button class="add-dish-btn flex min-w-[84px] cursor-pointer items-center justify-center rounded-lg h-8 px-4 bg-[#f3e7e8] text-[#1b0e0e] text-sm font-medium">
+                    <button class="add-dish-btn flex min-w-[84px] cursor-pointer items-center justify-center rounded-lg h-8 px-4 bg-[#f3e7e8] text-[#1b0e0e] text-sm font-medium hover:bg-[#ea2a33] hover:text-white transition-colors">
                         Добавить
                     </button>
                 </div>
@@ -317,12 +314,12 @@
                 <td class="py-3 px-2 text-sm">${item.name}</td>
                 <td class="py-3 px-2 text-sm text-center">
                     <div class="flex items-center justify-center gap-2">
-                        <button class="decrement-btn text-lg font-bold text-red-500">-</button>
-                        <span>${item.quantity}</span>
-                        <button class="increment-btn text-lg font-bold text-green-500">+</button>
+                        <button class="decrement-btn text-lg font-bold text-red-500 hover:text-red-700">-</button>
+                        <span class="min-w-[20px] text-center">${item.quantity}</span>
+                        <button class="increment-btn text-lg font-bold text-green-500 hover:text-green-700">+</button>
                     </div>
                 </td>
-                <td class="py-3 px-2 text-sm text-right">${itemTotal.toFixed(2)}</td>
+                <td class="py-3 px-2 text-sm text-right">₸${itemTotal.toFixed(2)}</td>
                 `;
                 tr.querySelector('.decrement-btn').addEventListener('click', () => decrementItem(item.dish_id));
                 tr.querySelector('.increment-btn').addEventListener('click', () => incrementItem(item.dish_id));
@@ -336,8 +333,8 @@
             currentOrder.items.forEach(item => {
                 subtotal += item.price * item.quantity;
             });
-            orderSubtotalEl.textContent = `${subtotal.toFixed(2)}`;
-            orderTotalEl.textContent = `${subtotal.toFixed(2)}`;
+            orderSubtotalEl.textContent = `₸${subtotal.toFixed(2)}`;
+            orderTotalEl.textContent = `₸${subtotal.toFixed(2)}`;
         }
 
         function addToOrder(dish) {
@@ -378,8 +375,8 @@
                 return;
             }
 
-            const tableId = parseInt(tableSelect.value);
-            if (!tableId) {
+            const tableNumber = parseInt(tableSelect.value);
+            if (!tableNumber) {
                 alert('Пожалуйста, выберите стол.');
                 return;
             }
@@ -388,15 +385,16 @@
             if (!token) return;
 
             const payload = {
-                table_id: tableId,
-                waiter_id: currentUser.id,
-                notes: "",
+                table_number: tableNumber,
+                notes: null,
                 items: Array.from(currentOrder.items.values()).map(item => ({
                     dish_id: item.dish_id,
                     qty: item.quantity,
-                    notes: ""
+                    notes: null
                 }))
             };
+
+            console.log('Sending order:', payload);
 
             createOrderBtn.disabled = true;
             createOrderBtn.textContent = 'Создание...';

@@ -128,7 +128,7 @@
                         </div>
                         <div>
                             <h3 class="text-sm font-medium text-subtext-light dark:text-subtext-dark">Total Revenue</h3>
-                            <p class="text-3xl font-bold text-text-light dark:text-text-dark mt-1" id="totalRevenue">$0
+                            <p class="text-3xl font-bold text-text-light dark:text-text-dark mt-1" id="totalRevenue">₸0
                             </p>
                             <p class="text-xs mt-1" id="revenueChange">--</p>
                         </div>
@@ -153,7 +153,7 @@
                         <div>
                             <h3 class="text-sm font-medium text-subtext-light dark:text-subtext-dark">Average Order
                                 Value</h3>
-                            <p class="text-3xl font-bold text-text-light dark:text-text-dark mt-1" id="avgOrderValue">$0
+                            <p class="text-3xl font-bold text-text-light dark:text-text-dark mt-1" id="avgOrderValue">₸0
                             </p>
                             <p class="text-xs mt-1" id="avgValueChange">--</p>
                         </div>
@@ -169,7 +169,7 @@
                             <h3 class="text-lg font-semibold text-text-light dark:text-text-dark">Sales by Category</h3>
                         </div>
                         <div id="categorySales" class="flex-1 flex flex-col space-y-4">
-                            <!-- Will be populated by JavaScript -->
+                            <p class="text-subtext-light dark:text-subtext-dark">Loading...</p>
                         </div>
                     </div>
 
@@ -178,7 +178,7 @@
                         class="lg:col-span-2 bg-card-light dark:bg-card-dark p-6 rounded-xl border border-gray-200 dark:border-gray-700">
                         <h3 class="text-lg font-semibold text-text-light dark:text-text-dark mb-4">Popular Dishes</h3>
                         <ul id="popularDishes" class="space-y-4">
-                            <!-- Will be populated by JavaScript -->
+                            <p class="text-subtext-light dark:text-subtext-dark">Loading...</p>
                         </ul>
                     </div>
                 </div>
@@ -224,7 +224,6 @@
                 if (response.ok) {
                     const result = await response.json();
 
-                    // Поддержка разных форматов ответа
                     if (result.success && result.data) {
                         currentUser = result.data;
                     } else if (result.id) {
@@ -267,21 +266,24 @@
 
                 if (response.ok) {
                     const result = await response.json();
+                    console.log('Dashboard data received:', result);
 
-                    // Поддержка разных форматов ответа
                     let data;
                     if (result.success && result.data) {
                         data = result.data;
                     } else if (result.summary) {
                         data = result;
                     } else {
+                        console.error('Invalid data format:', result);
                         showError('Invalid dashboard data format');
                         return;
                     }
 
                     updateDashboard(data);
                 } else {
-                    showError('Failed to load dashboard data');
+                    const errorText = await response.text();
+                    console.error('Dashboard error:', errorText);
+                    showError('Failed to load dashboard data: ' + response.status);
                 }
             } catch (error) {
                 console.error('Error loading dashboard:', error);
@@ -292,15 +294,22 @@
         }
 
         function updateDashboard(data) {
+            console.log('Updating dashboard with:', data);
             updateSummary(data.summary || {});
             updateCategorySales(data.category_sales || []);
             updatePopularDishes(data.popular_dishes || []);
         }
 
         function updateSummary(summary) {
-            document.getElementById('totalRevenue').textContent = '$' + (summary.total_revenue || 0).toFixed(2);
-            document.getElementById('totalOrders').textContent = summary.total_orders || 0;
-            document.getElementById('avgOrderValue').textContent = '$' + (summary.average_order_value || 0).toFixed(2);
+            console.log('Summary data:', summary);
+
+            const totalRevenue = summary.total_revenue || 0;
+            const totalOrders = summary.total_orders || 0;
+            const avgOrderValue = summary.average_order_value || 0;
+
+            document.getElementById('totalRevenue').textContent = '₸' + totalRevenue.toFixed(2);
+            document.getElementById('totalOrders').textContent = totalOrders;
+            document.getElementById('avgOrderValue').textContent = '₸' + avgOrderValue.toFixed(2);
 
             updateChangeIndicator('revenueChange', summary.revenue_change || 0);
             updateChangeIndicator('ordersChange', summary.orders_change || 0);
@@ -319,43 +328,49 @@
         }
 
         function updateCategorySales(sales) {
+            console.log('Category sales data:', sales);
             const container = document.getElementById('categorySales');
             const colors = ['red', 'green', 'blue', 'yellow', 'purple', 'orange'];
 
-            if (sales.length === 0) {
-                container.innerHTML = '<p class="text-subtext-light dark:text-subtext-dark">No data available</p>';
+            if (!sales || sales.length === 0) {
+                container.innerHTML = '<p class="text-subtext-light dark:text-subtext-dark">No sales data available for this period</p>';
                 return;
             }
 
             container.innerHTML = sales.map((sale, index) => {
                 const color = colors[index % colors.length];
                 const percentage = sale.percentage || 0;
+                const revenue = sale.revenue || 0;
 
                 return `
                     <div class="flex items-center">
-                        <div class="w-24 text-sm text-subtext-light dark:text-subtext-dark">${sale.category_name}</div>
+                        <div class="w-32 text-sm text-subtext-light dark:text-subtext-dark">${sale.category_name}</div>
                         <div class="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-4 mx-3">
-                            <div class="bg-${color}-500 h-4 rounded-full chart-bar" style="width: ${percentage}%;"></div>
+                            <div class="bg-${color}-500 h-4 rounded-full chart-bar" style="width: ${Math.max(percentage, 2)}%;"></div>
                         </div>
-                        <div class="w-20 text-right font-semibold text-text-light dark:text-text-dark">$${sale.revenue.toFixed(0)}</div>
+                        <div class="w-24 text-right font-semibold text-text-light dark:text-text-dark">₸${revenue.toFixed(0)}</div>
+                        <div class="w-16 text-right text-sm text-subtext-light dark:text-subtext-dark">${percentage.toFixed(1)}%</div>
                     </div>
                 `;
             }).join('');
         }
 
         function updatePopularDishes(dishes) {
+            console.log('Popular dishes data:', dishes);
             const container = document.getElementById('popularDishes');
             const icons = ['local_pizza', 'ramen_dining', 'tapas', 'cake', 'local_bar'];
             const colors = ['red', 'green', 'blue', 'yellow', 'orange'];
 
-            if (dishes.length === 0) {
-                container.innerHTML = '<p class="text-subtext-light dark:text-subtext-dark">No data available</p>';
+            if (!dishes || dishes.length === 0) {
+                container.innerHTML = '<p class="text-subtext-light dark:text-subtext-dark">No popular dishes data available for this period</p>';
                 return;
             }
 
             container.innerHTML = dishes.map((dish, index) => {
                 const icon = icons[index % icons.length];
                 const color = colors[index % colors.length];
+                const revenue = dish.revenue || 0;
+                const qtySold = dish.qty_sold || 0;
 
                 return `
                     <li class="flex items-center">
@@ -364,9 +379,9 @@
                         </div>
                         <div class="flex-1">
                             <span class="font-medium text-text-light dark:text-text-dark">${dish.dish_name}</span>
-                            <p class="text-sm text-subtext-light dark:text-subtext-dark">${dish.qty_sold} sold</p>
+                            <p class="text-sm text-subtext-light dark:text-subtext-dark">${qtySold} sold</p>
                         </div>
-                        <span class="font-semibold text-text-light dark:text-text-dark">${dish.revenue.toFixed(0)}</span>
+                        <span class="font-semibold text-text-light dark:text-text-dark">₸${revenue.toFixed(0)}</span>
                     </li>
                 `;
             }).join('');
@@ -405,6 +420,8 @@
 
         function showError(message) {
             alert(message);
+            document.getElementById('categorySales').innerHTML = '<p class="text-red-500">' + message + '</p>';
+            document.getElementById('popularDishes').innerHTML = '<p class="text-red-500">' + message + '</p>';
         }
     </script>
 </body>

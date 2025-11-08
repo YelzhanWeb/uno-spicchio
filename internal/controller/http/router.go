@@ -1,7 +1,8 @@
-// internal/adapters/http/router.go
 package httpAdapter
 
 import (
+	"net/http"
+
 	"github.com/YelzhanWeb/uno-spicchio/internal/controller/http/handlers"
 	"github.com/YelzhanWeb/uno-spicchio/internal/controller/http/middleware"
 	"github.com/YelzhanWeb/uno-spicchio/internal/domain"
@@ -55,6 +56,15 @@ func (rt *Router) Setup() *chi.Mux {
 	// Global middleware
 	r.Use(middleware.Logging)
 	r.Use(middleware.CORS)
+
+	// Serve static files
+	fileServer := http.FileServer(http.Dir("./static"))
+	r.Handle("/static/*", http.StripPrefix("/static/", fileServer))
+
+	// Redirect root to login page
+	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "/static/login.html", http.StatusFound)
+	})
 
 	// Public routes
 	r.Post("/api/auth/login", rt.authHandler.Login)
@@ -118,6 +128,8 @@ func (rt *Router) Setup() *chi.Mux {
 
 			// Cook and Admin can update status
 			r.With(middleware.RequireRole(domain.RoleCook, domain.RoleAdmin)).Put("/{id}/status", rt.orderHandler.UpdateStatus)
+
+			r.With(middleware.RequireRole(domain.RoleWaiter, domain.RoleAdmin)).Delete("/{id}", rt.orderHandler.Delete)
 		})
 
 		// Ingredient routes (Admin only)

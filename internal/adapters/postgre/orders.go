@@ -29,9 +29,11 @@ func (r *OrderRepository) Create(ctx context.Context, order *domain.Order) error
 
 func (r *OrderRepository) GetByID(ctx context.Context, id int) (*domain.Order, error) {
 	query := `
-		SELECT o.id, o.waiter_id, o.table_number, o.status, o.total, o.notes, o.created_at, o.updated_at,
-		       u.id, u.username, u.role, u.photo_key, u.is_active, u.created_at,
-		       t.id, t.name, t.status
+		SELECT 
+			o.id, o.waiter_id, o.table_number, o.status, o.total, o.notes, 
+			o.created_at, o.updated_at,
+			u.id, u.username, u.role, u.photokey, u.is_active, u.created_at,
+			t.id, t.name, t.status
 		FROM orders o
 		LEFT JOIN users u ON o.waiter_id = u.id
 		LEFT JOIN tables t ON o.table_number = t.id
@@ -42,24 +44,34 @@ func (r *OrderRepository) GetByID(ctx context.Context, id int) (*domain.Order, e
 		Table:  &domain.Table{},
 	}
 
+	var waiterCreatedAt time.Time
 	err := r.db.QueryRowContext(ctx, query, id).Scan(
 		&order.ID, &order.WaiterID, &order.TableNumber, &order.Status, &order.Total, &order.Notes,
 		&order.CreatedAt, &order.UpdatedAt,
 		&order.Waiter.ID, &order.Waiter.Username, &order.Waiter.Role, &order.Waiter.PhotoKey,
-		&order.Waiter.IsActive, &order.Waiter.CreatedAt,
+		&order.Waiter.IsActive, &waiterCreatedAt,
 		&order.Table.ID, &order.Table.Name, &order.Table.Status,
 	)
 
 	if err == sql.ErrNoRows {
 		return nil, nil
 	}
-	return order, err
+	if err != nil {
+		return nil, err
+	}
+
+	order.Waiter.CreatedAt = waiterCreatedAt
+	return order, nil
 }
 
 func (r *OrderRepository) GetAll(ctx context.Context, status *domain.OrderStatus) ([]domain.Order, error) {
 	query := `
-		SELECT o.id, o.waiter_id, o.table_number, o.status, o.total, o.notes, o.created_at, o.updated_at,
-		       u.username, t.name
+		SELECT 
+			o.id, o.waiter_id, o.table_number, o.status, o.total, o.notes, 
+			o.created_at, o.updated_at,
+			COALESCE(u.username, '') as waiter_username,
+			COALESCE(t.name, '') as table_name,
+			t.id as table_id
 		FROM orders o
 		LEFT JOIN users u ON o.waiter_id = u.id
 		LEFT JOIN tables t ON o.table_number = t.id`
@@ -81,17 +93,23 @@ func (r *OrderRepository) GetAll(ctx context.Context, status *domain.OrderStatus
 	for rows.Next() {
 		var order domain.Order
 		var waiterUsername, tableName string
+		var tableID int
 
 		if err := rows.Scan(
 			&order.ID, &order.WaiterID, &order.TableNumber, &order.Status, &order.Total,
 			&order.Notes, &order.CreatedAt, &order.UpdatedAt,
-			&waiterUsername, &tableName,
+			&waiterUsername, &tableName, &tableID,
 		); err != nil {
 			return nil, err
 		}
 
+		// Инициализируем связанные объекты
 		order.Waiter = &domain.User{Username: waiterUsername}
-		order.Table = &domain.Table{Name: tableName}
+		order.Table = &domain.Table{
+			ID:   tableID,
+			Name: tableName,
+		}
+
 		orders = append(orders, order)
 	}
 
@@ -135,11 +153,14 @@ func (r *OrderRepository) AddItem(ctx context.Context, item *domain.OrderItem) e
 
 func (r *OrderRepository) GetItems(ctx context.Context, orderID int) ([]domain.OrderItem, error) {
 	query := `
-		SELECT oi.id, oi.order_id, oi.dish_id, oi.qty, oi.price, oi.notes,
-		       d.name, d.price, d.photo_url
+		SELECT 
+			oi.id, oi.order_id, oi.dish_id, oi.qty, oi.price, 
+			COALESCE(oi.notes, '') as notes,
+			d.id, d.name, d.price, COALESCE(d.photo_url, '') as photo_url
 		FROM order_items oi
 		JOIN dishes d ON oi.dish_id = d.id
-		WHERE oi.order_id = $1`
+		WHERE oi.order_id = $1
+		ORDER BY oi.id`
 
 	rows, err := r.db.QueryContext(ctx, query, orderID)
 	if err != nil {
@@ -150,14 +171,21 @@ func (r *OrderRepository) GetItems(ctx context.Context, orderID int) ([]domain.O
 	var items []domain.OrderItem
 	for rows.Next() {
 		var item domain.OrderItem
+		var notes string
 		item.Dish = &domain.Dish{}
 
 		if err := rows.Scan(
-			&item.ID, &item.OrderID, &item.DishID, &item.Qty, &item.Price, &item.Notes,
-			&item.Dish.Name, &item.Dish.Price, &item.Dish.PhotoURL,
+			&item.ID, &item.OrderID, &item.DishID, &item.Qty, &item.Price,
+			&notes,
+			&item.Dish.ID, &item.Dish.Name, &item.Dish.Price, &item.Dish.PhotoURL,
 		); err != nil {
 			return nil, err
 		}
+
+		if notes != "" {
+			item.Notes = &notes
+		}
+
 		items = append(items, item)
 	}
 

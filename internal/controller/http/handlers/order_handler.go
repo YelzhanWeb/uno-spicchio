@@ -2,8 +2,9 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
+	"log"
 	"net/http"
-
 	"strconv"
 
 	"github.com/YelzhanWeb/uno-spicchio/internal/controller/http/middleware"
@@ -80,7 +81,21 @@ func (h *OrderHandler) Create(w http.ResponseWriter, r *http.Request) {
 
 	var req CreateOrderRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		response.BadRequest(w, "invalid request body")
+		response.BadRequest(w, "invalid request body: "+err.Error())
+		return
+	}
+
+	// Debug logging
+	log.Printf("Create order request: TableNumber=%d, Items=%d", req.TableNumber, len(req.Items))
+
+	// Validate request
+	if req.TableNumber <= 0 {
+		response.BadRequest(w, fmt.Sprintf("invalid table number: %d", req.TableNumber))
+		return
+	}
+
+	if len(req.Items) == 0 {
+		response.BadRequest(w, "order must have at least one item")
 		return
 	}
 
@@ -92,6 +107,10 @@ func (h *OrderHandler) Create(w http.ResponseWriter, r *http.Request) {
 
 	var items []domain.OrderItem
 	for _, itemReq := range req.Items {
+		if itemReq.DishID <= 0 || itemReq.Qty <= 0 {
+			response.BadRequest(w, "invalid dish id or quantity")
+			return
+		}
 		items = append(items, domain.OrderItem{
 			DishID: itemReq.DishID,
 			Qty:    itemReq.Qty,
@@ -104,7 +123,15 @@ func (h *OrderHandler) Create(w http.ResponseWriter, r *http.Request) {
 			response.BadRequest(w, "insufficient stock for order")
 			return
 		}
-		response.InternalError(w, "failed to create order")
+		if err == domain.ErrTableNotFound {
+			response.BadRequest(w, "table not found")
+			return
+		}
+		if err == domain.ErrDishNotFound {
+			response.BadRequest(w, "one or more dishes not found")
+			return
+		}
+		response.InternalError(w, "failed to create order: "+err.Error())
 		return
 	}
 
@@ -124,6 +151,19 @@ func (h *OrderHandler) UpdateStatus(w http.ResponseWriter, r *http.Request) {
 	}
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		response.BadRequest(w, "invalid request body")
+		return
+	}
+
+	// Validate status
+	validStatuses := map[domain.OrderStatus]bool{
+		domain.OrderNew:        true,
+		domain.OrderInProgress: true,
+		domain.OrderReady:      true,
+		domain.OrderPaid:       true,
+	}
+
+	if !validStatuses[req.Status] {
+		response.BadRequest(w, "invalid status value")
 		return
 	}
 
@@ -161,4 +201,24 @@ func (h *OrderHandler) CloseOrder(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response.Success(w, map[string]string{"message": "order closed"})
+}
+
+func (h *OrderHandler) Delete(w http.ResponseWriter, r *http.Request) {
+	idStr := chi.URLParam(r, "id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		response.BadRequest(w, "invalid order id")
+		return
+	}
+
+	if err := h.orderService.DeleteOrder(r.Context(), id); err != nil {
+		if err == domain.ErrOrderNotFound {
+			response.NotFound(w, "order not found")
+			return
+		}
+		response.InternalError(w, "failed to delete order")
+		return
+	}
+
+	response.Success(w, map[string]string{"message": "order deleted"})
 }
