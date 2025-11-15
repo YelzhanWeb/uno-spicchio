@@ -1,8 +1,7 @@
+// internal/adapters/http/router.go
 package httpAdapter
 
 import (
-	"net/http"
-
 	"github.com/YelzhanWeb/uno-spicchio/internal/controller/http/handlers"
 	"github.com/YelzhanWeb/uno-spicchio/internal/controller/http/middleware"
 	"github.com/YelzhanWeb/uno-spicchio/internal/domain"
@@ -57,15 +56,6 @@ func (rt *Router) Setup() *chi.Mux {
 	r.Use(middleware.Logging)
 	r.Use(middleware.CORS)
 
-	// Serve static files
-	fileServer := http.FileServer(http.Dir("./static"))
-	r.Handle("/static/*", http.StripPrefix("/static/", fileServer))
-
-	// Redirect root to login page
-	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		http.Redirect(w, r, "/static/login.html", http.StatusFound)
-	})
-
 	// Public routes
 	r.Post("/api/auth/login", rt.authHandler.Login)
 
@@ -117,19 +107,18 @@ func (rt *Router) Setup() *chi.Mux {
 
 		// Order routes
 		r.Route("/api/orders", func(r chi.Router) {
+			// Все могут просматривать заказы
 			r.Get("/", rt.orderHandler.GetAll)
 			r.Get("/{id}", rt.orderHandler.GetByID)
 
-			// Waiter can create orders
+			// Waiter и Admin могут создавать заказы
 			r.With(middleware.RequireRole(domain.RoleWaiter, domain.RoleAdmin)).Post("/", rt.orderHandler.Create)
 
-			// Waiter can close orders
+			// Waiter и Admin могут закрывать заказы (переводить в paid и освобождать стол)
 			r.With(middleware.RequireRole(domain.RoleWaiter, domain.RoleAdmin)).Put("/{id}/close", rt.orderHandler.CloseOrder)
 
-			// Cook and Admin can update status
-			r.With(middleware.RequireRole(domain.RoleCook, domain.RoleAdmin)).Put("/{id}/status", rt.orderHandler.UpdateStatus)
-
-			r.With(middleware.RequireRole(domain.RoleWaiter, domain.RoleAdmin)).Delete("/{id}", rt.orderHandler.Delete)
+			// Cook, Manager и Admin могут менять статус заказов
+			r.With(middleware.RequireRole(domain.RoleCook, domain.RoleManager, domain.RoleAdmin)).Put("/{id}/status", rt.orderHandler.UpdateStatus)
 		})
 
 		// Ingredient routes (Admin only)
@@ -155,7 +144,7 @@ func (rt *Router) Setup() *chi.Mux {
 			r.Get("/", rt.tableHandler.GetAll)
 			r.Get("/{id}", rt.tableHandler.GetByID)
 
-			// Waiter and Admin can update status
+			// Waiter и Admin могут обновлять статус стола
 			r.With(middleware.RequireRole(domain.RoleWaiter, domain.RoleAdmin)).Put("/{id}/status", rt.tableHandler.UpdateStatus)
 
 			// Admin only

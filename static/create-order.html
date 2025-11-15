@@ -1,88 +1,211 @@
 <!DOCTYPE html>
-<html>
+<html class="light" lang="en">
 
 <head>
-    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="" />
-    <link rel="stylesheet" as="style" onload="this.rel='stylesheet'"
-        href="https://fonts.googleapis.com/css2?display=swap&family=Work+Sans%3Awght%40400%3B500%3B700%3B900" />
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>UNO Spicchio - Новый заказ</title>
+
+    <!-- Шрифты -->
+    <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+
+    <!-- Tailwind -->
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#ec2513",
+                        "background-light": "#f8f6f6",
+                        "background-dark": "#221210",
+                    },
+                    fontFamily: {
+                        display: ["Work Sans", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.25rem",
+                        lg: "0.5rem",
+                        xl: "0.75rem",
+                        full: "9999px",
+                    },
+                },
+            },
+        };
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            font-size: 24px;
+        }
+    </style>
 </head>
 
-<body class="bg-[#fcf8f8]">
-    <div class="relative flex h-auto min-h-screen w-full flex-col"
-        style='font-family: "Work Sans", "Noto Sans", sans-serif;'>
-        <div class="layout-container flex h-full grow flex-col">
-            <header
-                class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#f3e7e8] px-10 py-3">
-                <a href="active-orders.html" class="flex items-center gap-4 text-[#1b0e0e]">
-                    <h2 class="text-[#1b0e0e] text-lg font-bold leading-tight tracking-[-0.015em]">UNO Spicchio</h2>
-                </a>
-                <div class="flex items-center gap-9">
-                    <a class="text-[#1b0e0e] text-sm font-medium leading-normal" href="active-orders.html">Заказы</a>
-                    <a class="text-[#1b0e0e] text-sm font-medium leading-normal" href="dashboard.html"
-                        id="dashboardLink">Аналитика</a>
-                    <button onclick="logout()"
-                        class="text-sm font-medium text-[#994d51] hover:text-[#ea2a33]">Выход</button>
+<body class="bg-background-light dark:bg-background-dark font-display">
+    <div class="relative flex min-h-screen w-full">
+        <!-- Sidebar -->
+        <aside
+            class="flex flex-col w-64 p-4 border-r border-[#e7d1cf] dark:border-white/10 bg-background-light dark:bg-background-dark text-[#1b0f0d] dark:text-gray-200">
+            <div class="flex flex-col gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
+                        data-alt="UNO Spicchio restaurant logo"
+                        style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCej6nzjOCtkOZnCO4ii1a233pgbYET5xcmiLDmPTeymtIJXUvI6lUMJ6uDMvSeLIpITQpAFUy-Zr4OsEN0Fltm3l88JmjT4eTT3wZuBVnZKXvMuR__hvoasQRRRlj_s3PyAqDUAfuGgXRDIc5kWHYO9jZ3M9LtlQmNCt06Bjo0p2vBW3bYBWadqc2rC7VBJEPCghP_fS4Nig3vr-5CZu-Ij4it-l7EE_R0ZCF1M2ZoqJwrph4MuZ5IRZHu-EDQHEu0rnpGkrQdRz4");'>
+                    </div>
+                    <div class="flex flex-col">
+                        <h1 class="text-base font-medium leading-normal text-[#1b0f0d] dark:text-white">
+                            UNO Spicchio
+                        </h1>
+                        <p class="text-sm font-normal leading-normal text-gray-500 dark:text-gray-400">
+                            Admin Panel
+                        </p>
+                    </div>
                 </div>
-            </header>
+                <nav class="flex flex-col gap-2 mt-4">
+                    <a href="dashboard.html"
+                        class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-primary/10 dark:hover:bg-primary/20">
+                        <span class="material-symbols-outlined">dashboard</span>
+                        <p class="text-sm font-medium leading-normal">Dashboard</p>
+                    </a>
+                    <a href="active-orders.html"
+                        class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/20 dark:bg-primary/30 text-primary dark:text-[#f8f6f6]">
+                        <span class="material-symbols-outlined"
+                            style="font-variation-settings: 'FILL' 1;">receipt_long</span>
+                        <p class="text-sm font-medium leading-normal">Orders</p>
+                    </a>
+                    <!-- Пока заглушки, можно подключить позже -->
+                    <a href="#"
+                        class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-primary/10 dark:hover:bg-primary/20">
+                        <span class="material-symbols-outlined">restaurant_menu</span>
+                        <p class="text-sm font-medium leading-normal">Menu</p>
+                    </a>
+                    <a href="#"
+                        class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-primary/10 dark:hover:bg-primary/20">
+                        <span class="material-symbols-outlined">table_restaurant</span>
+                        <p class="text-sm font-medium leading-normal">Reservations</p>
+                    </a>
+                    <a href="#"
+                        class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-primary/10 dark:hover:bg-primary/20">
+                        <span class="material-symbols-outlined">settings</span>
+                        <p class="text-sm font-medium leading-normal">Settings</p>
+                    </a>
+                </nav>
+            </div>
+            <div class="flex flex-col gap-4 mt-auto">
+                <button type="button"
+                    class="flex items-center justify-center w-full h-10 px-4 text-sm font-bold tracking-wider rounded-lg cursor-pointer bg-primary text-white">
+                    <span class="truncate">NEW ORDER</span>
+                </button>
+                <div class="flex flex-col gap-1">
+                    <a href="#"
+                        class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-primary/10 dark:hover:bg-primary/20">
+                        <span class="material-symbols-outlined">help_outline</span>
+                        <p class="text-sm font-medium leading-normal">Help</p>
+                    </a>
+                    <a href="#" onclick="logout(); return false;"
+                        class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-primary/10 dark:hover:bg-primary/20">
+                        <span class="material-symbols-outlined">logout</span>
+                        <p class="text-sm font-medium leading-normal">Log Out</p>
+                    </a>
+                </div>
+            </div>
+        </aside>
 
-            <main class="flex flex-1 flex-col gap-4 p-4 lg:flex-row lg:gap-8 lg:p-8">
-                <div class="flex flex-col gap-4 w-full lg:max-w-md">
-                    <div>
-                        <p class="text-[#1b0e0e] text-2xl font-bold">Новый заказ</p>
-                        <div class="mt-2">
-                            <label class="text-sm font-medium text-[#994d51]">Выберите стол:</label>
-                            <select id="table-select" class="mt-1 w-full rounded-lg border border-[#e7d0d1] p-2">
-                                <option value="">Загрузка столов...</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="flex flex-col rounded-lg border border-[#e7d0d1] bg-white p-4">
-                        <h3 class="text-[#1b0e0e] text-lg font-bold mb-4">Позиции заказа</h3>
-                        <table class="w-full">
-                            <thead>
-                                <tr class="border-b border-[#e7d0d1]">
-                                    <th class="py-2 text-left text-sm font-medium text-[#1b0e0e]">Позиция</th>
-                                    <th class="py-2 text-center text-sm font-medium text-[#1b0e0e]">Кол-во</th>
-                                    <th class="py-2 text-right text-sm font-medium text-[#1b0e0e]">Сумма</th>
-                                </tr>
-                            </thead>
-                            <tbody id="order-items-table-body">
-                                <tr>
-                                    <td colspan="3" class="text-center text-gray-400 py-8">Заказ пуст</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="flex flex-col rounded-lg border border-[#e7d0d1] bg-white p-4">
-                        <h3 class="text-[#1b0e0e] text-lg font-bold mb-4">Итого</h3>
-                        <div class="flex justify-between py-2">
-                            <p class="text-[#994d51]">Подытог</p>
-                            <p class="text-[#1b0e0e]" id="order-subtotal">₸0.00</p>
-                        </div>
-                        <div class="flex justify-between py-2 text-lg font-bold">
-                            <p class="text-[#1b0e0e]">Итого</p>
-                            <p class="text-[#1b0e0e]" id="order-total">₸0.00</p>
-                        </div>
-                    </div>
-                    <button id="create-order-btn"
-                        class="flex items-center justify-center rounded-lg h-12 px-5 bg-[#ea2a33] text-white text-base font-bold">
-                        Создать заказ
-                    </button>
+        <!-- Main content -->
+        <main class="flex-1 p-8 overflow-y-auto">
+            <div class="max-w-7xl mx-auto">
+                <!-- Заголовок -->
+                <div class="flex flex-wrap items-center justify-between gap-3 mb-8">
+                    <p class="text-[#1b0f0d] dark:text-white text-4xl font-black tracking-tighter">
+                        Create New Order
+                    </p>
                 </div>
 
-                <div class="flex-1 flex flex-col">
-                    <h3 class="text-[#1b0e0e] text-lg font-bold mb-4">Добавить позиции</h3>
-                    <div class="border-b border-[#e7d0d1]">
-                        <div id="menu-tabs-container" class="flex gap-8 px-4"></div>
+                <!-- Две колонки -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- Левая колонка (стол + заказ) -->
+                    <div class="lg:col-span-1 flex flex-col gap-6">
+                        <!-- Выбор стола -->
+                        <div class="flex flex-col w-full">
+                            <label class="flex flex-col w-full">
+                                <p class="text-[#1b0f0d] dark:text-gray-200 text-base font-medium leading-normal pb-2">
+                                    Select Table
+                                </p>
+                                <select id="table-select"
+                                    class="form-select flex w-full min-w-0 resize-none overflow-hidden rounded-lg text-[#1b0f0d] dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-[#e7d1cf] dark:border-white/20 bg-background-light dark:bg-background-dark focus:border-primary h-14 placeholder:text-gray-400 p-3 text-base font-normal leading-normal">
+                                    <option value="">Loading tables...</option>
+                                </select>
+                            </label>
+                        </div>
+
+                        <!-- Текущий заказ -->
+                        <div class="flex flex-col">
+                            <h3 class="text-[#1b0f0d] dark:text-white text-lg font-bold tracking-tight pb-2 pt-4">
+                                Current Order
+                            </h3>
+                            <div
+                                class="flex flex-col p-4 bg-white/50 dark:bg-white/5 rounded-xl border border-[#e7d1cf] dark:border-white/10">
+                                <!-- Контейнер для позиций заказа -->
+                                <div id="order-items-container" class="flex flex-col gap-3">
+                                    <!-- JS сам вставит сюда пустое состояние или список позиций -->
+                                </div>
+
+                                <!-- Итог -->
+                                <div
+                                    class="flex flex-col gap-2 pt-4 mt-4 border-t border-dashed border-[#e7d1cf] dark:border-white/10">
+                                    <div
+                                        class="flex justify-between items-center text-sm text-gray-600 dark:text-gray-300">
+                                        <span>Subtotal</span>
+                                        <span id="order-subtotal">₸0.00</span>
+                                    </div>
+                                    <div
+                                        class="flex justify-between items-center text-lg font-bold text-[#1b0f0d] dark:text-white">
+                                        <span>Total</span>
+                                        <span id="order-total">₸0.00</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Кнопка создания заказа -->
+                        <button id="create-order-btn" type="button"
+                            class="flex items-center justify-center w-full h-12 px-4 mt-auto text-base font-bold tracking-wider text-white rounded-lg cursor-pointer bg-primary hover:opacity-90 disabled:opacity-50">
+                            <span class="truncate">CREATE ORDER</span>
+                        </button>
                     </div>
-                    <div id="menu-items-container" class="py-4 flex flex-col gap-2"></div>
+
+                    <!-- Правая колонка (меню) -->
+                    <div class="lg:col-span-2 flex flex-col gap-6">
+                        <!-- Поиск -->
+                        <div class="relative">
+                            <span
+                                class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">search</span>
+                            <input id="menu-search" type="text"
+                                class="w-full h-14 pl-12 pr-4 text-base rounded-lg border border-[#e7d1cf] dark:border-white/20 bg-background-light dark:bg-background-dark focus:ring-2 focus:ring-primary/50 focus:border-primary text-[#1b0f0d] dark:text-white placeholder:text-gray-400"
+                                placeholder="Search menu items..." />
+                        </div>
+
+                        <!-- Табы категорий -->
+                        <div class="border-b border-[#e7d1cf] dark:border-white/10">
+                            <nav id="menu-tabs-container" aria-label="Tabs" class="flex -mb-px space-x-6">
+                                <!-- JS сам отрисует категории -->
+                            </nav>
+                        </div>
+
+                        <!-- Сетка блюд -->
+                        <div id="menu-items-container" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                            <!-- JS сам вставит карточки блюд -->
+                        </div>
+                    </div>
                 </div>
-            </main>
-        </div>
+            </div>
+        </main>
     </div>
 
+    <!-- ЛОГИКА ИЗ ТВОЕГО РАБОТАЮЩЕГО ВАРИАНТА -->
     <script>
         const API_BASE_URL = 'http://localhost:8080/api';
         let menuData = [];
@@ -90,14 +213,16 @@
         let activeCategoryId = null;
         let currentUser = null;
         let tables = [];
+        let menuSearchTerm = '';
 
         const menuTabsContainer = document.getElementById('menu-tabs-container');
         const menuItemsContainer = document.getElementById('menu-items-container');
-        const orderItemsBody = document.getElementById('order-items-table-body');
+        const orderItemsContainer = document.getElementById('order-items-container');
         const orderSubtotalEl = document.getElementById('order-subtotal');
         const orderTotalEl = document.getElementById('order-total');
         const createOrderBtn = document.getElementById('create-order-btn');
         const tableSelect = document.getElementById('table-select');
+        const menuSearchInput = document.getElementById('menu-search');
 
         function checkAuth() {
             const token = localStorage.getItem('auth_token');
@@ -127,10 +252,7 @@
                     }
 
                     if (currentUser) {
-                        if (currentUser.role !== 'admin' && currentUser.role !== 'manager') {
-                            document.getElementById('dashboardLink').style.display = 'none';
-                        }
-
+                        // В старом коде скрывался dashboardLink – здесь можно добавить доп. логику при желании
                         if (currentUser.role !== 'waiter' && currentUser.role !== 'admin') {
                             alert('У вас нет прав для создания заказов');
                             window.location.href = 'active-orders.html';
@@ -244,11 +366,13 @@
                     renderTabs();
                     renderMenu();
                 } else {
-                    menuItemsContainer.innerHTML = '<p class="text-gray-500 p-4">Меню пусто.</p>';
+                    menuItemsContainer.innerHTML =
+                        '<p class="text-gray-500 p-4">Меню пусто.</p>';
                 }
             } catch (error) {
                 console.error('Error loading menu:', error);
-                menuItemsContainer.innerHTML = '<p class="text-red-500 p-4">Ошибка загрузки меню.</p>';
+                menuItemsContainer.innerHTML =
+                    '<p class="text-red-500 p-4">Ошибка загрузки меню.</p>';
             }
         }
 
@@ -258,8 +382,12 @@
                 const isActive = category.id === activeCategoryId;
                 const tab = document.createElement('a');
                 tab.href = '#';
-                tab.className = `flex flex-col items-center justify-center border-b-[3px] pb-[13px] pt-4 ${isActive ? 'border-b-[#ea2a33] text-[#1b0e0e]' : 'border-b-transparent text-[#994d51]'}`;
-                tab.innerHTML = `<p class="text-sm font-bold">${category.name}</p>`;
+                tab.className =
+                    `px-1 py-3 text-sm font-semibold border-b-2 whitespace-nowrap ` +
+                    (isActive
+                        ? 'border-primary text-primary'
+                        : 'text-gray-500 border-transparent dark:text-gray-400 hover:text-primary hover:border-primary/50');
+                tab.textContent = category.name;
                 tab.addEventListener('click', (e) => {
                     e.preventDefault();
                     activeCategoryId = category.id;
@@ -274,57 +402,114 @@
             menuItemsContainer.innerHTML = '';
             const activeCategory = menuData.find(c => c.id === activeCategoryId);
             if (!activeCategory || !activeCategory.dishes || activeCategory.dishes.length === 0) {
-                menuItemsContainer.innerHTML = '<p class="text-gray-500 p-4">В этой категории нет блюд.</p>';
+                menuItemsContainer.innerHTML =
+                    '<p class="text-gray-500 p-4">В этой категории нет блюд.</p>';
                 return;
             }
 
-            activeCategory.dishes.forEach(dish => {
-                const menuItem = document.createElement('div');
-                menuItem.className = 'flex items-center gap-4 px-4 min-h-[72px] py-2 justify-between';
-                menuItem.innerHTML = `
-                <div class="flex flex-col justify-center overflow-hidden">
-                    <p class="text-[#1b0e0e] text-base font-medium truncate">${dish.name}</p>
-                    <p class="text-[#994d51] text-sm font-normal truncate">${dish.description || ''}</p>
-                    <p class="text-[#1b0e0e] text-sm font-bold">₸${dish.price.toFixed(2)}</p>
-                </div>
-                <div class="shrink-0">
-                    <button class="add-dish-btn flex min-w-[84px] cursor-pointer items-center justify-center rounded-lg h-8 px-4 bg-[#f3e7e8] text-[#1b0e0e] text-sm font-medium hover:bg-[#ea2a33] hover:text-white transition-colors">
-                        Добавить
-                    </button>
-                </div>
+            const dishesToRender = activeCategory.dishes.filter(dish => {
+                if (!menuSearchTerm) return true;
+                const text = `${dish.name} ${dish.description || ''}`.toLowerCase();
+                return text.includes(menuSearchTerm);
+            });
+
+            if (dishesToRender.length === 0) {
+                menuItemsContainer.innerHTML =
+                    '<p class="text-gray-500 p-4">Ничего не найдено по вашему запросу.</p>';
+                return;
+            }
+
+            dishesToRender.forEach(dish => {
+                const card = document.createElement('div');
+                card.className =
+                    'flex flex-col bg-white/50 dark:bg-white/5 rounded-xl border border-[#e7d1cf] dark:border-white/10 overflow-hidden';
+
+                // Если в API нет картинок, можно не показывать <img> вообще или использовать заглушку
+                const imageUrl = dish.image_url || '';
+                const hasImage = Boolean(imageUrl);
+
+                card.innerHTML = `
+                    ${hasImage
+                        ? `<img class="w-full h-40 object-cover" src="${imageUrl}" alt="${dish.name}"/>`
+                        : ''
+                    }
+                    <div class="p-4 flex flex-col flex-1">
+                        <div class="flex-1">
+                            <h4 class="font-bold text-lg text-[#1b0f0d] dark:text-white">${dish.name}</h4>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                ${dish.description || ''}
+                            </p>
+                        </div>
+                        <div class="flex justify-between items-center mt-4">
+                            <p class="font-bold text-lg text-[#1b0f0d] dark:text-white">
+                                ₸${dish.price.toFixed(2)}
+                            </p>
+                            <button
+                                class="add-dish-btn flex items-center justify-center h-9 px-4 text-sm font-bold tracking-wide rounded-lg cursor-pointer bg-primary/20 dark:bg-primary/30 text-primary dark:text-[#f8f6f6] hover:bg-primary/30 dark:hover:bg-primary/40">
+                                Add
+                            </button>
+                        </div>
+                    </div>
                 `;
-                menuItem.querySelector('.add-dish-btn').addEventListener('click', () => addToOrder(dish));
-                menuItemsContainer.appendChild(menuItem);
+
+                card.querySelector('.add-dish-btn')
+                    .addEventListener('click', () => addToOrder(dish));
+
+                menuItemsContainer.appendChild(card);
             });
         }
 
         function renderCurrentOrder() {
-            orderItemsBody.innerHTML = '';
+            orderItemsContainer.innerHTML = '';
+
             if (currentOrder.items.size === 0) {
-                orderItemsBody.innerHTML = '<tr><td colspan="3" class="text-center text-gray-400 py-8">Заказ пуст</td></tr>';
+                orderItemsContainer.innerHTML = `
+                    <div class="flex flex-col items-center gap-4 py-10 text-center">
+                        <p class="text-lg font-bold leading-tight tracking-tight text-[#1b0f0d] dark:text-white">
+                            No items added yet
+                        </p>
+                        <p class="text-sm font-normal leading-normal text-gray-500 dark:text-gray-400 max-w-xs">
+                            Select items from the menu to add them to this order.
+                        </p>
+                    </div>
+                `;
                 updateTotals();
                 return;
             }
 
             currentOrder.items.forEach(item => {
-                const tr = document.createElement('tr');
-                tr.className = 'border-b border-t-[#e7d0d1]';
+                const row = document.createElement('div');
+                row.className = 'flex items-center justify-between py-2 border-b border-[#e7d1cf]/80 last:border-b-0';
+
                 const itemTotal = item.price * item.quantity;
-                tr.innerHTML = `
-                <td class="py-3 px-2 text-sm">${item.name}</td>
-                <td class="py-3 px-2 text-sm text-center">
-                    <div class="flex items-center justify-center gap-2">
-                        <button class="decrement-btn text-lg font-bold text-red-500 hover:text-red-700">-</button>
-                        <span class="min-w-[20px] text-center">${item.quantity}</span>
-                        <button class="increment-btn text-lg font-bold text-green-500 hover:text-green-700">+</button>
+
+                row.innerHTML = `
+                    <div class="flex flex-col">
+                        <p class="text-sm font-medium text-[#1b0f0d] dark:text-white">${item.name}</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">
+                            Цена: ₸${item.price.toFixed(2)}
+                        </p>
                     </div>
-                </td>
-                <td class="py-3 px-2 text-sm text-right">₸${itemTotal.toFixed(2)}</td>
+                    <div class="flex items-center gap-4">
+                        <div class="flex items-center justify-center gap-2">
+                            <button class="decrement-btn text-lg font-bold text-red-500 hover:text-red-700">-</button>
+                            <span class="min-w-[20px] text-center text-sm">${item.quantity}</span>
+                            <button class="increment-btn text-lg font-bold text-green-500 hover:text-green-700">+</button>
+                        </div>
+                        <p class="text-sm font-semibold text-[#1b0f0d] dark:text-white">
+                            ₸${itemTotal.toFixed(2)}
+                        </p>
+                    </div>
                 `;
-                tr.querySelector('.decrement-btn').addEventListener('click', () => decrementItem(item.dish_id));
-                tr.querySelector('.increment-btn').addEventListener('click', () => incrementItem(item.dish_id));
-                orderItemsBody.appendChild(tr);
+
+                row.querySelector('.decrement-btn')
+                    .addEventListener('click', () => decrementItem(item.dish_id));
+                row.querySelector('.increment-btn')
+                    .addEventListener('click', () => incrementItem(item.dish_id));
+
+                orderItemsContainer.appendChild(row);
             });
+
             updateTotals();
         }
 
@@ -416,17 +601,24 @@
                     const errorData = await response.json();
                     alert('Ошибка при создании заказа: ' + (errorData.error || response.statusText));
                     createOrderBtn.disabled = false;
-                    createOrderBtn.textContent = 'Создать заказ';
+                    createOrderBtn.textContent = 'CREATE ORDER';
                 }
             } catch (error) {
                 alert('Сетевая ошибка. Не удалось отправить заказ.');
                 console.error(error);
                 createOrderBtn.disabled = false;
-                createOrderBtn.textContent = 'Создать заказ';
+                createOrderBtn.textContent = 'CREATE ORDER';
             }
         }
 
         createOrderBtn.addEventListener('click', submitOrder);
+
+        if (menuSearchInput) {
+            menuSearchInput.addEventListener('input', (e) => {
+                menuSearchTerm = e.target.value.toLowerCase();
+                renderMenu();
+            });
+        }
 
         document.addEventListener('DOMContentLoaded', async () => {
             await loadUserData();

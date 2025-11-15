@@ -2,8 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 
@@ -81,16 +79,13 @@ func (h *OrderHandler) Create(w http.ResponseWriter, r *http.Request) {
 
 	var req CreateOrderRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		response.BadRequest(w, "invalid request body: "+err.Error())
+		response.BadRequest(w, "invalid request body")
 		return
 	}
 
-	// Debug logging
-	log.Printf("Create order request: TableNumber=%d, Items=%d", req.TableNumber, len(req.Items))
-
-	// Validate request
+	// Валидация входных данных
 	if req.TableNumber <= 0 {
-		response.BadRequest(w, fmt.Sprintf("invalid table number: %d", req.TableNumber))
+		response.BadRequest(w, "invalid table number")
 		return
 	}
 
@@ -107,8 +102,8 @@ func (h *OrderHandler) Create(w http.ResponseWriter, r *http.Request) {
 
 	var items []domain.OrderItem
 	for _, itemReq := range req.Items {
-		if itemReq.DishID <= 0 || itemReq.Qty <= 0 {
-			response.BadRequest(w, "invalid dish id or quantity")
+		if itemReq.Qty <= 0 {
+			response.BadRequest(w, "item quantity must be greater than 0")
 			return
 		}
 		items = append(items, domain.OrderItem{
@@ -127,15 +122,18 @@ func (h *OrderHandler) Create(w http.ResponseWriter, r *http.Request) {
 			response.BadRequest(w, "table not found")
 			return
 		}
-		if err == domain.ErrDishNotFound {
-			response.BadRequest(w, "one or more dishes not found")
-			return
-		}
-		response.InternalError(w, "failed to create order: "+err.Error())
+		response.InternalError(w, "failed to create order")
 		return
 	}
 
-	response.Created(w, order)
+	// Загружаем полный заказ с деталями
+	fullOrder, err := h.orderService.GetByID(r.Context(), order.ID)
+	if err != nil {
+		response.InternalError(w, "order created but failed to retrieve details")
+		return
+	}
+
+	response.Created(w, fullOrder)
 }
 
 func (h *OrderHandler) UpdateStatus(w http.ResponseWriter, r *http.Request) {
@@ -154,7 +152,7 @@ func (h *OrderHandler) UpdateStatus(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Validate status
+	// Валидация статуса
 	validStatuses := map[domain.OrderStatus]bool{
 		domain.OrderNew:        true,
 		domain.OrderInProgress: true,
@@ -163,7 +161,7 @@ func (h *OrderHandler) UpdateStatus(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if !validStatuses[req.Status] {
-		response.BadRequest(w, "invalid status value")
+		response.BadRequest(w, "invalid order status")
 		return
 	}
 
@@ -180,7 +178,14 @@ func (h *OrderHandler) UpdateStatus(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response.Success(w, map[string]string{"message": "order status updated"})
+	// Получаем обновленный заказ
+	order, err := h.orderService.GetByID(r.Context(), id)
+	if err != nil {
+		response.Success(w, map[string]string{"message": "order status updated"})
+		return
+	}
+
+	response.Success(w, order)
 }
 
 func (h *OrderHandler) CloseOrder(w http.ResponseWriter, r *http.Request) {
@@ -200,7 +205,7 @@ func (h *OrderHandler) CloseOrder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response.Success(w, map[string]string{"message": "order closed"})
+	response.Success(w, map[string]string{"message": "order closed successfully"})
 }
 
 func (h *OrderHandler) Delete(w http.ResponseWriter, r *http.Request) {
@@ -211,7 +216,7 @@ func (h *OrderHandler) Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := h.orderService.DeleteOrder(r.Context(), id); err != nil {
+	if err := h.orderService.Delete(r.Context(), id); err != nil {
 		if err == domain.ErrOrderNotFound {
 			response.NotFound(w, "order not found")
 			return
@@ -220,5 +225,5 @@ func (h *OrderHandler) Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response.Success(w, map[string]string{"message": "order deleted"})
+	response.Success(w, map[string]string{"message": "order deleted successfully"})
 }

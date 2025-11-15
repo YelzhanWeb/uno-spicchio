@@ -33,7 +33,11 @@
                     <h1 class="text-[#1b0e0e] text-base font-medium leading-normal">UNO Spicchio</h1>
                     <div class="flex flex-col gap-2">
                         <a href="active-orders.html" class="flex items-center gap-3 px-3 py-2 rounded-lg bg-[#f3e7e8]">
-                            <p class="text-[#1b0e0e] text-sm font-medium leading-normal">Заказы</p>
+                            <p class="text-[#1b0e0e] text-sm font-medium leading-normal">Все заказы</p>
+                        </a>
+                        <a href="chef-orders.html"
+                            class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#f3e7e8]" id="chefLink">
+                            <p class="text-[#1b0e0e] text-sm font-medium leading-normal">Кухня</p>
                         </a>
                         <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#f3e7e8]"
                             id="dashboardLink">
@@ -86,8 +90,10 @@
                                         <th class="p-3 text-left text-sm font-medium text-[#1b0e0e] w-[15%]">Стол</th>
                                         <th class="p-3 text-left text-sm font-medium text-[#1b0e0e] w-[15%]">Статус</th>
                                         <th class="p-3 text-left text-sm font-medium text-[#1b0e0e] w-[15%]">Время</th>
-                                        <th class="p-3 text-left text-sm font-medium text-[#1b0e0e] w-[35%]">Детали</th>
+                                        <th class="p-3 text-left text-sm font-medium text-[#1b0e0e] w-[25%]">Детали</th>
                                         <th class="p-3 text-left text-sm font-medium text-[#1b0e0e] w-[10%]">Сумма</th>
+                                        <th class="p-3 text-left text-sm font-medium text-[#1b0e0e] w-[10%]">Действия
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody id="orders-table-body"></tbody>
@@ -136,13 +142,22 @@
                         currentUser = result;
                     }
 
+                    console.log('Current user:', currentUser);
+
                     if (currentUser) {
+                        // Управление видимостью ссылок в меню
                         if (currentUser.role !== 'admin' && currentUser.role !== 'manager') {
                             document.getElementById('dashboardLink').style.display = 'none';
                         }
 
                         if (currentUser.role !== 'waiter' && currentUser.role !== 'admin') {
                             document.getElementById('newOrderBtn').style.display = 'none';
+                        }
+
+                        // Показываем ссылку на кухню для cook, waiter и admin
+                        const chefLink = document.getElementById('chefLink');
+                        if (chefLink && currentUser.role !== 'cook' && currentUser.role !== 'waiter' && currentUser.role !== 'admin') {
+                            chefLink.style.display = 'none';
                         }
                     }
                 } else {
@@ -218,6 +233,7 @@
 
                 if (response.ok) {
                     const result = await response.json();
+                    console.log(`Order ${orderId} details:`, result);
 
                     let order;
                     if (result.success && result.data) {
@@ -226,6 +242,7 @@
                         order = result;
                     }
 
+                    console.log(`Order ${orderId} items:`, order?.items);
                     return order?.items || [];
                 }
             } catch (error) {
@@ -242,11 +259,13 @@
             });
 
             if (filteredOrders.length === 0) {
-                ordersTableBody.innerHTML = `<tr><td colspan="6" class="text-center p-8 text-gray-500">Нет заказов в этой категории.</td></tr>`;
+                ordersTableBody.innerHTML = `<tr><td colspan="7" class="text-center p-8 text-gray-500">Нет заказов в этой категории.</td></tr>`;
                 return;
             }
 
             for (const order of filteredOrders) {
+                console.log('Rendering order:', order);
+
                 const tr = document.createElement('tr');
                 tr.className = 'border-t border-t-[#e7d0d1] hover:bg-gray-50 cursor-pointer';
 
@@ -257,11 +276,34 @@
                 // Получаем детали заказа
                 const items = await fetchOrderDetails(order.id);
                 const details = items && items.length > 0
-                    ? items.map(item => `${item.dish?.name || 'Блюдо'} (x${item.qty})`).join(', ')
-                    : 'Загрузка...';
+                    ? items.map(item => {
+                        const dishName = item.dish?.name || item.dish_name || 'Блюдо';
+                        return `${dishName} (x${item.qty})`;
+                    }).join(', ')
+                    : 'Нет деталей';
 
-                // Получаем имя стола
-                const tableName = order.table?.name || order.table_name || `Стол ${order.table_number}`;
+                // Получаем имя стола - используем разные варианты
+                let tableName = 'Неизвестный стол';
+                if (order.table && order.table.name) {
+                    tableName = order.table.name;
+                } else if (order.table_name) {
+                    tableName = order.table_name;
+                } else {
+                    tableName = `Стол #${order.table_number}`;
+                }
+
+                console.log('Table info:', {
+                    table: order.table,
+                    table_name: order.table_name,
+                    table_number: order.table_number,
+                    resolved: tableName
+                });
+
+                // Кнопки действий (только для официантов и админов, только для готовых заказов)
+                let actionButton = '';
+                if ((currentUser.role === 'waiter' || currentUser.role === 'admin') && order.status === 'ready') {
+                    actionButton = `<button class="close-order-btn px-3 py-1 bg-green-600 text-white rounded text-xs font-semibold hover:bg-green-700" data-order-id="${order.id}">Закрыть</button>`;
+                }
 
                 tr.innerHTML = `
                     <td class="p-3 text-sm font-medium">#${order.id}</td>
@@ -277,9 +319,15 @@
                     </td>
                     <td class="p-3 text-sm text-[#994d51] truncate max-w-xs" title="${details}">${details}</td>
                     <td class="p-3 text-sm font-semibold">${order.total.toFixed(2)} ₸</td>
+                    <td class="p-3 text-sm">${actionButton}</td>
                 `;
                 ordersTableBody.appendChild(tr);
             }
+
+            // Добавляем обработчики для кнопок закрытия заказов
+            document.querySelectorAll('.close-order-btn').forEach(btn => {
+                btn.addEventListener('click', handleCloseOrder);
+            });
         }
 
         async function fetchOrders() {
@@ -335,6 +383,36 @@
             currentFilter = clickedTab.dataset.status;
             renderOrders();
         });
+
+        async function handleCloseOrder(event) {
+            const orderId = parseInt(event.target.dataset.orderId);
+            if (!orderId) return;
+
+            if (!confirm('Закрыть заказ и освободить стол?')) return;
+
+            const token = checkAuth();
+            if (!token) return;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/orders/${orderId}/close`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    alert('Заказ успешно закрыт!');
+                    await fetchOrders();
+                } else {
+                    const errorData = await response.json();
+                    alert('Ошибка: ' + (errorData.error || response.statusText));
+                }
+            } catch (error) {
+                console.error('Error closing order:', error);
+                alert('Ошибка сети');
+            }
+        }
 
         document.addEventListener('DOMContentLoaded', () => {
             loadUserData();

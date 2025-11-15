@@ -30,18 +30,38 @@ func NewOrderService(
 }
 
 func (s *OrderService) Create(ctx context.Context, order *domain.Order, items []domain.OrderItem) error {
-	// Check stock for all items
+	// Проверяем существование стола
+	table, err := s.tableRepo.GetByID(ctx, order.TableNumber)
+	if err != nil {
+		return err
+	}
+	if table == nil {
+		return domain.ErrTableNotFound
+	}
+
+	// Проверяем наличие ингредиентов для всех блюд
 	for _, item := range items {
-		ingredients, err := s.dishRepo.GetIngredients(ctx, item.DishID)
+		// Проверяем существование блюда
+		dish, err := s.dishRepo.GetByID(ctx, item.DishID)
 		if err != nil {
-			return fmt.Errorf("failed to get ingredients: %w", err)
+			return err
+		}
+		if dish == nil {
+			return fmt.Errorf("dish with id %d not found", item.DishID)
 		}
 
+		// Получаем ингредиенты блюда
+		ingredients, err := s.dishRepo.GetIngredients(ctx, item.DishID)
+		if err != nil {
+			return err
+		}
+
+		// Проверяем достаточность запасов
 		for _, ing := range ingredients {
 			needed := ing.QtyPerDish * float64(item.Qty)
 			ingredient, err := s.ingredientRepo.GetByID(ctx, ing.IngredientID)
 			if err != nil {
-				return fmt.Errorf("failed to get ingredient: %w", err)
+				return err
 			}
 
 			if ingredient.Qty < needed {
@@ -50,12 +70,12 @@ func (s *OrderService) Create(ctx context.Context, order *domain.Order, items []
 		}
 	}
 
-	// Calculate total
+	// Подсчитываем общую сумму заказа
 	var total float64
 	for _, item := range items {
 		dish, err := s.dishRepo.GetByID(ctx, item.DishID)
 		if err != nil {
-			return fmt.Errorf("failed to get dish: %w", err)
+			return err
 		}
 		total += dish.Price * float64(item.Qty)
 	}
@@ -63,34 +83,34 @@ func (s *OrderService) Create(ctx context.Context, order *domain.Order, items []
 	order.Status = domain.OrderNew
 	order.Total = total
 
-	// Create order
+	// Создаем заказ
 	if err := s.orderRepo.Create(ctx, order); err != nil {
-		return fmt.Errorf("failed to create order: %w", err)
+		return err
 	}
 
-	// Add items
+	// Добавляем позиции заказа
 	for _, item := range items {
 		item.OrderID = order.ID
 		dish, _ := s.dishRepo.GetByID(ctx, item.DishID)
 		item.Price = dish.Price
 
 		if err := s.orderRepo.AddItem(ctx, &item); err != nil {
-			return fmt.Errorf("failed to add order item: %w", err)
+			return err
 		}
 
-		// Deduct ingredients
+		// Списываем ингредиенты
 		ingredients, _ := s.dishRepo.GetIngredients(ctx, item.DishID)
 		for _, ing := range ingredients {
 			needed := ing.QtyPerDish * float64(item.Qty)
 			if err := s.ingredientRepo.UpdateQuantity(ctx, ing.IngredientID, -needed); err != nil {
-				return fmt.Errorf("failed to update ingredient quantity: %w", err)
+				return err
 			}
 		}
 	}
 
-	// Update table status to BUSY
+	// Обновляем статус стола на "занят"
 	if err := s.tableRepo.UpdateStatus(ctx, order.TableNumber, domain.TableBusy); err != nil {
-		return fmt.Errorf("failed to update table status: %w", err)
+		return err
 	}
 
 	return nil
@@ -105,6 +125,7 @@ func (s *OrderService) GetByID(ctx context.Context, id int) (*domain.Order, erro
 		return nil, domain.ErrOrderNotFound
 	}
 
+	// Загружаем позиции заказа
 	items, err := s.orderRepo.GetItems(ctx, id)
 	if err != nil {
 		return nil, err
@@ -120,13 +141,12 @@ func (s *OrderService) GetAll(ctx context.Context, status *domain.OrderStatus) (
 		return nil, err
 	}
 
-	// Load items for each order
+	// Загружаем детали для каждого заказа
 	for i := range orders {
 		items, err := s.orderRepo.GetItems(ctx, orders[i].ID)
-		if err != nil {
-			return nil, err
+		if err == nil {
+			orders[i].Items = items
 		}
-		orders[i].Items = items
 	}
 
 	return orders, nil
@@ -141,7 +161,7 @@ func (s *OrderService) UpdateStatus(ctx context.Context, id int, newStatus domai
 		return domain.ErrOrderNotFound
 	}
 
-	// Validate status transitions
+	// Валидация переходов статусов
 	validTransitions := map[domain.OrderStatus][]domain.OrderStatus{
 		domain.OrderNew:        {domain.OrderInProgress},
 		domain.OrderInProgress: {domain.OrderReady},
@@ -156,6 +176,7 @@ func (s *OrderService) UpdateStatus(ctx context.Context, id int, newStatus domai
 		}
 	}
 
+	// Разрешаем не менять статус, если он уже установлен
 	if !valid && newStatus != order.Status {
 		return domain.ErrInvalidStatusChange
 	}
@@ -172,20 +193,25 @@ func (s *OrderService) CloseOrder(ctx context.Context, id int) error {
 		return domain.ErrOrderNotFound
 	}
 
-	// Update order status to paid
-	if err := s.orderRepo.UpdateStatus(ctx, id, domain.OrderPaid); err != nil {
-		return fmt.Errorf("failed to update order status: %w", err)
+	// Проверяем, что заказ в статусе ready
+	if order.Status != domain.OrderReady {
+		return fmt.Errorf("order must be in ready status to close, current status: %s", order.Status)
 	}
 
-	// Update table status to FREE
+	// Обновляем статус заказа на "оплачен"
+	if err := s.orderRepo.UpdateStatus(ctx, id, domain.OrderPaid); err != nil {
+		return err
+	}
+
+	// Освобождаем стол
 	if err := s.tableRepo.UpdateStatus(ctx, order.TableNumber, domain.TableFree); err != nil {
-		return fmt.Errorf("failed to update table status: %w", err)
+		return err
 	}
 
 	return nil
 }
 
-func (s *OrderService) DeleteOrder(ctx context.Context, id int) error {
+func (s *OrderService) Delete(ctx context.Context, id int) error {
 	order, err := s.orderRepo.GetByID(ctx, id)
 	if err != nil {
 		return err
@@ -194,9 +220,10 @@ func (s *OrderService) DeleteOrder(ctx context.Context, id int) error {
 		return domain.ErrOrderNotFound
 	}
 
-	if err := s.orderRepo.Delete(ctx, id); err != nil {
-		return fmt.Errorf("failed to delete order: %w", err)
+	// Можно добавить проверку: разрешить удалять только новые заказы
+	if order.Status != domain.OrderNew {
+		return fmt.Errorf("cannot delete order in status: %s", order.Status)
 	}
 
-	return nil
+	return s.orderRepo.Delete(ctx, id)
 }

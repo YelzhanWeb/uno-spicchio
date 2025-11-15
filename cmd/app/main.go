@@ -27,10 +27,10 @@ func main() {
 		log.Fatalf("Failed to load config: %v", err)
 	}
 
-	log.Printf("Starting server with config: Host=%s, Port=%s, Env=%s",
-		cfg.Server.Host, cfg.Server.Port, cfg.Env)
+	log.Printf("Starting server with config: Host=%s, Port=%s, Env=%s", cfg.Server.Host, cfg.Server.Port, cfg.Env)
 
 	// Connect to database
+	log.Printf("Connecting to database: %s", cfg.Database.DSN())
 	db, err := connectDB(cfg.Database)
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
@@ -82,7 +82,6 @@ func main() {
 	ingredientService := usecase.NewIngredientService(ingredientRepo)
 	supplyService := usecase.NewSupplyService(supplyRepo)
 	tableService := usecase.NewTableService(tableRepo)
-	categoryService := usecase.NewCategoryService(categoryRepo)
 	analyticsService := usecase.NewAnalyticsService(analyticsRepo)
 
 	// Setup router
@@ -94,15 +93,33 @@ func main() {
 		ingredientService,
 		supplyService,
 		tableService,
-		categoryService,
+		categoryRepo,
 		analyticsService,
 		tokenManager,
 	)
 
+	// Get base router
+	r := router.Setup()
+
+	// Serve static files from ./static directory
+	staticDir := "./static"
+	if _, err := os.Stat(staticDir); os.IsNotExist(err) {
+		log.Printf("Warning: Static directory '%s' does not exist", staticDir)
+	} else {
+		log.Printf("Serving static files from: %s", staticDir)
+		fs := http.FileServer(http.Dir(staticDir))
+		r.Handle("/static/*", http.StripPrefix("/static/", fs))
+
+		// Redirect root to login page
+		r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+			http.Redirect(w, r, "/static/login.html", http.StatusFound)
+		})
+	}
+
 	// Create HTTP server
 	server := &http.Server{
 		Addr:         fmt.Sprintf("%s:%s", cfg.Server.Host, cfg.Server.Port),
-		Handler:      router.Setup(),
+		Handler:      r,
 		ReadTimeout:  15 * time.Second,
 		WriteTimeout: 15 * time.Second,
 		IdleTimeout:  60 * time.Second,
@@ -136,10 +153,7 @@ func main() {
 }
 
 func connectDB(cfg config.DatabaseConfig) (*sql.DB, error) {
-	dsn := cfg.DSN()
-	log.Printf("Connecting to database: %s", dsn)
-
-	db, err := sql.Open("pgx", dsn)
+	db, err := sql.Open("pgx", cfg.DSN())
 	if err != nil {
 		return nil, fmt.Errorf("failed to open database: %w", err)
 	}

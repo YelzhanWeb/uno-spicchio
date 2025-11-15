@@ -29,8 +29,8 @@ type OrderService interface {
 	GetByID(ctx context.Context, id int) (*domain.Order, error)
 	GetAll(ctx context.Context, status *domain.OrderStatus) ([]domain.Order, error)
 	UpdateStatus(ctx context.Context, id int, newStatus domain.OrderStatus) error
-	DeleteOrder(ctx context.Context, id int) error
 	CloseOrder(ctx context.Context, id int) error
+	Delete(ctx context.Context, id int) error
 }
 
 // DishService defines methods for dish management
