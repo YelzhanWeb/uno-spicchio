@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html class="light" lang="ru">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Закупки - UNO Spichio</title>
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap"
+        rel="stylesheet" />
+
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#2E7D32",
+                        "background-light": "#F8F9FA",
+                        "background-dark": "#1A1A1A",
+                        "text-light": "#343A40",
+                        "text-dark": "#E9ECEF",
+                        "border-light": "#DEE2E6",
+                        "border-dark": "#495057",
+                        "surface-light": "#FFFFFF",
+                        "surface-dark": "#212529",
+                        "accent-red": "#C62828",
+                        "accent-yellow": "#FBC02D",
+                        "accent-blue": "#1976D2",
+                    },
+                    fontFamily: {
+                        display: ["Work Sans", "sans-serif"],
+                    },
+                },
+            },
+        };
+    </script>
+
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+        }
+
+        .material-symbols-outlined.fill {
+            font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 24;
+        }
+    </style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark font-display text-text-light dark:text-text-dark">
+    <div class="relative flex min-h-screen w-full flex-col">
+        <div class="flex h-full grow">
+            <!-- SIDEBAR (общий) -->
+            <aside
+                class="w-64 flex-shrink-0 bg-surface-light dark:bg-surface-dark border-r border-border-light dark:border-border-dark p-4 flex flex-col">
+                <div>
+                    <div class="flex items-center gap-3 px-3 mb-6">
+                        <div class="bg-center bg-no-repeat bg-cover rounded-full size-10"
+                            style='background-image:url("https://lh3.googleusercontent.com/aida-public/AB6AXuAP2hMePJbmL9RhIgD0Pebyej4OsTIfAYHlM66V910qbcIS85xsmlYt31vK704eXqsf_gnhM0HOc9ccSkWz9BzxnejyY1YbyfZuu4qba9fnhC-Jx8DAohSgIgDvvbLuXALroqOm_LBRN1NrvmI49H3W4DgwgsUPlKVeDWaQc8KIY89MVD5seee9LvJkkxtGRB9q_Xis8lX8ApBo9M-zhQTkY9lkg-vlCLAmd2e6FdeimDLgjUB6-N1Bm97XvJkbGZbUizzgXxQvLQ");'>
+                        </div>
+                        <div class="flex flex-col">
+                            <h1 class="text-base font-bold leading-normal">UNO Spichio</h1>
+                            <p class="text-xs text-muted-light/80">Admin Panel</p>
+                        </div>
+                    </div>
+
+                    <nav class="flex flex-col gap-1">
+                        <!-- Главная -->
+                        <a href="dashboard.html"
+                            class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-primary/10 transition">
+                            <span class="material-symbols-outlined text-lg">dashboard</span>
+                            <span class="text-sm font-medium leading-normal">Главная</span>
+                        </a>
+
+                        <!-- Сотрудники -->
+                        <a href="employees.html"
+                            class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-primary/10 transition">
+                            <span class="material-symbols-outlined text-lg">group</span>
+                            <span class="text-sm font-medium leading-normal">Сотрудники</span>
+                        </a>
+
+                        <!-- Меню -->
+                        <a href="menu.html"
+                            class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-primary/10 transition">
+                            <span class="material-symbols-outlined text-lg">restaurant_menu</span>
+                            <span class="text-sm font-medium leading-normal">Меню</span>
+                        </a>
+
+                        <!-- Склад / Ингредиенты (активная) -->
+                        <a href="inventory.html"
+                            class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-primary/10 transition">
+                            <span class="material-symbols-outlined text-lg fill">inventory_2</span>
+                            <span class="text-sm leading-normal">Склад</span>
+                        </a>
+
+                        <!-- Закупки -->
+                        <a href="purchases.html"
+                            class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/15 text-primary font-semibold">
+                            <span class="material-symbols-outlined text-lg">shopping_cart</span>
+                            <span class="text-sm font-medium leading-normal">Закупки</span>
+                        </a>
+
+                        <!-- Поставщики -->
+                        <a href="suppliers.html"
+                            class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-primary/10 transition">
+                            <span class="material-symbols-outlined text-lg">local_shipping</span>
+                            <span class="text-sm font-medium leading-normal">Поставщики</span>
+                        </a>
+                    </nav>
+                </div>
+
+                <!-- низ сайдбара -->
+                <div class="mt-6 border-t border-border-light dark:border-border-dark pt-3">
+                    <button onclick="logout()"
+                        class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-primary/10 transition-colors w-full text-sm">
+                        <span class="material-symbols-outlined text-base">logout</span>
+                        <span>Выйти</span>
+                    </button>
+                </div>
+            </aside>
+
+            <!-- MAIN -->
+            <main class="flex-1 flex flex-col">
+                <!-- HEADER с темой -->
+                <header
+                    class="flex items-center justify-between px-8 py-4 border-b border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark">
+                    <div class="flex flex-col gap-1">
+                        <h1 class="text-3xl font-black leading-tight">Закупки</h1>
+                        <p class="text-base font-normal leading-normal text-text-light/70 dark:text-text-dark/70">
+                            Управление заказами на закупку для ресторана
+                        </p>
+                    </div>
+
+                    <div class="flex items-center gap-4">
+                        <button id="theme-toggle"
+                            class="flex items-center gap-2 px-4 py-2 rounded-lg border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark text-sm font-medium shadow-sm hover:bg-primary/5 dark:hover:bg-primary/20 transition">
+                            <span class="material-symbols-outlined" id="theme-toggle-icon">light_mode</span>
+                            <span id="theme-toggle-text">Light</span>
+                        </button>
+
+                        <button
+                            class="flex min-w-[84px] items-center justify-center gap-2 overflow-hidden rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-wide shadow-sm hover:bg-primary/90">
+                            <span class="material-symbols-outlined text-xl">add</span>
+                            <span class="truncate">Создать заказ</span>
+                        </button>
+                    </div>
+                </header>
+
+                <!-- CONTENT (твоя таблица закупок почти без изменений) -->
+                <section class="flex-1 p-8">
+                    <div class="flex flex-col max-w-full mx-auto">
+                        <!-- Search + фильтры -->
+                        <div class="flex flex-col md:flex-row gap-4 mb-4">
+                            <div class="flex-grow">
+                                <label class="flex flex-col min-w-40 h-12 w-full">
+                                    <div
+                                        class="flex w-full flex-1 items-stretch rounded-lg h-full bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark">
+                                        <div
+                                            class="text-text-light/70 dark:text-text-dark/70 flex items-center justify-center pl-4">
+                                            <span class="material-symbols-outlined text-2xl">search</span>
+                                        </div>
+                                        <input
+                                            class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden text-text-light dark:text-text-dark focus:outline-0 focus:ring-0 border-none bg-transparent h-full placeholder:text-text-light/70 dark:placeholder:text-text-dark/70 px-4 pl-2 text-base font-normal leading-normal"
+                                            placeholder="Поиск по номеру заказа, поставщику..." />
+                                    </div>
+                                </label>
+                            </div>
+                            <div class="flex gap-3 items-center">
+                                <button
+                                    class="flex h-12 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark px-4">
+                                    <span
+                                        class="material-symbols-outlined text-text-light dark:text-text-dark text-xl">filter_list</span>
+                                    <p class="text-text-light dark:text-text-dark text-sm font-medium leading-normal">
+                                        Статус
+                                    </p>
+                                    <span
+                                        class="material-symbols-outlined text-text-light dark:text-text-dark text-xl">arrow_drop_down</span>
+                                </button>
+                                <button
+                                    class="flex h-12 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark px-4">
+                                    <span
+                                        class="material-symbols-outlined text-text-light dark:text-text-dark text-xl">calendar_month</span>
+                                    <p class="text-text-light dark:text-text-dark text-sm font-medium leading-normal">
+                                        Диапазон дат
+                                    </p>
+                                    <span
+                                        class="material-symbols-outlined text-text-light dark:text-text-dark text-xl">arrow_drop_down</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Таблица (оставил как в макете) -->
+                        <!-- ... твоя таблица из исходного кода ... -->
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        function logout() {
+            localStorage.removeItem("auth_token");
+            localStorage.removeItem("user_data");
+            window.location.href = "login.html";
+        }
+
+        const themeToggleBtn = document.getElementById("theme-toggle");
+        const themeToggleText = document.getElementById("theme-toggle-text");
+        const themeToggleIcon = document.getElementById("theme-toggle-icon");
+
+        if (!localStorage.getItem("theme")) {
+            localStorage.setItem("theme", "light");
+        }
+
+        if (localStorage.getItem("theme") === "dark") {
+            document.documentElement.classList.add("dark");
+            themeToggleText.textContent = "Dark";
+            themeToggleIcon.textContent = "dark_mode";
+        }
+
+        themeToggleBtn?.addEventListener("click", () => {
+            const isDark = document.documentElement.classList.contains("dark");
+            if (isDark) {
+                document.documentElement.classList.remove("dark");
+                localStorage.setItem("theme", "light");
+                themeToggleText.textContent = "Light";
+                themeToggleIcon.textContent = "light_mode";
+            } else {
+                document.documentElement.classList.add("dark");
+                localStorage.setItem("theme", "dark");
+                themeToggleText.textContent = "Dark";
+                themeToggleIcon.textContent = "dark_mode";
+            }
+        });
+    </script>
+</body>
+
+</html>

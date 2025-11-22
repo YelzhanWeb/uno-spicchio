@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="light" lang="en">
+<html class="light" lang="ru">
 
 <head>
     <meta charset="utf-8" />
@@ -104,12 +104,18 @@
                     <span>Кухня</span>
                 </a>
 
+                <!-- НОВОЕ: кнопка "Склад" -->
+                <a id="inventoryLink" href="inventory.html"
+                    class="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300">
+                    <span class="material-symbols-outlined">inventory_2</span>
+                    <span>Склад</span>
+                </a>
+
                 <a id="dashboardLink" href="dashboard.html"
                     class="flex items-center gap-2 px-4 py-3 bg-red-100/50 dark:bg-gray-700/50 rounded-lg font-medium text-gray-900 dark:text-white">
                     <span class="material-symbols-outlined">analytics</span>
                     <span>Аналитика</span>
                 </a>
-
 
                 <!-- User + logout -->
                 <div class="mt-auto pt-4 border-t border-border-light dark:border-border-dark flex flex-col gap-3">
@@ -159,7 +165,7 @@
                             </button>
                         </div>
 
-                        <!-- Dark mode toggle -->
+                        <!-- Dark mode toggle (та же, что и на других страницах) -->
                         <button id="darkModeToggle"
                             class="p-2 rounded-full bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark hover:bg-black/5 dark:hover:bg-white/5">
                             <span
@@ -205,7 +211,7 @@
 
                 <!-- Charts & Popular Dishes -->
                 <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
-                    <!-- Sales by Category (оставлено по структуре как было) -->
+                    <!-- Sales by Category -->
                     <div
                         class="lg:col-span-3 bg-surface-light dark:bg-surface-dark p-6 rounded-xl border border-border-light dark:border-border-dark">
                         <div class="flex justify-between items-center mb-4">
@@ -216,7 +222,7 @@
                         </div>
                     </div>
 
-                    <!-- Popular Dishes (оставлено по структуре как было) -->
+                    <!-- Popular Dishes -->
                     <div
                         class="lg:col-span-2 bg-surface-light dark:bg-surface-dark p-6 rounded-xl border border-border-light dark:border-border-dark">
                         <h3 class="text-lg font-semibold mb-4">Popular Dishes</h3>
@@ -277,17 +283,26 @@
                         document.getElementById('userFullName').textContent = currentUser.username;
                         document.getElementById('userRole').textContent = currentUser.role;
 
-                        // Управление видимостью ссылок
+                        // Создать заказ – только для официанта и админа
                         if (currentUser.role !== 'waiter' && currentUser.role !== 'admin') {
                             document.getElementById('createOrderLink').style.display = 'none';
                         }
 
-                        // Показываем ссылку на кухню для cook, waiter и admin
+                        // Кухня – только cook/waiter/admin
                         const chefLink = document.getElementById('chefLink');
-                        if (chefLink && currentUser.role !== 'cook' && currentUser.role !== 'waiter' && currentUser.role !== 'admin') {
+                        if (chefLink && currentUser.role !== 'cook' &&
+                            currentUser.role !== 'waiter' &&
+                            currentUser.role !== 'admin') {
                             chefLink.style.display = 'none';
                         }
 
+                        // Склад – только для админа
+                        const inventoryLink = document.getElementById('inventoryLink');
+                        if (inventoryLink && currentUser.role !== 'admin') {
+                            inventoryLink.style.display = 'none';
+                        }
+
+                        // Аналитика – только admin/manager
                         if (currentUser.role !== 'admin' && currentUser.role !== 'manager') {
                             alert('У вас нет прав для просмотра аналитики');
                             window.location.href = 'active-orders.html';
@@ -376,7 +391,6 @@
             element.textContent = `${isPositive ? '+' : ''}${change.toFixed(1)}% from last period`;
         }
 
-        // --- Sales by Category (горизонтальные бары как на скрине) ---
         function updateCategorySales(sales) {
             const container = document.getElementById('categorySales');
 
@@ -417,7 +431,6 @@
             }).join('');
         }
 
-        // --- Popular Dishes (иконки + текст как на скрине) ---
         function updatePopularDishes(dishes) {
             const container = document.getElementById('popularDishes');
 

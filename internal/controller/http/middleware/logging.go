@@ -1,9 +1,10 @@
 package middleware
 
 import (
-	"log"
 	"net/http"
 	"time"
+
+	"github.com/YelzhanWeb/uno-spicchio/pkg/logger"
 )
 
 type responseWriter struct {
@@ -27,10 +28,9 @@ func Logging(next http.Handler) http.Handler {
 
 		next.ServeHTTP(rw, r)
 
-		log.Printf(
-			"%s %s %d %s",
+		logger.HTTP(
 			r.Method,
-			r.RequestURI,
+			r.URL.Path,
 			rw.statusCode,
 			time.Since(start),
 		)
