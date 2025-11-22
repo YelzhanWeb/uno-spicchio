@@ -104,7 +104,6 @@ func (s *OrderService) Create(ctx context.Context, order *domain.Order, items []
 	order.Total = total
 
 	s.logger.Order("Order total: %.2f ₸", total)
-
 	// Создаем заказ
 	if err := s.orderRepo.Create(ctx, order); err != nil {
 		s.logger.Error("Failed to create order: %v", err)
@@ -125,17 +124,6 @@ func (s *OrderService) Create(ctx context.Context, order *domain.Order, items []
 		}
 
 		s.logger.Info("Added item: %s (x%d) - %.2f ₸", dish.Name, item.Qty, item.Price)
-
-		// Списываем ингредиенты
-		ingredients, _ := s.dishRepo.GetIngredients(ctx, item.DishID)
-		for _, ing := range ingredients {
-			needed := ing.QtyPerDish * float64(item.Qty)
-			if err := s.ingredientRepo.UpdateQuantity(ctx, ing.IngredientID, -needed); err != nil {
-				s.logger.Error("Failed to update ingredient quantity: %v", err)
-				return err
-			}
-			s.logger.Debug("Deducted %.2f from ingredient #%d", needed, ing.IngredientID)
-		}
 	}
 
 	// Обновляем статус стола на "занят"
@@ -199,7 +187,6 @@ func (s *OrderService) GetAll(ctx context.Context, status *domain.OrderStatus) (
 	s.logger.Success("✓ Fetched %d orders", len(orders))
 	return orders, nil
 }
-
 func (s *OrderService) UpdateStatus(ctx context.Context, id int, newStatus domain.OrderStatus) error {
 	s.logger.Order("Updating order #%d status to: %s", id, newStatus)
 
@@ -232,6 +219,15 @@ func (s *OrderService) UpdateStatus(ctx context.Context, id int, newStatus domai
 	if !valid && newStatus != order.Status {
 		s.logger.Error("Invalid status transition from %s to %s", order.Status, newStatus)
 		return domain.ErrInvalidStatusChange
+	}
+
+	// 🔥 ВАЖНО: если переходим new -> in_progress, списываем ингредиенты
+	if order.Status == domain.OrderNew && newStatus == domain.OrderInProgress {
+		if err := s.consumeIngredientsForOrder(ctx, order.ID); err != nil {
+			s.logger.Error("Failed to consume ingredients for order #%d: %v", id, err)
+			// при желании можно вернуть ErrInsufficientStock, если добавим доп. проверки
+			return err
+		}
 	}
 
 	if err := s.orderRepo.UpdateStatus(ctx, id, newStatus); err != nil {
@@ -307,5 +303,39 @@ func (s *OrderService) Delete(ctx context.Context, id int) error {
 	}
 
 	s.logger.Success("✓ Order #%d deleted", id)
+	return nil
+}
+
+// consumeIngredientsForOrder списывает ингредиенты со склада,
+// исходя из позиций заказа и рецептов блюд.
+func (s *OrderService) consumeIngredientsForOrder(ctx context.Context, orderID int) error {
+	s.logger.Order("Consuming ingredients for order #%d", orderID)
+
+	items, err := s.orderRepo.GetItems(ctx, orderID)
+	if err != nil {
+		s.logger.Error("Failed to get items for order #%d: %v", orderID, err)
+		return err
+	}
+
+	for _, item := range items {
+		ingredients, err := s.dishRepo.GetIngredients(ctx, item.DishID)
+		if err != nil {
+			s.logger.Error("Failed to get ingredients for dish #%d: %v", item.DishID, err)
+			return err
+		}
+
+		for _, ing := range ingredients {
+			needed := ing.QtyPerDish * float64(item.Qty)
+
+			s.logger.Debug("Consuming ingredient #%d: -%.2f for dish #%d (qty=%d)",
+				ing.IngredientID, needed, item.DishID, item.Qty)
+			if err := s.ingredientRepo.UpdateQuantity(ctx, ing.IngredientID, -needed); err != nil {
+				s.logger.Error("Failed to update ingredient quantity: %v", err)
+				return err
+			}
+		}
+	}
+
+	s.logger.Success("✓ Ingredients consumed for order #%d", orderID)
 	return nil
 }

@@ -55,8 +55,7 @@
 
 <body class="bg-background-light dark:bg-background-dark font-display text-text-light dark:text-text-dark">
     <div class="flex min-h-screen">
-        <!-- SIDEBAR (тот же) -->
-        <!-- SIDEBAR (общий для админа) -->
+        <!-- SIDEBAR -->
         <aside
             class="w-64 flex-shrink-0 bg-surface-light dark:bg-surface-dark border-r border-border-light dark:border-border-dark p-4 flex flex-col">
             <div>
@@ -66,7 +65,7 @@
                     </div>
                     <div class="flex flex-col">
                         <h1 class="text-base font-bold leading-normal">UNO Spichio</h1>
-                        <p class="text-xs text-muted-light/80">Admin Panel</p>
+                        <p class="text-xs text-text-light/60 dark:text-text-dark/60">Admin Panel</p>
                     </div>
                 </div>
 
@@ -92,7 +91,7 @@
                         <span class="text-sm font-medium leading-normal">Меню</span>
                     </a>
 
-                    <!-- Склад / Ингредиенты (активная) -->
+                    <!-- Склад -->
                     <a href="inventory.html"
                         class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-primary/10 transition">
                         <span class="material-symbols-outlined text-lg fill">inventory_2</span>
@@ -106,7 +105,7 @@
                         <span class="text-sm font-medium leading-normal">Закупки</span>
                     </a>
 
-                    <!-- Поставщики -->
+                    <!-- Поставщики (активная) -->
                     <a href="suppliers.html"
                         class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/15 text-primary font-semibold">
                         <span class="material-symbols-outlined text-lg">local_shipping</span>
@@ -127,38 +126,91 @@
 
         <!-- MAIN -->
         <main class="flex-1 p-8 flex flex-col">
-            <!-- HEADER с кнопкой темы -->
+            <!-- HEADER -->
             <div
                 class="flex flex-wrap justify-between items-center gap-4 mb-6 border-b border-border-light dark:border-border-dark pb-4">
-                <h1 class="text-text-light dark:text-text-dark text-3xl font-bold tracking-tight">
-                    Управление поставщиками
-                </h1>
+                <div>
+                    <h1 class="text-text-light dark:text-text-dark text-3xl font-bold tracking-tight">
+                        Управление поставщиками
+                    </h1>
+                    <p class="text-sm text-subtext-light dark:text-subtext-dark mt-1">
+                        Список поставщиков, с которыми работал ресторан, на основе истории поставок
+                    </p>
+                </div>
                 <div class="flex items-center gap-3">
                     <button id="theme-toggle"
                         class="flex items-center gap-2 px-4 py-2 rounded-lg border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark text-sm font-medium shadow-sm hover:bg-primary/5 dark:hover:bg-primary/20 transition">
                         <span class="material-symbols-outlined" id="theme-toggle-icon">light_mode</span>
                         <span id="theme-toggle-text">Light</span>
                     </button>
-                    <button
-                        class="flex items-center justify-center gap-2 overflow-hidden rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-primary/90 transition-colors">
-                        <span class="material-symbols-outlined">add</span>
-                        <span class="truncate">Добавить поставщика</span>
-                    </button>
                 </div>
             </div>
 
-            <!-- дальше полностью твой контент (поиск, фильтры, таблица) -->
-            <!-- ... таблица поставщиков из исходного файла ... -->
+            <!-- Search + filter -->
+            <div class="flex flex-col md:flex-row gap-4 mb-4">
+                <div class="flex-grow">
+                    <label class="flex flex-col min-w-40 h-12 w-full">
+                        <div
+                            class="flex w-full flex-1 items-stretch rounded-lg h-full bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark">
+                            <div
+                                class="text-text-light/70 dark:text-text-dark/70 flex items-center justify-center pl-4">
+                                <span class="material-symbols-outlined text-2xl">search</span>
+                            </div>
+                            <input id="searchSupplierInput"
+                                class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden text-text-light dark:text-text-dark focus:outline-0 focus:ring-0 border-none bg-transparent h-full placeholder:text-text-light/70 dark:placeholder:text-text-dark/70 px-4 pl-2 text-base font-normal leading-normal"
+                                placeholder="Поиск по названию поставщика..." />
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Таблица поставщиков -->
+            <div
+                class="overflow-hidden rounded-lg border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark">
+                <table class="min-w-full divide-y divide-border-light dark:divide-border-dark">
+                    <thead>
+                        <tr class="bg-surface-light dark:bg-surface-dark">
+                            <th
+                                class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-text-light/70 dark:text-text-dark/70">
+                                Поставщик
+                            </th>
+                            <th
+                                class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-text-light/70 dark:text-text-dark/70">
+                                Кол-во поставок
+                            </th>
+                            <th
+                                class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-text-light/70 dark:text-text-dark/70">
+                                Последняя поставка
+                            </th>
+                            <th
+                                class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-text-light/70 dark:text-text-dark/70">
+                                Основные ингредиенты
+                            </th>
+                            <th
+                                class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-text-light/70 dark:text-text-dark/70">
+                                Статус
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody id="suppliersTableBody" class="divide-y divide-border-light dark:divide-border-dark">
+                        <!-- строки подставляются из JS -->
+                    </tbody>
+                </table>
+            </div>
         </main>
     </div>
 
     <script>
+        const API_BASE_URL = "http://localhost:8080/api";
+        let suppliersAggregated = [];
+
         function logout() {
             localStorage.removeItem("auth_token");
             localStorage.removeItem("user_data");
             window.location.href = "login.html";
         }
 
+        // ---------- ТЕМА ----------
         const themeToggleBtn = document.getElementById("theme-toggle");
         const themeToggleText = document.getElementById("theme-toggle-text");
         const themeToggleIcon = document.getElementById("theme-toggle-icon");
@@ -184,6 +236,137 @@
                 localStorage.setItem("theme", "dark");
                 themeToggleText.textContent = "Dark";
                 themeToggleIcon.textContent = "dark_mode";
+            }
+        });
+
+        function extractData(result) {
+            if (Array.isArray(result)) return result;
+            if (result && Array.isArray(result.data)) return result.data;
+            return [];
+        }
+
+        function aggregateSuppliersFromSupplies(supplies) {
+            const map = new Map();
+
+            supplies.forEach(s => {
+                const name = s.supplier_name || "Без названия";
+                if (!map.has(name)) {
+                    map.set(name, {
+                        name,
+                        count: 0,
+                        lastDate: null,
+                        ingredients: new Set()
+                    });
+                }
+                const entry = map.get(name);
+                entry.count += 1;
+
+                const date = new Date(s.created_at);
+                if (!entry.lastDate || date > entry.lastDate) {
+                    entry.lastDate = date;
+                }
+
+                if (s.ingredient && s.ingredient.name) {
+                    entry.ingredients.add(s.ingredient.name);
+                }
+            });
+
+            return Array.from(map.values()).map(e => ({
+                name: e.name,
+                count: e.count,
+                lastDate: e.lastDate,
+                ingredients: Array.from(e.ingredients)
+            })).sort((a, b) => b.count - a.count);
+        }
+
+        function renderSuppliers(filter = "") {
+            const tbody = document.getElementById("suppliersTableBody");
+            tbody.innerHTML = "";
+
+            const q = filter.trim().toLowerCase();
+
+            const filtered = suppliersAggregated.filter(s =>
+                !q || s.name.toLowerCase().includes(q)
+            );
+
+            if (!filtered.length) {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td colspan="5" class="px-4 py-6 text-center text-sm text-subtext-light dark:text-subtext-dark">
+                        Нет поставщиков (или ничего не найдено по фильтру)
+                    </td>`;
+                tbody.appendChild(tr);
+                return;
+            }
+
+            filtered.forEach(s => {
+                const tr = document.createElement("tr");
+
+                const lastDateStr = s.lastDate ? s.lastDate.toLocaleString() : "—";
+                const ingredientsPreview = s.ingredients.slice(0, 3).join(", ");
+                const moreCount = s.ingredients.length > 3 ? ` +${s.ingredients.length - 3}` : "";
+
+                tr.innerHTML = `
+                    <td class="px-4 py-3 text-sm font-medium text-text-light dark:text-text-dark">
+                        ${s.name}
+                    </td>
+                    <td class="px-4 py-3 text-sm text-text-light dark:text-text-dark">
+                        ${s.count}
+                    </td>
+                    <td class="px-4 py-3 text-sm text-text-light dark:text-text-dark">
+                        ${lastDateStr}
+                    </td>
+                    <td class="px-4 py-3 text-sm text-text-light dark:text-text-dark">
+                        ${ingredientsPreview || "—"}${moreCount}
+                    </td>
+                    <td class="px-4 py-3 text-sm text-right">
+                        <span
+                            class="inline-flex items-center rounded-full px-2 py-1 text-xs font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300">
+                            Активен
+                        </span>
+                    </td>
+                `;
+
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function loadSuppliers() {
+            const token = localStorage.getItem("auth_token");
+            if (!token) {
+                window.location.href = "login.html";
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API_BASE_URL}/supplies`, {
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    }
+                });
+
+                if (!res.ok) {
+                    console.error("Failed to load supplies for suppliers", res.status);
+                    return;
+                }
+
+                const result = await res.json();
+                const supplies = extractData(result);
+                suppliersAggregated = aggregateSuppliersFromSupplies(supplies);
+                renderSuppliers();
+            } catch (e) {
+                console.error("Error loading suppliers", e);
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            loadSuppliers();
+
+            const searchInput = document.getElementById("searchSupplierInput");
+            if (searchInput) {
+                searchInput.addEventListener("input", () => {
+                    renderSuppliers(searchInput.value);
+                });
             }
         });
     </script>

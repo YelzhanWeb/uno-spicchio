@@ -50,6 +50,10 @@
         .material-symbols-outlined.fill {
             font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 24;
         }
+
+        .backdrop-blur-xs {
+            backdrop-filter: blur(2px);
+        }
     </style>
 </head>
 
@@ -66,7 +70,7 @@
                         </div>
                         <div class="flex flex-col">
                             <h1 class="text-base font-bold leading-normal">UNO Spichio</h1>
-                            <p class="text-xs text-muted-light/80">Admin Panel</p>
+                            <p class="text-xs text-text-light/60 dark:text-text-dark/60">Admin Panel</p>
                         </div>
                     </div>
 
@@ -92,14 +96,14 @@
                             <span class="text-sm font-medium leading-normal">Меню</span>
                         </a>
 
-                        <!-- Склад / Ингредиенты (активная) -->
+                        <!-- Склад -->
                         <a href="inventory.html"
                             class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-primary/10 transition">
                             <span class="material-symbols-outlined text-lg fill">inventory_2</span>
                             <span class="text-sm leading-normal">Склад</span>
                         </a>
 
-                        <!-- Закупки -->
+                        <!-- Закупки (активная) -->
                         <a href="purchases.html"
                             class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/15 text-primary font-semibold">
                             <span class="material-symbols-outlined text-lg">shopping_cart</span>
@@ -126,7 +130,7 @@
             </aside>
 
             <!-- MAIN -->
-            <main class="flex-1 flex flex-col">
+            <main class="flex-1 flex flex-col relative">
                 <!-- HEADER с темой -->
                 <header
                     class="flex items-center justify-between px-8 py-4 border-b border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark">
@@ -144,7 +148,7 @@
                             <span id="theme-toggle-text">Light</span>
                         </button>
 
-                        <button
+                        <button id="openCreateModalBtn"
                             class="flex min-w-[84px] items-center justify-center gap-2 overflow-hidden rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-wide shadow-sm hover:bg-primary/90">
                             <span class="material-symbols-outlined text-xl">add</span>
                             <span class="truncate">Создать заказ</span>
@@ -152,7 +156,7 @@
                     </div>
                 </header>
 
-                <!-- CONTENT (твоя таблица закупок почти без изменений) -->
+                <!-- CONTENT -->
                 <section class="flex-1 p-8">
                     <div class="flex flex-col max-w-full mx-auto">
                         <!-- Search + фильтры -->
@@ -165,7 +169,7 @@
                                             class="text-text-light/70 dark:text-text-dark/70 flex items-center justify-center pl-4">
                                             <span class="material-symbols-outlined text-2xl">search</span>
                                         </div>
-                                        <input
+                                        <input id="searchSupplyInput"
                                             class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden text-text-light dark:text-text-dark focus:outline-0 focus:ring-0 border-none bg-transparent h-full placeholder:text-text-light/70 dark:placeholder:text-text-dark/70 px-4 pl-2 text-base font-normal leading-normal"
                                             placeholder="Поиск по номеру заказа, поставщику..." />
                                     </div>
@@ -195,21 +199,125 @@
                             </div>
                         </div>
 
-                        <!-- Таблица (оставил как в макете) -->
-                        <!-- ... твоя таблица из исходного кода ... -->
+                        <!-- Таблица закупок (реальные поставки) -->
+                        <div class="overflow-hidden rounded-lg border border-border-light dark:border-border-dark">
+                            <table class="min-w-full divide-y divide-border-light dark:divide-border-dark">
+                                <thead class="bg-surface-light dark:bg-surface-dark">
+                                    <tr>
+                                        <th
+                                            class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-text-light/70 dark:text-text-dark/70">
+                                            № заказа
+                                        </th>
+                                        <th
+                                            class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-text-light/70 dark:text-text-dark/70">
+                                            Ингредиент
+                                        </th>
+                                        <th
+                                            class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-text-light/70 dark:text-text-dark/70">
+                                            Количество
+                                        </th>
+                                        <th
+                                            class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-text-light/70 dark:text-text-dark/70">
+                                            Поставщик
+                                        </th>
+                                        <th
+                                            class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-text-light/70 dark:text-text-dark/70">
+                                            Дата
+                                        </th>
+                                        <th
+                                            class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-text-light/70 dark:text-text-dark/70">
+                                            Статус
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody id="suppliesTableBody"
+                                    class="bg-surface-light dark:bg-surface-dark divide-y divide-border-light dark:divide-border-dark">
+                                    <!-- строки подставляются из JS -->
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </section>
+
+                <!-- MODAL: создание поставки -->
+                <div id="createSupplyModal"
+                    class="hidden fixed inset-0 z-30 flex items-center justify-center bg-black/40 backdrop-blur-xs">
+                    <div
+                        class="bg-surface-light dark:bg-surface-dark rounded-xl shadow-xl max-w-md w-full mx-4 p-6 border border-border-light dark:border-border-dark">
+                        <div class="flex items-center justify-between mb-4">
+                            <h2 class="text-lg font-semibold">Новый заказ на закупку</h2>
+                            <button id="closeCreateModalBtn"
+                                class="p-1 rounded-full hover:bg-border-light/50 dark:hover:bg-border-dark/50">
+                                <span class="material-symbols-outlined">close</span>
+                            </button>
+                        </div>
+
+                        <form id="createSupplyForm" class="space-y-4">
+                            <!-- Ingredient select -->
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Ингредиент</label>
+                                <select id="ingredientSelect"
+                                    class="block w-full rounded-lg border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/60">
+                                    <option value="">Выберите ингредиент</option>
+                                </select>
+                            </div>
+
+                            <!-- Quantity -->
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Количество</label>
+                                <div class="flex gap-2">
+                                    <input id="qtyInput" type="number" step="0.01" min="0"
+                                        class="flex-1 rounded-lg border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/60"
+                                        placeholder="Например, 5.0" />
+                                    <span id="unitLabel"
+                                        class="inline-flex items-center px-3 rounded-lg border border-dashed border-border-light dark:border-border-dark text-xs text-text-light/70 dark:text-text-dark/70">
+                                        ед.
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Supplier name -->
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Поставщик</label>
+                                <input id="supplierNameInput" type="text"
+                                    class="block w-full rounded-lg border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/60"
+                                    placeholder="Название компании или ФИО" />
+                            </div>
+
+                            <!-- Error message -->
+                            <p id="formError"
+                                class="hidden text-sm text-accent-red bg-accent-red/10 px-3 py-2 rounded-lg"></p>
+
+                            <div class="flex justify-end gap-2 pt-2">
+                                <button type="button" id="cancelCreateModalBtn"
+                                    class="px-4 py-2 rounded-lg border border-border-light dark:border-border-dark text-sm hover:bg-border-light/50 dark:hover:bg-border-dark/50">
+                                    Отмена
+                                </button>
+                                <button type="submit" id="submitCreateSupplyBtn"
+                                    class="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary/90 disabled:opacity-60 disabled:cursor-not-allowed">
+                                    <span class="material-symbols-outlined text-base">check</span>
+                                    <span>Создать</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </main>
         </div>
     </div>
 
     <script>
+        const API_BASE_URL = "http://localhost:8080/api";
+        let allSupplies = [];
+        let allIngredients = [];
+
         function logout() {
             localStorage.removeItem("auth_token");
             localStorage.removeItem("user_data");
             window.location.href = "login.html";
         }
 
+        // ---------- ТЕМА ----------
         const themeToggleBtn = document.getElementById("theme-toggle");
         const themeToggleText = document.getElementById("theme-toggle-text");
         const themeToggleIcon = document.getElementById("theme-toggle-icon");
@@ -236,6 +344,270 @@
                 localStorage.setItem("theme", "dark");
                 themeToggleText.textContent = "Dark";
                 themeToggleIcon.textContent = "dark_mode";
+            }
+        });
+
+        function extractData(result) {
+            if (Array.isArray(result)) return result;
+            if (result && Array.isArray(result.data)) return result.data;
+            return [];
+        }
+
+        // ---------- Рендер списка поставок ----------
+        function renderSupplies(filter = "") {
+            const tbody = document.getElementById("suppliesTableBody");
+            tbody.innerHTML = "";
+
+            const q = filter.trim().toLowerCase();
+
+            const filtered = allSupplies.filter(s => {
+                const numberStr = `#${s.id}`;
+                const supplier = (s.supplier_name || "").toLowerCase();
+                return !q || numberStr.toLowerCase().includes(q) || supplier.includes(q);
+            });
+
+            if (!filtered.length) {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td colspan="6" class="px-4 py-6 text-center text-sm text-text-light/70 dark:text-text-dark/70">
+                        Нет поставок (или ничего не найдено по фильтру)
+                    </td>`;
+                tbody.appendChild(tr);
+                return;
+            }
+
+            filtered.forEach(s => {
+                const tr = document.createElement("tr");
+                const date = new Date(s.created_at);
+
+                tr.innerHTML = `
+                    <td class="px-4 py-3 text-sm text-text-light dark:text-text-dark">
+                        #${s.id}
+                    </td>
+                    <td class="px-4 py-3 text-sm text-text-light dark:text-text-dark">
+                        ${s.ingredient?.name || ("ID " + s.ingredient_id)}
+                    </td>
+                    <td class="px-4 py-3 text-sm text-text-light dark:text-text-dark">
+                        ${s.qty.toFixed(2)} ${s.ingredient?.unit || ""}
+                    </td>
+                    <td class="px-4 py-3 text-sm text-text-light dark:text-text-dark">
+                        ${s.supplier_name}
+                    </td>
+                    <td class="px-4 py-3 text-sm text-text-light dark:text-text-dark">
+                        ${date.toLocaleString()}
+                    </td>
+                    <td class="px-4 py-3 text-sm text-right">
+                        <span
+                            class="inline-flex items-center rounded-full px-2 py-1 text-xs font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300">
+                            Завершено
+                        </span>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function loadSupplies() {
+            const token = localStorage.getItem("auth_token");
+            if (!token) {
+                window.location.href = "login.html";
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API_BASE_URL}/supplies`, {
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    }
+                });
+
+                if (!res.ok) {
+                    console.error("Failed to load supplies", res.status);
+                    return;
+                }
+
+                const result = await res.json();
+                allSupplies = extractData(result);
+                renderSupplies();
+            } catch (e) {
+                console.error("Error loading supplies", e);
+            }
+        }
+
+        // ---------- Загрузка ингредиентов для селекта ----------
+        async function loadIngredients() {
+            const token = localStorage.getItem("auth_token");
+            if (!token) {
+                window.location.href = "login.html";
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API_BASE_URL}/ingredients`, {
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    }
+                });
+
+                if (!res.ok) {
+                    console.error("Failed to load ingredients", res.status);
+                    return;
+                }
+
+                const result = await res.json();
+                allIngredients = extractData(result);
+                fillIngredientSelect();
+            } catch (e) {
+                console.error("Error loading ingredients", e);
+            }
+        }
+
+        function fillIngredientSelect() {
+            const select = document.getElementById("ingredientSelect");
+            if (!select) return;
+
+            select.innerHTML = `<option value="">Выберите ингредиент</option>`;
+
+            allIngredients.forEach(ing => {
+                const opt = document.createElement("option");
+                opt.value = ing.id;
+                const unit = ing.unit ? ` (${ing.unit})` : "";
+                opt.textContent = `${ing.name}${unit}`;
+                select.appendChild(opt);
+            });
+        }
+
+        // ---------- Модалка ----------
+        const modal = document.getElementById("createSupplyModal");
+        const openModalBtn = document.getElementById("openCreateModalBtn");
+        const closeModalBtn = document.getElementById("closeCreateModalBtn");
+        const cancelModalBtn = document.getElementById("cancelCreateModalBtn");
+        const createSupplyForm = document.getElementById("createSupplyForm");
+        const ingredientSelect = document.getElementById("ingredientSelect");
+        const qtyInput = document.getElementById("qtyInput");
+        const supplierNameInput = document.getElementById("supplierNameInput");
+        const unitLabel = document.getElementById("unitLabel");
+        const formError = document.getElementById("formError");
+        const submitBtn = document.getElementById("submitCreateSupplyBtn");
+
+        function openModal() {
+            if (!modal) return;
+            formError.classList.add("hidden");
+            formError.textContent = "";
+            createSupplyForm.reset();
+            unitLabel.textContent = "ед.";
+            modal.classList.remove("hidden");
+        }
+
+        function closeModal() {
+            if (!modal) return;
+            modal.classList.add("hidden");
+        }
+
+        openModalBtn?.addEventListener("click", openModal);
+        closeModalBtn?.addEventListener("click", closeModal);
+        cancelModalBtn?.addEventListener("click", (e) => {
+            e.preventDefault();
+            closeModal();
+        });
+
+        // Обновление юнита при смене ингредиента
+        ingredientSelect?.addEventListener("change", () => {
+            const id = parseInt(ingredientSelect.value, 10);
+            const ing = allIngredients.find(i => i.id === id);
+            unitLabel.textContent = ing?.unit || "ед.";
+        });
+
+        // ---------- Создание поставки через форму ----------
+        async function createSupplyViaForm(event) {
+            event.preventDefault();
+            if (!ingredientSelect || !qtyInput || !supplierNameInput) return;
+
+            const ingredientId = parseInt(ingredientSelect.value, 10);
+            const qty = parseFloat(qtyInput.value.replace(",", "."));
+            const supplierName = supplierNameInput.value.trim();
+
+            if (!ingredientId || isNaN(ingredientId)) {
+                showFormError("Выберите ингредиент");
+                return;
+            }
+            if (isNaN(qty) || qty <= 0) {
+                showFormError("Введите корректное количество");
+                return;
+            }
+            if (!supplierName) {
+                showFormError("Введите название поставщика");
+                return;
+            }
+
+            const token = localStorage.getItem("auth_token");
+            if (!token) {
+                window.location.href = "login.html";
+                return;
+            }
+
+            const payload = {
+                ingredient_id: ingredientId,
+                qty: qty,
+                supplier_name: supplierName
+            };
+
+            try {
+                submitBtn.disabled = true;
+
+                const res = await fetch(`${API_BASE_URL}/supplies`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!res.ok) {
+                    const text = await res.text();
+                    console.error("Failed to create supply", res.status, text);
+                    showFormError("Ошибка при создании поставки");
+                    submitBtn.disabled = false;
+                    return;
+                }
+
+                // Успех
+                closeModal();
+                await loadSupplies();
+            } catch (e) {
+                console.error("Error creating supply", e);
+                showFormError("Ошибка при создании поставки");
+            } finally {
+                submitBtn.disabled = false;
+            }
+        }
+
+        function showFormError(message) {
+            if (!formError) return;
+            formError.textContent = message;
+            formError.classList.remove("hidden");
+        }
+
+        createSupplyForm?.addEventListener("submit", createSupplyViaForm);
+
+        // Закрытие по клику вне модалки
+        modal?.addEventListener("click", (e) => {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+
+        // ---------- INIT ----------
+        document.addEventListener("DOMContentLoaded", () => {
+            loadSupplies();
+            loadIngredients();
+
+            const searchInput = document.getElementById("searchSupplyInput");
+            if (searchInput) {
+                searchInput.addEventListener("input", () => {
+                    renderSupplies(searchInput.value);
+                });
             }
         });
     </script>

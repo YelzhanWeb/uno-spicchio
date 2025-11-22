@@ -34,6 +34,19 @@ func (h *SupplyHandler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if supply.IngredientID <= 0 {
+		response.BadRequest(w, "ingredient_id must be > 0")
+		return
+	}
+	if supply.Qty <= 0 {
+		response.BadRequest(w, "qty must be > 0")
+		return
+	}
+	if supply.SupplierName == "" {
+		response.BadRequest(w, "supplier_name is required")
+		return
+	}
+
 	if err := h.supplyService.Create(r.Context(), &supply); err != nil {
 		response.InternalError(w, "failed to create supply")
 		return

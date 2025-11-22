@@ -174,6 +174,10 @@ func (h *OrderHandler) UpdateStatus(w http.ResponseWriter, r *http.Request) {
 			response.BadRequest(w, "invalid status change")
 			return
 		}
+		if err == domain.ErrInsufficientStock {
+			response.BadRequest(w, "insufficient stock to start cooking this order")
+			return
+		}
 		response.InternalError(w, "failed to update order status")
 		return
 	}

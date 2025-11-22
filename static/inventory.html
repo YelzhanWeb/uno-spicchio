@@ -145,20 +145,20 @@
             <main class="flex-1 flex justify-center px-6 py-6">
                 <div
                     class="layout-content-container flex flex-col max-w-[960px] flex-1 bg-background-light dark:bg-background-dark rounded-lg">
-                    <!-- search + заголовок (заголовок уже в header, здесь оставим только поиск) -->
+                    <!-- search -->
                     <div class="px-4 py-3">
                         <label class="flex flex-col min-w-40 h-12 w-full">
                             <div class="flex w-full flex-1 items-stretch rounded-lg h-full bg-[#f3e7e8]">
                                 <div class="text-[#994d51] flex items-center justify-center pl-4">
                                     <span class="material-symbols-outlined text-xl">search</span>
                                 </div>
-                                <input placeholder="Поиск ингредиентов"
+                                <input id="searchInput" placeholder="Поиск ингредиентов"
                                     class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-[#1b0e0e] focus:outline-0 focus:ring-0 border-none bg-[#f3e7e8] h-full placeholder:text-[#994d51] px-4 pl-2 text-base font-normal leading-normal" />
                             </div>
                         </label>
                     </div>
 
-                    <!-- таблица (твой дизайн) -->
+                    <!-- таблица -->
                     <div class="px-4 py-3 @container">
                         <div class="flex overflow-hidden rounded-lg border border-[#e7d0d1] bg-[#fcf8f8]">
                             <table class="flex-1">
@@ -194,9 +194,8 @@
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    <!-- дальше полностью твоя статическая таблица — я не менял строки -->
-                                    <!-- ... (оставил как в твоём HTML, чтобы не раздувать ответ) ... -->
+                                <tbody id="ingredientsTableBody">
+                                    <!-- строки подставляются из JS -->
                                 </tbody>
                             </table>
                         </div>
@@ -250,13 +249,16 @@
     </div>
 
     <script>
+        const API_BASE_URL = "http://localhost:8080/api";
+        let allIngredients = [];
+
         function logout() {
             localStorage.removeItem("auth_token");
             localStorage.removeItem("user_data");
             window.location.href = "login.html";
         }
 
-        // Общий переключатель темы
+        // ---------- ТЕМА ----------
         const themeToggleBtn = document.getElementById("theme-toggle");
         const themeToggleText = document.getElementById("theme-toggle-text");
         const themeToggleIcon = document.getElementById("theme-toggle-icon");
@@ -283,6 +285,117 @@
                 localStorage.setItem("theme", "dark");
                 themeToggleText.textContent = "Dark";
                 themeToggleIcon.textContent = "dark_mode";
+            }
+        });
+
+        function extractData(result) {
+            if (Array.isArray(result)) return result;
+            if (result && Array.isArray(result.data)) return result.data;
+            return [];
+        }
+
+        function renderIngredients(filter = "") {
+            const tbody = document.getElementById("ingredientsTableBody");
+            tbody.innerHTML = "";
+
+            const q = filter.trim().toLowerCase();
+
+            const filtered = allIngredients.filter(ing =>
+                !q || ing.name.toLowerCase().includes(q)
+            );
+
+            if (!filtered.length) {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td colspan="7" class="px-4 py-6 text-center text-sm text-[#994d51]">
+                        Нет ингредиентов (или ничего не найдено по фильтру)
+                    </td>`;
+                tbody.appendChild(tr);
+                return;
+            }
+
+            filtered.forEach(ing => {
+                const isLow = ing.qty <= ing.min_qty;
+
+                const tr = document.createElement("tr");
+                tr.className = "border-t border-[#e7d0d1]";
+
+                tr.innerHTML = `
+                    <td class="px-4 py-3 text-sm font-medium text-[#1b0e0e]">
+                        ${ing.name}
+                    </td>
+                    <td class="px-4 py-3 text-sm text-[#1b0e0e]">
+                        –
+                    </td>
+                    <td class="px-4 py-3 text-sm">
+                        <div class="flex items-center gap-2">
+                            <div class="h-2 flex-1 rounded-full bg-[#f3e7e8]">
+                                <div class="h-2 rounded-full ${isLow ? "bg-red-500" : "bg-green-500"}" 
+                                     style="width: 80%;"></div>
+                            </div>
+                            <span class="text-xs text-[#994d51]">
+                                ${ing.qty.toFixed(2)} ${ing.unit} 
+                                <span class="${isLow ? "text-red-600 font-semibold" : ""}">
+                                    (мин. ${ing.min_qty.toFixed(2)})
+                                </span>
+                            </span>
+                        </div>
+                    </td>
+                    <td class="px-4 py-3 text-sm text-[#1b0e0e]">
+                        ${ing.unit}
+                    </td>
+                    <td class="px-4 py-3 text-sm text-[#1b0e0e]">
+                        –
+                    </td>
+                    <td class="px-4 py-3 text-sm text-[#1b0e0e]">
+                        –
+                    </td>
+                    <td class="px-4 py-3 text-sm text-[#994d51]">
+                        <button class="text-xs underline hover:no-underline">
+                            История поставок
+                        </button>
+                    </td>
+                `;
+
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function loadIngredients() {
+            const token = localStorage.getItem("auth_token");
+            if (!token) {
+                window.location.href = "login.html";
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API_BASE_URL}/ingredients`, {
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    }
+                });
+
+                if (!res.ok) {
+                    console.error("Failed to load ingredients", res.status);
+                    return;
+                }
+
+                const result = await res.json();
+                allIngredients = extractData(result);
+                renderIngredients();
+            } catch (e) {
+                console.error("Error loading ingredients", e);
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            loadIngredients();
+
+            const searchInput = document.getElementById("searchInput");
+            if (searchInput) {
+                searchInput.addEventListener("input", () => {
+                    renderIngredients(searchInput.value);
+                });
             }
         });
     </script>
