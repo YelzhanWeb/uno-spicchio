@@ -9,8 +9,9 @@
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 
     <!-- Inter + Material Symbols -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap"
-        rel="stylesheet" />
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&display=swap"
         rel="stylesheet" />
 
@@ -85,30 +86,30 @@
                 </div>
 
                 <!-- Nav -->
-                <nav class="flex flex-col space-y-2 flex-1">
-                    <div class="px-4 py-3 bg-red-50 dark:bg-gray-700 rounded-lg">
-                        <p class="font-semibold text-primary">UNO Spicchio</p>
-                    </div>
+                <a href="active-orders.html"
+                    class="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300">
+                    <span class="material-symbols-outlined">receipt_long</span>
+                    <span>Все заказы</span>
+                </a>
 
-                    <a href="active-orders.html"
-                        class="block px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300">
-                        Все заказы
-                    </a>
+                <a id="createOrderLink" href="create-order.html"
+                    class="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300">
+                    <span class="material-symbols-outlined">add_shopping_cart</span>
+                    <span>Создать заказ</span>
+                </a>
 
-                    <a id="createOrderLink" href="create-order.html"
-                        class="block px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300">
-                        Создать заказ
-                    </a>
+                <a id="chefLink" href="chef-orders.html"
+                    class="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300">
+                    <span class="material-symbols-outlined">restaurant</span>
+                    <span>Кухня</span>
+                </a>
 
-                    <a id="chefLink" href="chef-orders.html"
-                        class="block px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300">
-                        Кухня
-                    </a>
-                    <a id="dashboardLink" href="dashboard.html"
-                        class="block px-4 py-3 bg-red-100/50 dark:bg-gray-700/50 rounded-lg font-medium text-gray-900 dark:text-white">
-                        Аналитика
-                    </a>
-                </nav>
+                <a id="dashboardLink" href="dashboard.html"
+                    class="flex items-center gap-2 px-4 py-3 bg-red-100/50 dark:bg-gray-700/50 rounded-lg font-medium text-gray-900 dark:text-white">
+                    <span class="material-symbols-outlined">analytics</span>
+                    <span>Аналитика</span>
+                </a>
+
 
                 <!-- User + logout -->
                 <div class="mt-auto pt-4 border-t border-border-light dark:border-border-dark flex flex-col gap-3">
