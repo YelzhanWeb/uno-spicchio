@@ -6,31 +6,27 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>UNO Spicchio - Новый заказ</title>
 
-    <!-- Шрифты -->
-    <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700;800;900&display=swap"
-        rel="stylesheet" />
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
 
     <!-- Tailwind -->
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
     <script>
         tailwind.config = {
             darkMode: "class",
             theme: {
                 extend: {
                     colors: {
-                        primary: "#ec2513",
-                        "background-light": "#f8f6f6",
-                        "background-dark": "#221210",
+                        primary: "#E53935",
+                        "background-light": "#F8F7F5",
+                        "background-dark": "#121212",
                     },
                     fontFamily: {
-                        display: ["Work Sans", "sans-serif"],
+                        display: ["Inter", "sans-serif"],
                     },
                     borderRadius: {
-                        DEFAULT: "0.25rem",
-                        lg: "0.5rem",
-                        xl: "0.75rem",
-                        full: "9999px",
+                        DEFAULT: "0.5rem",
                     },
                 },
             },
@@ -38,196 +34,196 @@
     </script>
     <style>
         .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-            font-size: 24px;
+            font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
         }
     </style>
 </head>
 
-<body class="bg-background-light dark:bg-background-dark font-display">
-    <div class="relative flex min-h-screen w-full">
-        <!-- Sidebar -->
+<body class="font-display bg-background-light dark:bg-background-dark text-gray-900 dark:text-gray-100">
+    <div class="flex h-screen">
+        <!-- SIDEBAR -->
         <aside
-            class="flex flex-col w-64 p-4 border-r border-[#e7d1cf] dark:border-white/10 bg-background-light dark:bg-background-dark text-[#1b0f0d] dark:text-gray-200">
-            <div class="flex flex-col gap-4">
-                <div class="flex items-center gap-3">
-                    <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
-                        data-alt="UNO Spicchio restaurant logo"
-                        style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCej6nzjOCtkOZnCO4ii1a233pgbYET5xcmiLDmPTeymtIJXUvI6lUMJ6uDMvSeLIpITQpAFUy-Zr4OsEN0Fltm3l88JmjT4eTT3wZuBVnZKXvMuR__hvoasQRRRlj_s3PyAqDUAfuGgXRDIc5kWHYO9jZ3M9LtlQmNCt06Bjo0p2vBW3bYBWadqc2rC7VBJEPCghP_fS4Nig3vr-5CZu-Ij4it-l7EE_R0ZCF1M2ZoqJwrph4MuZ5IRZHu-EDQHEu0rnpGkrQdRz4");'>
-                    </div>
-                    <div class="flex flex-col">
-                        <h1 class="text-base font-medium leading-normal text-[#1b0f0d] dark:text-white">
-                            UNO Spicchio
-                        </h1>
-                        <p class="text-sm font-normal leading-normal text-gray-500 dark:text-gray-400">
-                            Admin Panel
-                        </p>
-                    </div>
-                </div>
-                <nav class="flex flex-col gap-2 mt-4">
-                    <a href="dashboard.html"
-                        class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-primary/10 dark:hover:bg-primary/20">
-                        <span class="material-symbols-outlined">dashboard</span>
-                        <p class="text-sm font-medium leading-normal">Dashboard</p>
-                    </a>
-                    <a href="active-orders.html"
-                        class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/20 dark:bg-primary/30 text-primary dark:text-[#f8f6f6]">
-                        <span class="material-symbols-outlined"
-                            style="font-variation-settings: 'FILL' 1;">receipt_long</span>
-                        <p class="text-sm font-medium leading-normal">Orders</p>
-                    </a>
-                    <!-- Пока заглушки, можно подключить позже -->
-                    <a href="#"
-                        class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-primary/10 dark:hover:bg-primary/20">
-                        <span class="material-symbols-outlined">restaurant_menu</span>
-                        <p class="text-sm font-medium leading-normal">Menu</p>
-                    </a>
-                    <a href="#"
-                        class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-primary/10 dark:hover:bg-primary/20">
-                        <span class="material-symbols-outlined">table_restaurant</span>
-                        <p class="text-sm font-medium leading-normal">Reservations</p>
-                    </a>
-                    <a href="#"
-                        class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-primary/10 dark:hover:bg-primary/20">
-                        <span class="material-symbols-outlined">settings</span>
-                        <p class="text-sm font-medium leading-normal">Settings</p>
-                    </a>
-                </nav>
+            class="w-64 flex-shrink-0 bg-white dark:bg-gray-800 p-6 border-r border-gray-200 dark:border-gray-700 flex flex-col">
+            <div class="mb-10">
+                <h1 class="text-xl font-bold text-gray-900 dark:text-white">UNO Spicchio</h1>
             </div>
-            <div class="flex flex-col gap-4 mt-auto">
-                <button type="button"
-                    class="flex items-center justify-center w-full h-10 px-4 text-sm font-bold tracking-wider rounded-lg cursor-pointer bg-primary text-white">
-                    <span class="truncate">NEW ORDER</span>
-                </button>
-                <div class="flex flex-col gap-1">
+
+            <!-- ВКЛАДКИ -->
+            <nav class="flex flex-col space-y-2 flex-1">
+                <div class="px-4 py-3 bg-red-50 dark:bg-gray-700 rounded-lg">
+                    <p class="font-semibold text-primary">UNO Spicchio</p>
+                </div>
+
+                <!-- Все заказы (НЕ активная на этой странице) -->
+                <a href="active-orders.html"
+                    class="block px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300">
+                    Все заказы
+                </a>
+
+                <!-- Создать заказ (ТЕКУЩАЯ страница — активная) -->
+                <a id="createOrderLink" href="create-order.html"
+                    class="block px-4 py-3 bg-red-100/50 dark:bg-gray-700/50 rounded-lg font-medium text-gray-900 dark:text-white">
+                    Создать заказ
+                </a>
+
+                <a id="chefLink" href="chef-orders.html"
+                    class="block px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300">
+                    Кухня
+                </a>
+                <a id="dashboardLink" href="dashboard.html"
+                    class="block px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300">
+                    Аналитика
+                </a>
+            </nav>
+
+            <!-- Низ сайдбара (кнопку NEW ORDER убрали) -->
+            <div class="mt-6">
+                <div class="border-t border-gray-200 dark:border-gray-700 pt-3 space-y-2 text-sm">
                     <a href="#"
-                        class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-primary/10 dark:hover:bg-primary/20">
-                        <span class="material-symbols-outlined">help_outline</span>
-                        <p class="text-sm font-medium leading-normal">Help</p>
+                        class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <span class="material-symbols-outlined text-xl">help</span>
+                        <span>Help</span>
                     </a>
                     <a href="#" onclick="logout(); return false;"
-                        class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-primary/10 dark:hover:bg-primary/20">
-                        <span class="material-symbols-outlined">logout</span>
-                        <p class="text-sm font-medium leading-normal">Log Out</p>
+                        class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <span class="material-symbols-outlined text-xl">logout</span>
+                        <span>Log Out</span>
                     </a>
                 </div>
             </div>
         </aside>
 
-        <!-- Main content -->
-        <main class="flex-1 p-8 overflow-y-auto">
-            <div class="max-w-7xl mx-auto">
-                <!-- Заголовок -->
-                <div class="flex flex-wrap items-center justify-between gap-3 mb-8">
-                    <p class="text-[#1b0f0d] dark:text-white text-4xl font-black tracking-tighter">
-                        Create New Order
-                    </p>
-                </div>
+        <!-- MAIN -->
+        <main class="flex-1 overflow-y-auto p-8">
+            <!-- THEME TOGGLE BUTTON -->
+            <div class="flex justify-end mb-6">
+                <button id="theme-toggle"
+                    class="flex items-center gap-2 px-4 py-2 rounded-lg bg-white dark:bg-zinc-800 border border-gray-300 dark:border-zinc-700 text-gray-800 dark:text-gray-100 shadow hover:bg-gray-100 dark:hover:bg-zinc-700 transition">
+                    <span class="material-symbols-outlined">light_mode</span>
+                    <span id="theme-toggle-text">Light</span>
+                </button>
+            </div>
 
-                <!-- Две колонки -->
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    <!-- Левая колонка (стол + заказ) -->
-                    <div class="lg:col-span-1 flex flex-col gap-6">
-                        <!-- Выбор стола -->
-                        <div class="flex flex-col w-full">
-                            <label class="flex flex-col w-full">
-                                <p class="text-[#1b0f0d] dark:text-gray-200 text-base font-medium leading-normal pb-2">
-                                    Select Table
-                                </p>
+            <div class="max-w-7xl mx-auto grid grid-cols-3 gap-8">
+                <!-- LEFT: TABLE + MENU (2 columns) -->
+                <div class="col-span-2 flex flex-col">
+                    <h1 class="text-3xl font-bold mb-8 text-gray-900 dark:text-white">
+                        Create New Order
+                    </h1>
+
+                    <!-- Top controls: Select table + Search -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                        <!-- Select table -->
+                        <div>
+                            <label for="table-select"
+                                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Select
+                                Table</label>
+                            <div class="relative">
                                 <select id="table-select"
-                                    class="form-select flex w-full min-w-0 resize-none overflow-hidden rounded-lg text-[#1b0f0d] dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-[#e7d1cf] dark:border-white/20 bg-background-light dark:bg-background-dark focus:border-primary h-14 placeholder:text-gray-400 p-3 text-base font-normal leading-normal">
+                                    class="w-full pl-4 pr-10 py-3 text-sm border border-gray-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 focus:ring-primary focus:border-primary appearance-none">
                                     <option value="">Loading tables...</option>
                                 </select>
-                            </label>
-                        </div>
-
-                        <!-- Текущий заказ -->
-                        <div class="flex flex-col">
-                            <h3 class="text-[#1b0f0d] dark:text-white text-lg font-bold tracking-tight pb-2 pt-4">
-                                Current Order
-                            </h3>
-                            <div
-                                class="flex flex-col p-4 bg-white/50 dark:bg-white/5 rounded-xl border border-[#e7d1cf] dark:border-white/10">
-                                <!-- Контейнер для позиций заказа -->
-                                <div id="order-items-container" class="flex flex-col gap-3">
-                                    <!-- JS сам вставит сюда пустое состояние или список позиций -->
-                                </div>
-
-                                <!-- Итог -->
                                 <div
-                                    class="flex flex-col gap-2 pt-4 mt-4 border-t border-dashed border-[#e7d1cf] dark:border-white/10">
-                                    <div
-                                        class="flex justify-between items-center text-sm text-gray-600 dark:text-gray-300">
-                                        <span>Subtotal</span>
-                                        <span id="order-subtotal">₸0.00</span>
-                                    </div>
-                                    <div
-                                        class="flex justify-between items-center text-lg font-bold text-[#1b0f0d] dark:text-white">
-                                        <span>Total</span>
-                                        <span id="order-total">₸0.00</span>
-                                    </div>
+                                    class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400">
+                                    <span class="material-symbols-outlined text-xl">
+                                        expand_more
+                                    </span>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Кнопка создания заказа -->
-                        <button id="create-order-btn" type="button"
-                            class="flex items-center justify-center w-full h-12 px-4 mt-auto text-base font-bold tracking-wider text-white rounded-lg cursor-pointer bg-primary hover:opacity-90 disabled:opacity-50">
-                            <span class="truncate">CREATE ORDER</span>
-                        </button>
+                        <!-- Search menu -->
+                        <div>
+                            <label for="menu-search"
+                                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 invisible">Search</label>
+                            <div class="relative">
+                                <span
+                                    class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500">search</span>
+                                <input id="menu-search" type="text" placeholder="Search menu items..."
+                                    class="w-full pl-12 pr-4 py-3 text-sm border border-gray-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 focus:ring-primary focus:border-primary" />
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- Правая колонка (меню) -->
-                    <div class="lg:col-span-2 flex flex-col gap-6">
-                        <!-- Поиск -->
-                        <div class="relative">
-                            <span
-                                class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">search</span>
-                            <input id="menu-search" type="text"
-                                class="w-full h-14 pl-12 pr-4 text-base rounded-lg border border-[#e7d1cf] dark:border-white/20 bg-background-light dark:bg-background-dark focus:ring-2 focus:ring-primary/50 focus:border-primary text-[#1b0f0d] dark:text-white placeholder:text-gray-400"
-                                placeholder="Search menu items..." />
+                    <!-- Tabs (categories) -->
+                    <div class="border-b border-gray-200 dark:border-zinc-700 mb-6 overflow-x-auto">
+                        <nav id="menu-tabs-container" aria-label="Tabs" class="flex space-x-8 -mb-px">
+                            <!-- JS will render tabs here -->
+                        </nav>
+                    </div>
+
+                    <!-- Menu items grid -->
+                    <div id="menu-items-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- JS will render dish cards here -->
+                    </div>
+                </div>
+
+                <!-- RIGHT: CURRENT ORDER (1 column) -->
+                <div class="col-span-1">
+                    <div
+                        class="sticky top-8 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-lg p-6 flex flex-col">
+                        <h2 class="text-xl font-bold mb-6 text-gray-900 dark:text-white">
+                            Current Order
+                        </h2>
+
+                        <!-- Order items -->
+                        <div id="order-items-container" class="flex flex-col">
+                            <div class="text-center py-12">
+                                <h3 class="font-semibold text-gray-800 dark:text-white mb-1">
+                                    No items added yet
+                                </h3>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">
+                                    Select items from the menu to add them to this order.
+                                </p>
+                            </div>
                         </div>
 
-                        <!-- Табы категорий -->
-                        <div class="border-b border-[#e7d1cf] dark:border-white/10">
-                            <nav id="menu-tabs-container" aria-label="Tabs" class="flex -mb-px space-x-6">
-                                <!-- JS сам отрисует категории -->
-                            </nav>
+                        <!-- Totals -->
+                        <div class="border-t border-gray-200 dark:border-zinc-700 pt-4 mt-4 space-y-4">
+                            <div class="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+                                <span>Subtotal</span>
+                                <span id="order-subtotal">₸0.00</span>
+                            </div>
+                            <div class="flex justify-between font-bold text-lg text-gray-900 dark:text-white">
+                                <span>Total</span>
+                                <span id="order-total">₸0.00</span>
+                            </div>
                         </div>
 
-                        <!-- Сетка блюд -->
-                        <div id="menu-items-container" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-                            <!-- JS сам вставит карточки блюд -->
-                        </div>
+                        <!-- Create order button -->
+                        <button id="create-order-btn" type="button"
+                            class="w-full bg-primary text-white font-semibold py-3.5 rounded-lg mt-6 text-sm hover:bg-red-700 transition-colors disabled:opacity-50">
+                            CREATE ORDER
+                        </button>
                     </div>
                 </div>
             </div>
         </main>
     </div>
 
-    <!-- ЛОГИКА ИЗ ТВОЕГО РАБОТАЮЩЕГО ВАРИАНТА -->
+    <!-- JS LOGIC (как у тебя) -->
     <script>
-        const API_BASE_URL = 'http://localhost:8080/api';
+        const API_BASE_URL = "http://localhost:8080/api";
         let menuData = [];
         let currentOrder = { items: new Map() };
         let activeCategoryId = null;
         let currentUser = null;
         let tables = [];
-        let menuSearchTerm = '';
+        let menuSearchTerm = "";
 
-        const menuTabsContainer = document.getElementById('menu-tabs-container');
-        const menuItemsContainer = document.getElementById('menu-items-container');
-        const orderItemsContainer = document.getElementById('order-items-container');
-        const orderSubtotalEl = document.getElementById('order-subtotal');
-        const orderTotalEl = document.getElementById('order-total');
-        const createOrderBtn = document.getElementById('create-order-btn');
-        const tableSelect = document.getElementById('table-select');
-        const menuSearchInput = document.getElementById('menu-search');
+        const menuTabsContainer = document.getElementById("menu-tabs-container");
+        const menuItemsContainer = document.getElementById("menu-items-container");
+        const orderItemsContainer = document.getElementById("order-items-container");
+        const orderSubtotalEl = document.getElementById("order-subtotal");
+        const orderTotalEl = document.getElementById("order-total");
+        const createOrderBtn = document.getElementById("create-order-btn");
+        const tableSelect = document.getElementById("table-select");
+        const menuSearchInput = document.getElementById("menu-search");
 
         function checkAuth() {
-            const token = localStorage.getItem('auth_token');
+            const token = localStorage.getItem("auth_token");
             if (!token) {
-                window.location.href = 'login.html';
+                window.location.href = "login.html";
                 return false;
             }
             return token;
@@ -239,7 +235,7 @@
 
             try {
                 const response = await fetch(`${API_BASE_URL}/auth/me`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
+                    headers: { Authorization: `Bearer ${token}` },
                 });
 
                 if (response.ok) {
@@ -252,25 +248,24 @@
                     }
 
                     if (currentUser) {
-                        // В старом коде скрывался dashboardLink – здесь можно добавить доп. логику при желании
-                        if (currentUser.role !== 'waiter' && currentUser.role !== 'admin') {
-                            alert('У вас нет прав для создания заказов');
-                            window.location.href = 'active-orders.html';
+                        if (currentUser.role !== "waiter" && currentUser.role !== "admin") {
+                            alert("У вас нет прав для создания заказов");
+                            window.location.href = "active-orders.html";
                         }
                     }
                 } else {
                     logout();
                 }
             } catch (error) {
-                console.error('Error loading user data:', error);
+                console.error("Error loading user data:", error);
                 logout();
             }
         }
 
         function logout() {
-            localStorage.removeItem('auth_token');
-            localStorage.removeItem('user_data');
-            window.location.href = 'login.html';
+            localStorage.removeItem("auth_token");
+            localStorage.removeItem("user_data");
+            window.location.href = "login.html";
         }
 
         async function loadTables() {
@@ -279,7 +274,7 @@
 
             try {
                 const response = await fetch(`${API_BASE_URL}/tables`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
+                    headers: { Authorization: `Bearer ${token}` },
                 });
 
                 if (response.ok) {
@@ -294,21 +289,24 @@
                     }
 
                     tableSelect.innerHTML = '<option value="">Выберите стол</option>';
-                    tables.forEach(table => {
-                        const option = document.createElement('option');
+                    tables.forEach((table) => {
+                        const option = document.createElement("option");
                         option.value = table.id;
-                        let statusText = table.status === 'free' ? '🟢 Свободен' :
-                            table.status === 'reserve' ? '🟡 Зарезервирован' :
-                                '🔴 Занят';
+                        let statusText =
+                            table.status === "free"
+                                ? "🟢 Свободен"
+                                : table.status === "reserve"
+                                    ? "🟡 Зарезервирован"
+                                    : "🔴 Занят";
                         option.textContent = `${table.name} - ${statusText}`;
-                        option.disabled = table.status === 'busy';
+                        option.disabled = table.status === "busy";
                         tableSelect.appendChild(option);
                     });
                 } else {
-                    console.error('Ошибка загрузки столов');
+                    console.error("Ошибка загрузки столов");
                 }
             } catch (error) {
-                console.error('Error loading tables:', error);
+                console.error("Error loading tables:", error);
             }
         }
 
@@ -317,12 +315,15 @@
             if (!token) return;
 
             try {
-                const categoriesResponse = await fetch(`${API_BASE_URL}/categories`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
+                const categoriesResponse = await fetch(
+                    `${API_BASE_URL}/categories`,
+                    {
+                        headers: { Authorization: `Bearer ${token}` },
+                    }
+                );
 
                 if (!categoriesResponse.ok) {
-                    throw new Error('Failed to load categories');
+                    throw new Error("Failed to load categories");
                 }
 
                 const categoriesResult = await categoriesResponse.json();
@@ -336,12 +337,15 @@
                     categories = [];
                 }
 
-                const dishesResponse = await fetch(`${API_BASE_URL}/dishes?active=true`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
+                const dishesResponse = await fetch(
+                    `${API_BASE_URL}/dishes?active=true`,
+                    {
+                        headers: { Authorization: `Bearer ${token}` },
+                    }
+                );
 
                 if (!dishesResponse.ok) {
-                    throw new Error('Failed to load dishes');
+                    throw new Error("Failed to load dishes");
                 }
 
                 const dishesResult = await dishesResponse.json();
@@ -355,10 +359,12 @@
                     dishes = [];
                 }
 
-                menuData = categories.map(category => ({
+                menuData = categories.map((category) => ({
                     id: category.id,
                     name: category.name,
-                    dishes: dishes.filter(dish => dish.category_id === category.id && dish.is_active)
+                    dishes: dishes.filter(
+                        (dish) => dish.category_id === category.id && dish.is_active
+                    ),
                 }));
 
                 if (menuData.length > 0) {
@@ -370,25 +376,25 @@
                         '<p class="text-gray-500 p-4">Меню пусто.</p>';
                 }
             } catch (error) {
-                console.error('Error loading menu:', error);
+                console.error("Error loading menu:", error);
                 menuItemsContainer.innerHTML =
                     '<p class="text-red-500 p-4">Ошибка загрузки меню.</p>';
             }
         }
 
         function renderTabs() {
-            menuTabsContainer.innerHTML = '';
-            menuData.forEach(category => {
+            menuTabsContainer.innerHTML = "";
+            menuData.forEach((category) => {
                 const isActive = category.id === activeCategoryId;
-                const tab = document.createElement('a');
-                tab.href = '#';
+                const tab = document.createElement("a");
+                tab.href = "#";
                 tab.className =
-                    `px-1 py-3 text-sm font-semibold border-b-2 whitespace-nowrap ` +
+                    "py-3 px-1 text-sm font-semibold border-b-2 whitespace-nowrap " +
                     (isActive
-                        ? 'border-primary text-primary'
-                        : 'text-gray-500 border-transparent dark:text-gray-400 hover:text-primary hover:border-primary/50');
+                        ? "border-primary text-primary"
+                        : "text-gray-500 dark:text-gray-400 border-transparent hover:text-gray-700 dark:hover:text-gray-200 hover:border-gray-300 dark:hover:border-zinc-600");
                 tab.textContent = category.name;
-                tab.addEventListener('click', (e) => {
+                tab.addEventListener("click", (e) => {
                     e.preventDefault();
                     activeCategoryId = category.id;
                     renderTabs();
@@ -399,17 +405,19 @@
         }
 
         function renderMenu() {
-            menuItemsContainer.innerHTML = '';
-            const activeCategory = menuData.find(c => c.id === activeCategoryId);
+            menuItemsContainer.innerHTML = "";
+            const activeCategory = menuData.find(
+                (c) => c.id === activeCategoryId
+            );
             if (!activeCategory || !activeCategory.dishes || activeCategory.dishes.length === 0) {
                 menuItemsContainer.innerHTML =
                     '<p class="text-gray-500 p-4">В этой категории нет блюд.</p>';
                 return;
             }
 
-            const dishesToRender = activeCategory.dishes.filter(dish => {
+            const dishesToRender = activeCategory.dishes.filter((dish) => {
                 if (!menuSearchTerm) return true;
-                const text = `${dish.name} ${dish.description || ''}`.toLowerCase();
+                const text = `${dish.name} ${dish.description || ""}`.toLowerCase();
                 return text.includes(menuSearchTerm);
             });
 
@@ -419,93 +427,91 @@
                 return;
             }
 
-            dishesToRender.forEach(dish => {
-                const card = document.createElement('div');
+            dishesToRender.forEach((dish) => {
+                const card = document.createElement("div");
                 card.className =
-                    'flex flex-col bg-white/50 dark:bg-white/5 rounded-xl border border-[#e7d1cf] dark:border-white/10 overflow-hidden';
+                    "bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-lg p-4 flex flex-col";
 
-                // Если в API нет картинок, можно не показывать <img> вообще или использовать заглушку
-                const imageUrl = dish.image_url || '';
+                const imageUrl = dish.image_url || "";
                 const hasImage = Boolean(imageUrl);
 
                 card.innerHTML = `
-                    ${hasImage
-                        ? `<img class="w-full h-40 object-cover" src="${imageUrl}" alt="${dish.name}"/>`
-                        : ''
+            ${hasImage
+                        ? `<img class="w-full h-40 object-cover rounded-md mb-3" src="${imageUrl}" alt="${dish.name}" />`
+                        : ""
                     }
-                    <div class="p-4 flex flex-col flex-1">
-                        <div class="flex-1">
-                            <h4 class="font-bold text-lg text-[#1b0f0d] dark:text-white">${dish.name}</h4>
-                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                                ${dish.description || ''}
-                            </p>
-                        </div>
-                        <div class="flex justify-between items-center mt-4">
-                            <p class="font-bold text-lg text-[#1b0f0d] dark:text-white">
-                                ₸${dish.price.toFixed(2)}
-                            </p>
-                            <button
-                                class="add-dish-btn flex items-center justify-center h-9 px-4 text-sm font-bold tracking-wide rounded-lg cursor-pointer bg-primary/20 dark:bg-primary/30 text-primary dark:text-[#f8f6f6] hover:bg-primary/30 dark:hover:bg-primary/40">
-                                Add
-                            </button>
-                        </div>
-                    </div>
-                `;
+            <div class="flex-grow mb-4">
+              <h3 class="font-semibold text-gray-800 dark:text-white">${dish.name}</h3>
+              <p class="text-sm text-gray-500 dark:text-gray-400">${dish.description || ""}</p>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-gray-900 dark:text-white">₸${dish.price.toFixed(2)}</span>
+              <button
+                class="add-dish-btn bg-red-100 dark:bg-primary/20 text-primary font-semibold text-sm px-5 py-2 rounded-lg hover:bg-red-200 dark:hover:bg-primary/30 transition-colors"
+              >
+                Add
+              </button>
+            </div>
+          `;
 
-                card.querySelector('.add-dish-btn')
-                    .addEventListener('click', () => addToOrder(dish));
+                card
+                    .querySelector(".add-dish-btn")
+                    .addEventListener("click", () => addToOrder(dish));
 
                 menuItemsContainer.appendChild(card);
             });
         }
 
         function renderCurrentOrder() {
-            orderItemsContainer.innerHTML = '';
+            orderItemsContainer.innerHTML = "";
 
             if (currentOrder.items.size === 0) {
                 orderItemsContainer.innerHTML = `
-                    <div class="flex flex-col items-center gap-4 py-10 text-center">
-                        <p class="text-lg font-bold leading-tight tracking-tight text-[#1b0f0d] dark:text-white">
-                            No items added yet
-                        </p>
-                        <p class="text-sm font-normal leading-normal text-gray-500 dark:text-gray-400 max-w-xs">
-                            Select items from the menu to add them to this order.
-                        </p>
-                    </div>
-                `;
+            <div class="text-center py-12">
+              <h3 class="font-semibold text-gray-800 dark:text-white mb-1">
+                No items added yet
+              </h3>
+              <p class="text-sm text-gray-500 dark:text-gray-400">
+                Select items from the menu to add them to this order.
+              </p>
+            </div>
+          `;
                 updateTotals();
                 return;
             }
 
-            currentOrder.items.forEach(item => {
-                const row = document.createElement('div');
-                row.className = 'flex items-center justify-between py-2 border-b border-[#e7d1cf]/80 last:border-b-0';
+            currentOrder.items.forEach((item) => {
+                const row = document.createElement("div");
+                row.className =
+                    "flex items-center justify-between py-2 border-b border-gray-200 dark:border-zinc-700 last:border-b-0";
 
                 const itemTotal = item.price * item.quantity;
 
                 row.innerHTML = `
-                    <div class="flex flex-col">
-                        <p class="text-sm font-medium text-[#1b0f0d] dark:text-white">${item.name}</p>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">
-                            Цена: ₸${item.price.toFixed(2)}
-                        </p>
-                    </div>
-                    <div class="flex items-center gap-4">
-                        <div class="flex items-center justify-center gap-2">
-                            <button class="decrement-btn text-lg font-bold text-red-500 hover:text-red-700">-</button>
-                            <span class="min-w-[20px] text-center text-sm">${item.quantity}</span>
-                            <button class="increment-btn text-lg font-bold text-green-500 hover:text-green-700">+</button>
-                        </div>
-                        <p class="text-sm font-semibold text-[#1b0f0d] dark:text-white">
-                            ₸${itemTotal.toFixed(2)}
-                        </p>
-                    </div>
-                `;
+            <div class="flex flex-col">
+              <p class="text-sm font-medium text-gray-900 dark:text-white">${item.name}</p>
+              <p class="text-xs text-gray-500 dark:text-gray-400">
+                Цена: ₸${item.price.toFixed(2)}
+              </p>
+            </div>
+            <div class="flex items-center gap-4">
+              <div class="flex items-center justify-center gap-2">
+                <button class="decrement-btn text-lg font-bold text-red-500 hover:text-red-700">-</button>
+                <span class="min-w-[20px] text-center text-sm">${item.quantity}</span>
+                <button class="increment-btn text-lg font-bold text-green-500 hover:text-green-700">+</button>
+              </div>
+              <p class="text-sm font-semibold text-gray-900 dark:text-white">
+                ₸${itemTotal.toFixed(2)}
+              </p>
+            </div>
+          `;
 
-                row.querySelector('.decrement-btn')
-                    .addEventListener('click', () => decrementItem(item.dish_id));
-                row.querySelector('.increment-btn')
-                    .addEventListener('click', () => incrementItem(item.dish_id));
+                row
+                    .querySelector(".decrement-btn")
+                    .addEventListener("click", () => decrementItem(item.dish_id));
+                row
+                    .querySelector(".increment-btn")
+                    .addEventListener("click", () => incrementItem(item.dish_id));
 
                 orderItemsContainer.appendChild(row);
             });
@@ -515,7 +521,7 @@
 
         function updateTotals() {
             let subtotal = 0;
-            currentOrder.items.forEach(item => {
+            currentOrder.items.forEach((item) => {
                 subtotal += item.price * item.quantity;
             });
             orderSubtotalEl.textContent = `₸${subtotal.toFixed(2)}`;
@@ -530,7 +536,7 @@
                     dish_id: dish.id,
                     name: dish.name,
                     price: dish.price,
-                    quantity: 1
+                    quantity: 1,
                 });
             }
             renderCurrentOrder();
@@ -556,13 +562,13 @@
 
         async function submitOrder() {
             if (currentOrder.items.size === 0) {
-                alert('Нельзя создать пустой заказ.');
+                alert("Нельзя создать пустой заказ.");
                 return;
             }
 
             const tableNumber = parseInt(tableSelect.value);
             if (!tableNumber) {
-                alert('Пожалуйста, выберите стол.');
+                alert("Пожалуйста, выберите стол.");
                 return;
             }
 
@@ -572,59 +578,97 @@
             const payload = {
                 table_number: tableNumber,
                 notes: null,
-                items: Array.from(currentOrder.items.values()).map(item => ({
+                items: Array.from(currentOrder.items.values()).map((item) => ({
                     dish_id: item.dish_id,
                     qty: item.quantity,
-                    notes: null
-                }))
+                    notes: null,
+                })),
             };
 
-            console.log('Sending order:', payload);
+            console.log("Sending order:", payload);
 
             createOrderBtn.disabled = true;
-            createOrderBtn.textContent = 'Создание...';
+            createOrderBtn.textContent = "Создание...";
 
             try {
                 const response = await fetch(`${API_BASE_URL}/orders`, {
-                    method: 'POST',
+                    method: "POST",
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
                     },
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify(payload),
                 });
 
                 if (response.ok) {
-                    alert('Заказ успешно создан!');
-                    window.location.href = 'active-orders.html';
+                    alert("Заказ успешно создан!");
+                    window.location.href = "active-orders.html";
                 } else {
                     const errorData = await response.json();
-                    alert('Ошибка при создании заказа: ' + (errorData.error || response.statusText));
+                    alert(
+                        "Ошибка при создании заказа: " +
+                        (errorData.error || response.statusText)
+                    );
                     createOrderBtn.disabled = false;
-                    createOrderBtn.textContent = 'CREATE ORDER';
+                    createOrderBtn.textContent = "CREATE ORDER";
                 }
             } catch (error) {
-                alert('Сетевая ошибка. Не удалось отправить заказ.');
+                alert("Сетевая ошибка. Не удалось отправить заказ.");
                 console.error(error);
                 createOrderBtn.disabled = false;
-                createOrderBtn.textContent = 'CREATE ORDER';
+                createOrderBtn.textContent = "CREATE ORDER";
             }
         }
 
-        createOrderBtn.addEventListener('click', submitOrder);
+        createOrderBtn.addEventListener("click", submitOrder);
 
         if (menuSearchInput) {
-            menuSearchInput.addEventListener('input', (e) => {
+            menuSearchInput.addEventListener("input", (e) => {
                 menuSearchTerm = e.target.value.toLowerCase();
                 renderMenu();
             });
         }
 
-        document.addEventListener('DOMContentLoaded', async () => {
+        document.addEventListener("DOMContentLoaded", async () => {
             await loadUserData();
             await loadTables();
             await loadMenu();
             renderCurrentOrder();
+        });
+    </script>
+
+    <!-- Переключение темы -->
+    <script>
+        const themeToggleBtn = document.getElementById("theme-toggle");
+        const themeToggleText = document.getElementById("theme-toggle-text");
+        const themeIcon = themeToggleBtn.querySelector(".material-symbols-outlined");
+
+        // Default theme = light
+        if (!localStorage.getItem("theme")) {
+            localStorage.setItem("theme", "light");
+        }
+
+        // Apply saved theme
+        if (localStorage.getItem("theme") === "dark") {
+            document.documentElement.classList.add("dark");
+            themeToggleText.textContent = "Dark";
+            themeIcon.textContent = "dark_mode";
+        }
+
+        themeToggleBtn.addEventListener("click", () => {
+            const isDark = document.documentElement.classList.contains("dark");
+
+            if (isDark) {
+                document.documentElement.classList.remove("dark");
+                localStorage.setItem("theme", "light");
+                themeToggleText.textContent = "Light";
+                themeIcon.textContent = "light_mode";
+            } else {
+                document.documentElement.classList.add("dark");
+                localStorage.setItem("theme", "dark");
+                themeToggleText.textContent = "Dark";
+                themeIcon.textContent = "dark_mode";
+            }
         });
     </script>
 </body>

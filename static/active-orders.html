@@ -1,110 +1,159 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 
 <head>
-    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="" />
-    <link rel="stylesheet" as="style" onload="this.rel='stylesheet'"
-        href="https://fonts.googleapis.com/css2?display=swap&family=Work+Sans%3Awght%40400%3B500%3B700%3B900" />
-    <title>UNO Spicchio - Активные Заказы</title>
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Активные заказы - UNO Spicchio</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#E53E3E", // red-600
+                        "background-light": "#F9FAFB", // gray-50
+                        "background-dark": "#111827", // gray-900
+                    },
+                    fontFamily: {
+                        display: ["Inter", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.5rem", // 8px
+                    },
+                },
+            },
+        };
+    </script>
+
+    <style>
+        body {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+    </style>
 </head>
 
-<body class="bg-[#fcf8f8]">
-    <div class="relative flex h-auto min-h-screen w-full flex-col"
-        style='font-family: "Work Sans", "Noto Sans", sans-serif;'>
-        <div class="layout-container flex h-full grow flex-col">
-            <header
-                class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#f3e7e8] px-10 py-3">
-                <div class="flex items-center gap-4 text-[#1b0e0e]">
-                    <h2 class="text-[#1b0e0e] text-lg font-bold leading-tight tracking-[-0.015em]">UNO Spicchio</h2>
+<body class="font-display bg-background-light dark:bg-background-dark text-gray-800 dark:text-gray-200">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <aside
+            class="w-64 flex-shrink-0 bg-white dark:bg-gray-800 p-6 border-r border-gray-200 dark:border-gray-700 flex flex-col">
+            <div class="mb-10">
+                <h1 class="text-xl font-bold text-gray-900 dark:text-white">UNO Spicchio</h1>
+            </div>
+
+            <nav class="flex flex-col space-y-2 flex-1">
+                <div class="px-4 py-3 bg-red-50 dark:bg-gray-700 rounded-lg">
+                    <p class="font-semibold text-primary">UNO Spicchio</p>
                 </div>
 
-                <div class="flex items-center gap-4">
-                    <button onclick="logout()" class="text-sm font-medium text-[#994d51] hover:text-[#ea2a33]">
+                <a href="active-orders.html"
+                    class="block px-4 py-3 bg-red-100/50 dark:bg-gray-700/50 rounded-lg font-medium text-gray-900 dark:text-white">
+                    Все заказы
+                </a>
+
+                <a id="createOrderLink" href="create-order.html"
+                    class="block px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300">
+                    Создать заказ
+                </a>
+
+                <a id="chefLink" href="chef-orders.html"
+                    class="block px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300">
+                    Кухня
+                </a>
+                <a id="dashboardLink" href="dashboard.html"
+                    class="block px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300">
+                    Аналитика
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main -->
+        <main class="flex-1 flex flex-col">
+            <!-- Header -->
+            <header
+                class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+                <div></div>
+                <div class="flex items-center space-x-4">
+                    <button onclick="logout()"
+                        class="text-sm text-gray-600 dark:text-gray-300 hover:text-primary transition-colors">
                         Выход
                     </button>
-                    <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-10 w-10"
-                        style='background-image: url("https://i.pravatar.cc/40");'></div>
+                    <img alt="Аватар пользователя" class="h-10 w-10 rounded-full object-cover"
+                        src="https://i.pravatar.cc/40" />
                 </div>
             </header>
 
-            <main class="flex flex-1 gap-4 p-4 lg:gap-8 lg:p-8">
-                <aside class="flex flex-col gap-4 w-full max-w-[280px] p-4 rounded-lg bg-white border border-[#e7d0d1]">
-                    <h1 class="text-[#1b0e0e] text-base font-medium leading-normal">UNO Spicchio</h1>
-                    <div class="flex flex-col gap-2">
-                        <a href="active-orders.html" class="flex items-center gap-3 px-3 py-2 rounded-lg bg-[#f3e7e8]">
-                            <p class="text-[#1b0e0e] text-sm font-medium leading-normal">Все заказы</p>
-                        </a>
-                        <a href="chef-orders.html"
-                            class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#f3e7e8]" id="chefLink">
-                            <p class="text-[#1b0e0e] text-sm font-medium leading-normal">Кухня</p>
-                        </a>
-                        <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#f3e7e8]"
-                            id="dashboardLink">
-                            <p class="text-[#1b0e0e] text-sm font-medium leading-normal">Аналитика</p>
-                        </a>
+            <!-- Content -->
+            <div class="flex-1 p-8 overflow-y-auto">
+                <!-- Heading + New order -->
+                <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+                    <div>
+                        <h2 class="text-3xl font-bold text-gray-900 dark:text-white">Активные заказы</h2>
+                        <p class="mt-1 text-gray-500 dark:text-gray-400">
+                            Просмотр всех текущих заказов в реальном времени
+                        </p>
                     </div>
-                </aside>
+                    <a href="create-order.html" id="newOrderBtn"
+                        class="bg-primary hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg flex items-center space-x-2 transition-colors">
+                        <span class="material-icons" style="font-size: 20px;">add</span>
+                        <span>Новый заказ</span>
+                    </a>
+                </div>
 
-                <div class="flex-1 flex flex-col">
-                    <div class="flex flex-wrap justify-between items-center gap-3 p-4">
-                        <div class="flex min-w-72 flex-col gap-3">
-                            <h1 class="text-[#1b0e0e] tracking-light text-[32px] font-bold leading-tight">Активные
-                                заказы</h1>
-                            <p class="text-[#994d51] text-sm font-normal leading-normal">Просмотр всех текущих заказов в
-                                реальном времени</p>
-                        </div>
-                        <a href="create-order.html" id="newOrderBtn"
-                            class="flex items-center justify-center rounded-lg h-12 px-5 bg-[#ea2a33] text-white text-base font-bold">
-                            + Новый заказ
+                <!-- Tabs -->
+                <div class="border-b border-gray-200 dark:border-gray-700 mb-6">
+                    <nav id="tabs" class="flex space-x-8 -mb-px">
+                        <a href="#" data-status="all"
+                            class="tab-link py-4 px-1 border-b-2 font-medium text-sm text-primary border-primary">
+                            Все заказы
                         </a>
-                    </div>
+                        <a href="#" data-status="new"
+                            class="tab-link py-4 px-1 border-b-2 font-medium text-sm text-gray-500 dark:text-gray-400 border-transparent hover:text-gray-700 dark:hover:text-gray-200 hover:border-gray-300 dark:hover:border-gray-600">
+                            Новые
+                        </a>
+                        <a href="#" data-status="in_progress"
+                            class="tab-link py-4 px-1 border-b-2 font-medium text-sm text-gray-500 dark:text-gray-400 border-transparent hover:text-gray-700 dark:hover:text-gray-200 hover:border-gray-300 dark:hover:border-gray-600">
+                            В процессе
+                        </a>
+                        <a href="#" data-status="ready"
+                            class="tab-link py-4 px-1 border-b-2 font-medium text-sm text-gray-500 dark:text-gray-400 border-transparent hover:text-gray-700 dark:hover:text-gray-200 hover:border-gray-300 dark:hover:border-gray-600">
+                            Готово
+                        </a>
+                    </nav>
+                </div>
 
-                    <div class="pb-3">
-                        <div id="tabs" class="flex border-b border-[#e7d0d1] px-4 gap-8">
-                            <a href="#" data-status="all"
-                                class="tab-link flex flex-col items-center justify-center border-b-[3px] border-b-[#ea2a33] text-[#1b0e0e] pb-[13px] pt-4">
-                                <p class="text-sm font-bold">Все заказы</p>
-                            </a>
-                            <a href="#" data-status="new"
-                                class="tab-link flex flex-col items-center justify-center border-b-[3px] border-b-transparent text-[#994d51] pb-[13px] pt-4">
-                                <p class="text-sm font-bold">Новые</p>
-                            </a>
-                            <a href="#" data-status="in_progress"
-                                class="tab-link flex flex-col items-center justify-center border-b-[3px] border-b-transparent text-[#994d51] pb-[13px] pt-4">
-                                <p class="text-sm font-bold">В процессе</p>
-                            </a>
-                            <a href="#" data-status="ready"
-                                class="tab-link flex flex-col items-center justify-center border-b-[3px] border-b-transparent text-[#994d51] pb-[13px] pt-4">
-                                <p class="text-sm font-bold">Готово</p>
-                            </a>
-                        </div>
-                    </div>
-
-                    <div class="px-4 py-3">
-                        <div class="flex overflow-hidden rounded-lg border border-[#e7d0d1] bg-white">
-                            <table class="w-full">
-                                <thead class="bg-[#fcf8f8]">
-                                    <tr>
-                                        <th class="p-3 text-left text-sm font-medium text-[#1b0e0e] w-[10%]">Номер</th>
-                                        <th class="p-3 text-left text-sm font-medium text-[#1b0e0e] w-[15%]">Стол</th>
-                                        <th class="p-3 text-left text-sm font-medium text-[#1b0e0e] w-[15%]">Статус</th>
-                                        <th class="p-3 text-left text-sm font-medium text-[#1b0e0e] w-[15%]">Время</th>
-                                        <th class="p-3 text-left text-sm font-medium text-[#1b0e0e] w-[25%]">Детали</th>
-                                        <th class="p-3 text-left text-sm font-medium text-[#1b0e0e] w-[10%]">Сумма</th>
-                                        <th class="p-3 text-left text-sm font-medium text-[#1b0e0e] w-[10%]">Действия
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody id="orders-table-body"></tbody>
-                            </table>
-                        </div>
+                <!-- Table -->
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left">
+                            <thead
+                                class="text-xs text-gray-500 dark:text-gray-400 uppercase bg-gray-50 dark:bg-gray-700/50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-4 font-medium">Номер</th>
+                                    <th scope="col" class="px-6 py-4 font-medium">Стол</th>
+                                    <th scope="col" class="px-6 py-4 font-medium">Статус</th>
+                                    <th scope="col" class="px-6 py-4 font-medium">Время</th>
+                                    <th scope="col" class="px-6 py-4 font-medium">Детали</th>
+                                    <th scope="col" class="px-6 py-4 font-medium">Сумма</th>
+                                    <th scope="col" class="px-6 py-4 font-medium text-right">Действия</th>
+                                </tr>
+                            </thead>
+                            <tbody id="orders-table-body"></tbody>
+                        </table>
                     </div>
                 </div>
-            </main>
-        </div>
+            </div>
+        </main>
     </div>
 
+    <!-- Logic (как в исходной странице, чуть подправлены классы строк/колонок) -->
     <script>
         const API_BASE_URL = 'http://localhost:8080/api';
         const ordersTableBody = document.getElementById('orders-table-body');
@@ -145,18 +194,22 @@
                     console.log('Current user:', currentUser);
 
                     if (currentUser) {
-                        // Управление видимостью ссылок в меню
+                        // Скрываем аналитику для не admin/manager
                         if (currentUser.role !== 'admin' && currentUser.role !== 'manager') {
                             document.getElementById('dashboardLink').style.display = 'none';
                         }
 
+                        // Новый заказ только для официантов и админов
                         if (currentUser.role !== 'waiter' && currentUser.role !== 'admin') {
                             document.getElementById('newOrderBtn').style.display = 'none';
                         }
 
-                        // Показываем ссылку на кухню для cook, waiter и admin
+                        // Кухня только для cook, waiter и admin
                         const chefLink = document.getElementById('chefLink');
-                        if (chefLink && currentUser.role !== 'cook' && currentUser.role !== 'waiter' && currentUser.role !== 'admin') {
+                        if (chefLink &&
+                            currentUser.role !== 'cook' &&
+                            currentUser.role !== 'waiter' &&
+                            currentUser.role !== 'admin') {
                             chefLink.style.display = 'none';
                         }
                     }
@@ -178,15 +231,15 @@
         function getStatusInfo(status) {
             switch (status) {
                 case 'new':
-                    return { text: 'Новый', colorClass: 'bg-blue-100 text-blue-800' };
+                    return { text: 'Новый', colorClass: 'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-200' };
                 case 'in_progress':
-                    return { text: 'В процессе', colorClass: 'bg-yellow-100 text-yellow-800' };
+                    return { text: 'В процессе', colorClass: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-200' };
                 case 'ready':
-                    return { text: 'Готово', colorClass: 'bg-green-100 text-green-800' };
+                    return { text: 'Готово', colorClass: 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300' };
                 case 'paid':
-                    return { text: 'Оплачен', colorClass: 'bg-gray-100 text-gray-800' };
+                    return { text: 'Оплачен', colorClass: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200' };
                 default:
-                    return { text: status, colorClass: 'bg-gray-100 text-gray-800' };
+                    return { text: status, colorClass: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200' };
             }
         }
 
@@ -259,7 +312,13 @@
             });
 
             if (filteredOrders.length === 0) {
-                ordersTableBody.innerHTML = `<tr><td colspan="7" class="text-center p-8 text-gray-500">Нет заказов в этой категории.</td></tr>`;
+                ordersTableBody.innerHTML = `
+          <tr>
+            <td colspan="7"
+                class="text-center px-6 py-8 text-gray-500 dark:text-gray-400">
+              Нет заказов в этой категории.
+            </td>
+          </tr>`;
                 return;
             }
 
@@ -267,13 +326,13 @@
                 console.log('Rendering order:', order);
 
                 const tr = document.createElement('tr');
-                tr.className = 'border-t border-t-[#e7d0d1] hover:bg-gray-50 cursor-pointer';
+                tr.className = 'border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer';
 
                 const statusInfo = getStatusInfo(order.status);
                 const timeAgo = formatTimeAgo(order.created_at);
                 const localTime = formatLocalTime(order.created_at);
 
-                // Получаем детали заказа
+                // Детали заказа
                 const items = await fetchOrderDetails(order.id);
                 const details = items && items.length > 0
                     ? items.map(item => {
@@ -282,49 +341,51 @@
                     }).join(', ')
                     : 'Нет деталей';
 
-                // Получаем имя стола - используем разные варианты
+                // Имя стола
                 let tableName = 'Неизвестный стол';
                 if (order.table && order.table.name) {
                     tableName = order.table.name;
                 } else if (order.table_name) {
                     tableName = order.table_name;
-                } else {
+                } else if (order.table_number) {
                     tableName = `Стол #${order.table_number}`;
                 }
 
-                console.log('Table info:', {
-                    table: order.table,
-                    table_name: order.table_name,
-                    table_number: order.table_number,
-                    resolved: tableName
-                });
-
-                // Кнопки действий (только для официантов и админов, только для готовых заказов)
+                // Кнопка "Закрыть"
                 let actionButton = '';
                 if ((currentUser.role === 'waiter' || currentUser.role === 'admin') && order.status === 'ready') {
-                    actionButton = `<button class="close-order-btn px-3 py-1 bg-green-600 text-white rounded text-xs font-semibold hover:bg-green-700" data-order-id="${order.id}">Закрыть</button>`;
+                    actionButton = `
+            <button
+              class="close-order-btn bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md text-xs transition-colors"
+              data-order-id="${order.id}">
+              Закрыть
+            </button>`;
                 }
 
                 tr.innerHTML = `
-                    <td class="p-3 text-sm font-medium">#${order.id}</td>
-                    <td class="p-3 text-sm">${tableName}</td>
-                    <td class="p-3">
-                        <div class="inline-flex items-center justify-center rounded-full h-8 px-4 text-sm font-medium ${statusInfo.colorClass}">
-                            ${statusInfo.text}
-                        </div>
-                    </td>
-                    <td class="p-3 text-sm text-[#994d51]">
-                        <div class="font-semibold">${timeAgo}</div>
-                        <div class="text-xs text-gray-500">${localTime}</div>
-                    </td>
-                    <td class="p-3 text-sm text-[#994d51] truncate max-w-xs" title="${details}">${details}</td>
-                    <td class="p-3 text-sm font-semibold">${order.total.toFixed(2)} ₸</td>
-                    <td class="p-3 text-sm">${actionButton}</td>
-                `;
+          <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">#${order.id}</td>
+          <td class="px-6 py-4">${tableName}</td>
+          <td class="px-6 py-4">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusInfo.colorClass}">
+              ${statusInfo.text}
+            </span>
+          </td>
+          <td class="px-6 py-4">
+            <div class="text-gray-900 dark:text-white">${timeAgo}</div>
+            <div class="text-gray-500 dark:text-gray-400 text-xs">${localTime}</div>
+          </td>
+          <td class="px-6 py-4 text-gray-700 dark:text-gray-200 truncate max-w-xs" title="${details}">${details}</td>
+          <td class="px-6 py-4 font-semibold text-gray-900 dark:text-white">
+            ${order.total.toFixed(2)} ₸
+          </td>
+          <td class="px-6 py-4 text-right">
+            ${actionButton}
+          </td>
+        `;
                 ordersTableBody.appendChild(tr);
             }
 
-            // Добавляем обработчики для кнопок закрытия заказов
+            // Обработчики кнопок закрытия
             document.querySelectorAll('.close-order-btn').forEach(btn => {
                 btn.addEventListener('click', handleCloseOrder);
             });
@@ -363,22 +424,29 @@
                 }
             } catch (error) {
                 console.error('Не удалось подключиться к серверу:', error);
-                ordersTableBody.innerHTML = `<tr><td colspan="6" class="text-center p-8 text-red-600">Не удалось загрузить данные.</td></tr>`;
+                ordersTableBody.innerHTML = `
+          <tr>
+            <td colspan="7"
+                class="text-center px-6 py-8 text-red-600 dark:text-red-400">
+              Не удалось загрузить данные.
+            </td>
+          </tr>`;
             }
         }
 
+        // Tabs
         tabsContainer.addEventListener('click', (event) => {
             const clickedTab = event.target.closest('.tab-link');
             if (!clickedTab) return;
             event.preventDefault();
 
             tabsContainer.querySelectorAll('.tab-link').forEach(tab => {
-                tab.classList.remove('border-b-[#ea2a33]', 'text-[#1b0e0e]');
-                tab.classList.add('border-b-transparent', 'text-[#994d51]');
+                tab.classList.remove('text-primary', 'border-primary');
+                tab.classList.add('text-gray-500', 'dark:text-gray-400', 'border-transparent');
             });
 
-            clickedTab.classList.add('border-b-[#ea2a33]', 'text-[#1b0e0e]');
-            clickedTab.classList.remove('border-b-transparent', 'text-[#994d51]');
+            clickedTab.classList.add('text-primary', 'border-primary');
+            clickedTab.classList.remove('text-gray-500', 'dark:text-gray-400', 'border-transparent');
 
             currentFilter = clickedTab.dataset.status;
             renderOrders();
@@ -417,7 +485,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             loadUserData();
             fetchOrders();
-            // Обновляем каждые 30 секунд
+            // автообновление каждые 30 секунд
             setInterval(fetchOrders, 30000);
         });
     </script>

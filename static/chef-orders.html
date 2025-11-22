@@ -5,133 +5,222 @@
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>UNO Spicchio - Управление заказами</title>
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#E53E3E",
+                        "background-light": "#F9FAFB",
+                        "background-dark": "#111827",
+                    },
+                    fontFamily: {
+                        display: ["Inter", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.5rem",
+                    },
+                },
+            },
+        };
+    </script>
+
     <style>
         body {
-            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
     </style>
 </head>
 
-<body class="bg-gray-50">
-    <div class="flex flex-col min-h-screen">
-        <!-- Header -->
-        <header class="flex items-center justify-between px-6 py-4 bg-white border-b border-gray-200">
-            <div class="flex items-center gap-4">
-                <div class="p-2 bg-red-600 rounded-lg">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round"
-                            stroke-linejoin="round" stroke-width="2"></path>
-                    </svg>
+<body class="font-display bg-background-light dark:bg-background-dark text-gray-800 dark:text-gray-200">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <aside
+            class="w-64 flex-shrink-0 bg-white dark:bg-gray-800 p-6 border-r border-gray-200 dark:border-gray-700 flex flex-col">
+            <div class="mb-10">
+                <h1 class="text-xl font-bold text-gray-900 dark:text-white">UNO Spicchio</h1>
+            </div>
+            <nav class="flex flex-col space-y-2 flex-1">
+                <div class="px-4 py-3 bg-red-50 dark:bg-gray-700 rounded-lg">
+                    <p class="font-semibold text-primary">UNO Spicchio</p>
                 </div>
-                <h1 class="text-xl font-bold text-gray-900">UNO Spicchio</h1>
-            </div>
-            <nav class="hidden md:flex items-center gap-6">
-                <a class="text-sm font-medium text-gray-600 hover:text-red-600" href="dashboard.html"
-                    id="dashboardLink">Аналитика</a>
-                <a class="text-sm font-medium text-gray-600 hover:text-red-600" href="active-orders.html">Все заказы</a>
-                <a class="text-sm font-medium text-red-600" href="chef-orders.html">Кухня</a>
+
+                <a href="active-orders.html"
+                    class="block px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300">
+                    Все заказы
+                </a>
+
+                <a id="createOrderLink" href="create-order.html"
+                    class="block px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300">
+                    Создать заказ
+                </a>
+
+                <a id="chefLink" href="chef-orders.html"
+                    class="block px-4 py-3 bg-red-100/50 dark:bg-gray-700/50 rounded-lg font-medium text-gray-900 dark:text-white">
+                    Кухня
+                </a>
+                <a id="dashboardLink" href="dashboard.html"
+                    class="block px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300">
+                    Аналитика
+                </a>
             </nav>
-            <div class="flex items-center gap-4">
-                <button onclick="logout()" class="text-sm font-medium text-gray-600 hover:text-red-600">
-                    Выход
-                </button>
-                <div class="w-10 h-10 rounded-full bg-cover bg-center"
-                    style='background-image: url("https://i.pravatar.cc/40");'></div>
-            </div>
-        </header>
+        </aside>
 
-        <!-- Main Content -->
-        <main class="flex-1 p-6 lg:p-8">
-            <div class="max-w-7xl mx-auto">
-                <h1 class="text-3xl font-bold text-gray-900 mb-8">Управление заказами на кухне</h1>
+        <!-- Main -->
+        <main class="flex-1 flex flex-col">
+            <!-- Header -->
+            <header
+                class="flex items-center justify-end p-6 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+                <div class="flex items-center gap-4">
+                    <button onclick="logout()"
+                        class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary transition-colors">
+                        Выход
+                    </button>
+                    <div class="w-10 h-10 rounded-full bg-cover bg-center"
+                        style='background-image: url("https://i.pravatar.cc/40");'></div>
+                </div>
+            </header>
 
-                <!-- Incoming Orders -->
-                <section class="mb-12">
-                    <h2 class="text-2xl font-semibold text-gray-800 mb-4">Новые заказы</h2>
-                    <div class="bg-white rounded-lg shadow-sm overflow-hidden">
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-sm text-left">
-                                <thead class="bg-gray-50 text-xs text-gray-700 uppercase tracking-wider">
-                                    <tr>
-                                        <th class="px-6 py-3">№ Заказа</th>
-                                        <th class="px-6 py-3">Стол</th>
-                                        <th class="px-6 py-3">Блюда</th>
-                                        <th class="px-6 py-3">Примечания</th>
-                                        <th class="px-6 py-3 text-center">Время</th>
-                                        <th class="px-6 py-3 text-center">Действия</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="new-orders-body" class="divide-y divide-gray-200">
-                                    <tr>
-                                        <td colspan="6" class="px-6 py-8 text-center text-gray-500">
-                                            Загрузка заказов...
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+            <!-- Content -->
+            <main class="flex-1 p-6 lg:p-8 overflow-y-auto">
+                <div class="max-w-7xl mx-auto">
+                    <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-8">
+                        Управление заказами на кухне
+                    </h1>
+
+                    <!-- Incoming Orders -->
+                    <section class="mb-12">
+                        <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-4">Новые заказы</h2>
+                        <div
+                            class="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden border border-gray-200 dark:border-gray-700">
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-sm text-left">
+                                    <thead
+                                        class="bg-gray-50 dark:bg-gray-700/50 text-xs text-gray-700 dark:text-gray-200 uppercase tracking-wider">
+                                        <tr>
+                                            <th class="px-6 py-3">№ Заказа</th>
+                                            <th class="px-6 py-3">Стол</th>
+                                            <th class="px-6 py-3">Блюда</th>
+                                            <th class="px-6 py-3">Примечания</th>
+                                            <th class="px-6 py-3 text-center">Время</th>
+                                            <th class="px-6 py-3 text-center">Действия</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="new-orders-body" class="divide-y divide-gray-200 dark:divide-gray-700">
+                                        <tr>
+                                            <td colspan="6"
+                                                class="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
+                                                Загрузка заказов...
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
-                    </div>
-                </section>
+                    </section>
 
-                <!-- Orders in Progress -->
-                <section class="mb-12">
-                    <h2 class="text-2xl font-semibold text-gray-800 mb-4">Заказы в процессе</h2>
-                    <div class="bg-white rounded-lg shadow-sm overflow-hidden">
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-sm text-left">
-                                <thead class="bg-gray-50 text-xs text-gray-700 uppercase tracking-wider">
-                                    <tr>
-                                        <th class="px-6 py-3">№ Заказа</th>
-                                        <th class="px-6 py-3">Стол</th>
-                                        <th class="px-6 py-3">Блюда</th>
-                                        <th class="px-6 py-3">Примечания</th>
-                                        <th class="px-6 py-3 text-center">Время</th>
-                                        <th class="px-6 py-3 text-center">Действия</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="in-progress-orders-body" class="divide-y divide-gray-200">
-                                    <tr>
-                                        <td colspan="6" class="px-6 py-8 text-center text-gray-500">
-                                            Нет заказов в процессе
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                    <!-- Orders in Progress -->
+                    <section class="mb-12">
+                        <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-4">Заказы в процессе</h2>
+                        <div
+                            class="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden border border-gray-200 dark:border-gray-700">
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-sm text-left">
+                                    <thead
+                                        class="bg-gray-50 dark:bg-gray-700/50 text-xs text-gray-700 dark:text-gray-200 uppercase tracking-wider">
+                                        <tr>
+                                            <th class="px-6 py-3">№ Заказа</th>
+                                            <th class="px-6 py-3">Стол</th>
+                                            <th class="px-6 py-3">Блюда</th>
+                                            <th class="px-6 py-3">Примечания</th>
+                                            <th class="px-6 py-3 text-center">Время</th>
+                                            <th class="px-6 py-3 text-center">Действия</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="in-progress-orders-body"
+                                        class="divide-y divide-gray-200 dark:divide-gray-700">
+                                        <tr>
+                                            <td colspan="6"
+                                                class="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
+                                                Нет заказов в процессе
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
-                    </div>
-                </section>
+                    </section>
 
-                <!-- Completed Orders -->
-                <section>
-                    <h2 class="text-2xl font-semibold text-gray-800 mb-4">Готовые заказы</h2>
-                    <div class="bg-white rounded-lg shadow-sm overflow-hidden">
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-sm text-left">
-                                <thead class="bg-gray-50 text-xs text-gray-700 uppercase tracking-wider">
-                                    <tr>
-                                        <th class="px-6 py-3">№ Заказа</th>
-                                        <th class="px-6 py-3">Стол</th>
-                                        <th class="px-6 py-3">Блюда</th>
-                                        <th class="px-6 py-3">Примечания</th>
-                                        <th class="px-6 py-3 text-center">Время</th>
-                                        <th class="px-6 py-3 text-center">Действия</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="ready-orders-body" class="divide-y divide-gray-200">
-                                    <tr>
-                                        <td colspan="6" class="px-6 py-8 text-center text-gray-500">
-                                            Нет готовых заказов
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                    <!-- Completed (ready) Orders -->
+                    <section class="mb-12">
+                        <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-4">Готовые заказы</h2>
+                        <div
+                            class="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden border border-gray-200 dark:border-gray-700">
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-sm text-left">
+                                    <thead
+                                        class="bg-gray-50 dark:bg-gray-700/50 text-xs text-gray-700 dark:text-gray-200 uppercase tracking-wider">
+                                        <tr>
+                                            <th class="px-6 py-3">№ Заказа</th>
+                                            <th class="px-6 py-3">Стол</th>
+                                            <th class="px-6 py-3">Блюда</th>
+                                            <th class="px-6 py-3">Примечания</th>
+                                            <th class="px-6 py-3 text-center">Время</th>
+                                            <th class="px-6 py-3 text-center">Статус</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="ready-orders-body" class="divide-y divide-gray-200 dark:divide-gray-700">
+                                        <tr>
+                                            <td colspan="6"
+                                                class="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
+                                                Нет готовых заказов
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
-                    </div>
-                </section>
-            </div>
+                    </section>
+
+                    <!-- NEW: Closed Orders -->
+                    <section>
+                        <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-4">Закрытые заказы</h2>
+                        <div
+                            class="bg-gray-50 dark:bg-gray-900/60 rounded-lg shadow-inner overflow-hidden border border-gray-200 dark:border-gray-800">
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-sm text-left">
+                                    <thead
+                                        class="bg-gray-100 dark:bg-gray-900 text-xs text-gray-600 dark:text-gray-300 uppercase tracking-wider">
+                                        <tr>
+                                            <th class="px-6 py-3">№ Заказа</th>
+                                            <th class="px-6 py-3">Стол</th>
+                                            <th class="px-6 py-3">Блюда</th>
+                                            <th class="px-6 py-3">Примечания</th>
+                                            <th class="px-6 py-3 text-center">Время</th>
+                                            <th class="px-6 py-3 text-center">Статус</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="closed-orders-body"
+                                        class="divide-y divide-gray-200/70 dark:divide-gray-800">
+                                        <tr>
+                                            <td colspan="6"
+                                                class="px-6 py-8 text-center text-gray-400 dark:text-gray-500 italic">
+                                                Нет закрытых заказов
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </main>
         </main>
     </div>
 
@@ -173,14 +262,11 @@
                     console.log('Current user:', currentUser);
 
                     if (currentUser) {
-                        // Скрываем ссылку на аналитику для неавторизованных ролей
                         if (currentUser.role !== 'admin' && currentUser.role !== 'manager') {
                             const dashboardLink = document.getElementById('dashboardLink');
                             if (dashboardLink) dashboardLink.style.display = 'none';
                         }
 
-                        // Проверяем права доступа к странице
-                        // Доступ: cook, waiter, admin
                         if (currentUser.role !== 'cook' && currentUser.role !== 'waiter' && currentUser.role !== 'admin') {
                             alert('У вас нет прав для доступа к этой странице');
                             window.location.href = 'dashboard.html';
@@ -213,7 +299,6 @@
                         orders = [];
                     }
 
-                    // Загружаем детали для каждого заказа
                     for (let order of orders) {
                         order.items = await loadOrderItems(order.id);
                     }
@@ -268,33 +353,43 @@
             const newOrdersBody = document.getElementById('new-orders-body');
             const inProgressBody = document.getElementById('in-progress-orders-body');
             const readyOrdersBody = document.getElementById('ready-orders-body');
+            const closedOrdersBody = document.getElementById('closed-orders-body');
 
             const newOrders = orders.filter(o => o.status === 'new');
             const inProgressOrders = orders.filter(o => o.status === 'in_progress');
             const readyOrders = orders.filter(o => o.status === 'ready');
+            const closedOrders = orders.filter(o =>
+                o.status === 'paid' || o.status === 'closed'
+            );
 
-            // Новые заказы
             if (newOrders.length === 0) {
-                newOrdersBody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-gray-500">Нет новых заказов</td></tr>';
+                newOrdersBody.innerHTML =
+                    '<tr><td colspan="6" class="px-6 py-8 text-center text-gray-500 dark:text-gray-400">Нет новых заказов</td></tr>';
             } else {
                 newOrdersBody.innerHTML = newOrders.map(order => renderOrderRow(order, 'new')).join('');
             }
 
-            // Заказы в процессе
             if (inProgressOrders.length === 0) {
-                inProgressBody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-gray-500">Нет заказов в процессе</td></tr>';
+                inProgressBody.innerHTML =
+                    '<tr><td colspan="6" class="px-6 py-8 text-center text-gray-500 dark:text-gray-400">Нет заказов в процессе</td></tr>';
             } else {
                 inProgressBody.innerHTML = inProgressOrders.map(order => renderOrderRow(order, 'in_progress')).join('');
             }
 
-            // Готовые заказы
             if (readyOrders.length === 0) {
-                readyOrdersBody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-gray-500">Нет готовых заказов</td></tr>';
+                readyOrdersBody.innerHTML =
+                    '<tr><td colspan="6" class="px-6 py-8 text-center text-gray-500 dark:text-gray-400">Нет готовых заказов</td></tr>';
             } else {
                 readyOrdersBody.innerHTML = readyOrders.map(order => renderOrderRow(order, 'ready')).join('');
             }
 
-            // Добавляем обработчики событий для кнопок
+            if (closedOrders.length === 0) {
+                closedOrdersBody.innerHTML =
+                    '<tr><td colspan="6" class="px-6 py-8 text-center text-gray-400 dark:text-gray-500 italic">Нет закрытых заказов</td></tr>';
+            } else {
+                closedOrdersBody.innerHTML = closedOrders.map(order => renderOrderRow(order, 'closed')).join('');
+            }
+
             document.querySelectorAll('.status-btn').forEach(btn => {
                 btn.addEventListener('click', handleStatusChange);
             });
@@ -309,36 +404,41 @@
             const notes = order.notes || 'Нет';
             const timeAgo = formatTimeAgo(order.created_at);
 
-            let actionButton = '';
+            let actionCellContent = '';
+            let rowClass =
+                'hover:bg-gray-50 dark:hover:bg-gray-900/40 transition-colors';
+
             if (currentStatus === 'new') {
-                actionButton = `<button class="status-btn px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-semibold hover:bg-red-700 transition-colors" data-order-id="${order.id}" data-new-status="in_progress">Принять на кухню</button>`;
+                actionCellContent =
+                    `<button class="status-btn px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-semibold hover:bg-red-700 transition-colors" data-order-id="${order.id}" data-new-status="in_progress">Принять на кухню</button>`;
             } else if (currentStatus === 'in_progress') {
-                actionButton = `<button class="status-btn px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-semibold hover:bg-green-700 transition-colors" data-order-id="${order.id}" data-new-status="ready">Готово</button>`;
+                actionCellContent =
+                    `<button class="status-btn px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-semibold hover:bg-green-700 transition-colors" data-order-id="${order.id}" data-new-status="ready">Готово</button>`;
             } else if (currentStatus === 'ready') {
-                // Показываем кнопку закрытия заказа для официантов/админов
-                if (currentUser && (currentUser.role === 'waiter' || currentUser.role === 'admin')) {
-                    actionButton = `<button class="close-btn px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors" data-order-id="${order.id}">Закрыть заказ</button>`;
-                } else {
-                    actionButton = `<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">Готов к выдаче</span>`;
-                }
+                actionCellContent =
+                    `<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300">Готов к выдаче</span>`;
+            } else if (currentStatus === 'closed') {
+                rowClass =
+                    'bg-gray-50 dark:bg-gray-900/70 text-gray-500 dark:text-gray-400';
+                actionCellContent =
+                    `<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-300/70 text-gray-800 dark:bg-gray-700 dark:text-gray-200">Закрыт</span>`;
             }
 
             return `
-                <tr class="hover:bg-gray-50 transition-colors">
-                    <td class="px-6 py-4 font-medium text-gray-900">#${order.id}</td>
-                    <td class="px-6 py-4">${tableName}</td>
-                    <td class="px-6 py-4">${itemsText}</td>
-                    <td class="px-6 py-4 text-gray-600 italic">${notes}</td>
-                    <td class="px-6 py-4 text-center">${timeAgo}</td>
-                    <td class="px-6 py-4 text-center">${actionButton}</td>
-                </tr>
-            `;
+        <tr class="${rowClass}">
+          <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">#${order.id}</td>
+          <td class="px-6 py-4">${tableName}</td>
+          <td class="px-6 py-4">${itemsText}</td>
+          <td class="px-6 py-4 text-gray-600 dark:text-gray-300 italic">${notes}</td>
+          <td class="px-6 py-4 text-center">${timeAgo}</td>
+          <td class="px-6 py-4 text-center">${actionCellContent}</td>
+        </tr>
+      `;
         }
 
         async function handleStatusChange(event) {
             const orderId = parseInt(event.target.dataset.orderId);
             const newStatus = event.target.dataset.newStatus;
-
             if (!orderId || !newStatus) return;
 
             try {
@@ -353,7 +453,7 @@
 
                 if (response.ok) {
                     console.log(`Order ${orderId} status changed to ${newStatus}`);
-                    await loadOrders(); // Перезагружаем заказы
+                    await loadOrders();
                 } else {
                     const errorData = await response.json();
                     console.error('Failed to change status:', errorData);
@@ -365,12 +465,10 @@
             }
         }
 
-        // Инициализация
         document.addEventListener('DOMContentLoaded', async () => {
             if (!checkAuth()) return;
             await loadUserInfo();
             await loadOrders();
-            // Обновляем заказы каждые 10 секунд
             setInterval(loadOrders, 10000);
         });
     </script>
