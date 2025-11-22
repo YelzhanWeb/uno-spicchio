@@ -169,6 +169,7 @@ func (rt *Router) Setup() *chi.Mux {
 
 			// Dishes analytics
 			r.Get("/dishes/popular", rt.analyticsHandler.GetPopularDishes)
+			r.Get("/dishes/availability", rt.analyticsHandler.GetDishAvailability)
 
 			// Orders analytics
 			r.Get("/orders/stats", rt.analyticsHandler.GetOrderStats)
@@ -181,6 +182,7 @@ func (rt *Router) Setup() *chi.Mux {
 
 			// Tables analytics
 			r.Get("/tables/utilization", rt.analyticsHandler.GetTableUtilization)
+
 		})
 
 	})

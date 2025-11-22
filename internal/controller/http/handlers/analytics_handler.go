@@ -248,3 +248,13 @@ func (h *AnalyticsHandler) parseDateRange(r *http.Request) (from, to time.Time, 
 
 	return from, to, nil
 }
+
+func (h *AnalyticsHandler) GetDishAvailability(w http.ResponseWriter, r *http.Request) {
+	data, err := h.analyticsService.GetDishAvailability(r.Context())
+	if err != nil {
+		response.InternalError(w, "failed to get dish availability")
+		return
+	}
+
+	response.Success(w, data)
+}

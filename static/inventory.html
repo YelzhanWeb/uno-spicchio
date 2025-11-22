@@ -158,6 +158,12 @@
                         </label>
                     </div>
 
+                    <div id="lowStockAlert" class="px-4 py-3 hidden">
+                        <div class="rounded-lg border border-accent-yellow/60 bg-accent-yellow/10 px-4 py-3 text-sm">
+                            <p class="font-semibold mb-1">Внимание: низкий остаток по ингредиентам</p>
+                            <ul id="lowStockList" class="list-disc list-inside space-y-1 text-sm"></ul>
+                        </div>
+                    </div>
                     <!-- таблица -->
                     <div class="px-4 py-3 @container">
                         <div class="flex overflow-hidden rounded-lg border border-[#e7d0d1] bg-[#fcf8f8]">
@@ -398,7 +404,54 @@
                 });
             }
         });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('auth_token');
+            if (!token) {
+                window.location.href = 'login.html';
+                return;
+            }
+            loadLowStock(token);
+            // сюда же позже можно добавить загрузку таблицы из backend
+        });
+
+        async function loadLowStock(token) {
+            try {
+                const res = await fetch(`${API_BASE_URL}/ingredients/low-stock`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!res.ok) {
+                    console.error('Failed to load low-stock ingredients');
+                    return;
+                }
+
+                const result = await res.json();
+                const ingredients = result.data ?? result;
+
+                const alertBox = document.getElementById('lowStockAlert');
+                const list = document.getElementById('lowStockList');
+
+                if (!ingredients || ingredients.length === 0) {
+                    alertBox.classList.add('hidden');
+                    return;
+                }
+
+                list.innerHTML = '';
+                ingredients.forEach(ing => {
+                    const li = document.createElement('li');
+                    li.textContent = `${ing.name}: на складе ${ing.qty.toFixed(2)} ${ing.unit} (минимум ${ing.min_qty.toFixed(2)})`;
+                    list.appendChild(li);
+                });
+
+                alertBox.classList.remove('hidden');
+            } catch (err) {
+                console.error(err);
+            }
+        }
     </script>
+
+
 </body>
 
 </html>

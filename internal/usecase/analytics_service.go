@@ -154,3 +154,7 @@ func calculatePercentageChange(current, previous float64) float64 {
 func roundFloat(val float64) float64 {
 	return float64(int(val*100)) / 100
 }
+
+func (s *AnalyticsService) GetDishAvailability(ctx context.Context) ([]domain.DishAvailability, error) {
+	return s.analyticsRepo.GetDishAvailability(ctx)
+}

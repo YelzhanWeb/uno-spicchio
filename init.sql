@@ -268,6 +268,81 @@ VALUES ('Chicken Breast', 'kg', 10, 2),
     ('Coffee Beans', 'kg', 6, 2),
     ('Orange', 'kg', 8, 3);
 
+------------------------------------------------------------
+-- === DISH INGREDIENT FORMULAS (REALISTIC RECIPES) ===
+-- Полное заполнение dish_ingredients по именам блюд и ингридиентов
+------------------------------------------------------------
+
+-- Очистка старых связей (если скрипт запускается повторно)
+DELETE FROM dish_ingredients;
+
+-- Вставляем формулы
+INSERT INTO dish_ingredients (dish_id, ingredient_id, qty_per_dish)
+SELECT d.id, i.id, v.qty
+FROM (
+    -- Caesar Salad
+    VALUES
+        ('Caesar Salad',  'Lettuce',        0.15),
+        ('Caesar Salad',  'Chicken Breast', 0.20),
+        ('Caesar Salad',  'Cheese',         0.05),
+
+-- Greek Salad
+('Greek Salad', 'Tomato', 0.20),
+(
+    'Greek Salad',
+    'Cucumber',
+    0.15
+),
+('Greek Salad', 'Cheese', 0.05),
+(
+    'Greek Salad',
+    'Lettuce',
+    0.10
+),
+
+-- Tomato Soup
+('Tomato Soup', 'Tomato', 0.30), ('Tomato Soup', 'Rice', 0.05),
+
+-- Beef Steak
+('Beef Steak', 'Beef', 0.35),
+
+-- Chicken Curry
+(
+    'Chicken Curry',
+    'Chicken Breast',
+    0.25
+),
+(
+    'Chicken Curry',
+    'Tomato',
+    0.10
+),
+('Chicken Curry', 'Rice', 0.20),
+('Chicken Curry', 'Milk', 0.10),
+
+-- Cheesecake
+('Cheesecake', 'Flour', 0.10),
+('Cheesecake', 'Sugar', 0.05),
+('Cheesecake', 'Milk', 0.15),
+('Cheesecake', 'Cheese', 0.20),
+
+-- Cappuccino
+(
+    'Cappuccino',
+    'Coffee Beans',
+    0.02
+),
+('Cappuccino', 'Milk', 0.20),
+
+-- Orange Juice
+
+
+('Orange Juice',  'Orange',         0.25)
+
+) AS v(dish_name, ingredient_name, qty)
+JOIN dishes d ON d.name = v.dish_name
+JOIN ingredients i ON i.name = v.ingredient_name;
+
 -- === DISH_INGREDIENTS SEED DATA ===
 INSERT INTO
     dish_ingredients (

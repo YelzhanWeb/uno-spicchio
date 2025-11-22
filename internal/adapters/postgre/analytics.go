@@ -292,3 +292,47 @@ func (r *AnalyticsRepository) GetHourlyRevenue(ctx context.Context, date time.Ti
 
 	return hourlyData, rows.Err()
 }
+
+func (r *AnalyticsRepository) GetDishAvailability(ctx context.Context) ([]domain.DishAvailability, error) {
+	query := `
+		SELECT 
+			d.id,
+			d.name,
+			d.price,
+			COALESCE(
+				FLOOR(
+					MIN(
+						CASE 
+							WHEN di.qty_per_dish > 0 
+							THEN (i.qty / di.qty_per_dish)
+							ELSE NULL
+						END
+					)
+				),
+				0
+			) AS portions_left
+		FROM dishes d
+		JOIN dish_ingredients di ON di.dish_id = d.id
+		JOIN ingredients i ON i.id = di.ingredient_id
+		WHERE d.is_active = TRUE
+		GROUP BY d.id, d.name, d.price
+		ORDER BY d.id;
+	`
+
+	rows, err := r.db.QueryContext(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var result []domain.DishAvailability
+	for rows.Next() {
+		var d domain.DishAvailability
+		if err := rows.Scan(&d.DishID, &d.Name, &d.Price, &d.PortionsLeft); err != nil {
+			return nil, err
+		}
+		result = append(result, d)
+	}
+
+	return result, rows.Err()
+}

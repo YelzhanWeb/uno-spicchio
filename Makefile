@@ -12,6 +12,9 @@ build: ## Build the application
 run: ## Run the application
 	go run cmd/app/main.go
 
+psql:
+	docker exec -it restaurant_crm_db psql -U restaurant_user -d restaurant_crm
+
 test: ## Run tests
 	go test -v ./...
 

@@ -92,3 +92,10 @@ type DateRange struct {
 	From time.Time `json:"from"`
 	To   time.Time `json:"to"`
 }
+
+type DishAvailability struct {
+	DishID       int     `json:"dish_id"`
+	Name         string  `json:"name"`
+	Price        float64 `json:"price"`
+	PortionsLeft int     `json:"portions_left"`
+}

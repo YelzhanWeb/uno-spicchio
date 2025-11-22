@@ -90,4 +90,5 @@ type AnalyticsService interface {
 	GetIngredientTurnover(ctx context.Context, from, to time.Time) ([]domain.IngredientTurnover, error)
 	GetTableUtilization(ctx context.Context, from, to time.Time) ([]domain.TableUtilization, error)
 	GetHourlyRevenue(ctx context.Context, date time.Time) ([]domain.HourlyRevenue, error)
+	GetDishAvailability(ctx context.Context) ([]domain.DishAvailability, error)
 }
