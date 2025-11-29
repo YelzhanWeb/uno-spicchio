@@ -61,73 +61,64 @@
     <div class="relative flex min-h-screen w-full flex-col">
         <div class="flex h-full grow">
             <!-- SIDEBAR (общий) -->
+            <!-- SIDEBAR (общий) -->
             <aside
-                class="w-64 flex-shrink-0 bg-surface-light dark:bg-surface-dark border-r border-border-light dark:border-border-dark p-4 flex flex-col">
-                <div>
-                    <div class="flex items-center gap-3 px-3 mb-6">
-                        <div class="bg-center bg-no-repeat bg-cover rounded-full size-10"
-                            style='background-image:url("https://lh3.googleusercontent.com/aida-public/AB6AXuAP2hMePJbmL9RhIgD0Pebyej4OsTIfAYHlM66V910qbcIS85xsmlYt31vK704eXqsf_gnhM0HOc9ccSkWz9BzxnejyY1YbyfZuu4qba9fnhC-Jx8DAohSgIgDvvbLuXALroqOm_LBRN1NrvmI49H3W4DgwgsUPlKVeDWaQc8KIY89MVD5seee9LvJkkxtGRB9q_Xis8lX8ApBo9M-zhQTkY9lkg-vlCLAmd2e6FdeimDLgjUB6-N1Bm97XvJkbGZbUizzgXxQvLQ");'>
-                        </div>
-                        <div class="flex flex-col">
-                            <h1 class="text-base font-bold leading-normal">UNO Spichio</h1>
-                            <p class="text-xs text-text-light/60 dark:text-text-dark/60">Admin Panel</p>
-                        </div>
-                    </div>
-
-                    <nav class="flex flex-col gap-1">
-                        <!-- Главная -->
-                        <a href="dashboard.html"
-                            class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-primary/10 transition">
-                            <span class="material-symbols-outlined text-lg">dashboard</span>
-                            <span class="text-sm font-medium leading-normal">Главная</span>
-                        </a>
-
-                        <!-- Сотрудники -->
-                        <a href="employees.html"
-                            class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-primary/10 transition">
-                            <span class="material-symbols-outlined text-lg">group</span>
-                            <span class="text-sm font-medium leading-normal">Сотрудники</span>
-                        </a>
-
-                        <!-- Меню -->
-                        <a href="menu.html"
-                            class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-primary/10 transition">
-                            <span class="material-symbols-outlined text-lg">restaurant_menu</span>
-                            <span class="text-sm font-medium leading-normal">Меню</span>
-                        </a>
-
-                        <!-- Склад -->
-                        <a href="inventory.html"
-                            class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-primary/10 transition">
-                            <span class="material-symbols-outlined text-lg fill">inventory_2</span>
-                            <span class="text-sm leading-normal">Склад</span>
-                        </a>
-
-                        <!-- Закупки (активная) -->
-                        <a href="purchases.html"
-                            class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/15 text-primary font-semibold">
-                            <span class="material-symbols-outlined text-lg">shopping_cart</span>
-                            <span class="text-sm font-medium leading-normal">Закупки</span>
-                        </a>
-
-                        <!-- Поставщики -->
-                        <a href="suppliers.html"
-                            class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-primary/10 transition">
-                            <span class="material-symbols-outlined text-lg">local_shipping</span>
-                            <span class="text-sm font-medium leading-normal">Поставщики</span>
-                        </a>
-                    </nav>
+                class="w-64 flex-shrink-0 bg-white dark:bg-gray-800 p-6 border-r border-gray-200 dark:border-gray-700 flex flex-col">
+                <!-- Верх: бренд -->
+                <div class="mb-10">
+                    <h1 class="text-xl font-bold text-gray-900 dark:text-white">UNO Spicchio</h1>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Admin Panel</p>
                 </div>
 
-                <!-- низ сайдбара -->
-                <div class="mt-6 border-t border-border-light dark:border-border-dark pt-3">
-                    <button onclick="logout()"
-                        class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-primary/10 transition-colors w-full text-sm">
-                        <span class="material-symbols-outlined text-base">logout</span>
-                        <span>Выйти</span>
-                    </button>
+                <!-- Вкладки -->
+                <nav class="flex flex-col space-y-2 flex-1">
+                    <!-- Главная -->
+                    <a href="dashboard.html" class="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700
+                  text-gray-600 dark:text-gray-300">
+                        <span class="material-symbols-outlined">dashboard</span>
+                        <span class="text-sm font-medium leading-normal">Главная</span>
+                    </a>
+
+
+                    <!-- Склад -->
+                    <a href="inventory.html" class="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700
+                  text-gray-600 dark:text-gray-300">
+                        <span class="material-symbols-outlined">inventory_2</span>
+                        <span class="text-sm leading-normal">Склад</span>
+                    </a>
+
+                    <!-- Закупки (АКТИВНАЯ) -->
+                    <a href="purchases.html" class="flex items-center gap-2 px-4 py-3 bg-red-100/50 dark:bg-gray-700/50 rounded-lg
+                  font-medium text-gray-900 dark:text-white">
+                        <span class="material-symbols-outlined">shopping_cart</span>
+                        <span class="text-sm font-medium leading-normal">Закупки</span>
+                    </a>
+
+                    <!-- Поставщики -->
+                    <a href="suppliers.html" class="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700
+                  text-gray-600 dark:text-gray-300">
+                        <span class="material-symbols-outlined">local_shipping</span>
+                        <span class="text-sm font-medium leading-normal">Поставщики</span>
+                    </a>
+                </nav>
+
+                <!-- Низ сайдбара -->
+                <div class="mt-6">
+                    <div class="border-t border-gray-200 dark:border-gray-700 pt-3 space-y-2 text-sm">
+                        <a href="#" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 dark:text-gray-400
+                      hover:bg-gray-100 dark:hover:bg-gray-700">
+                            <span class="material-symbols-outlined">help</span>
+                            <span>Help</span>
+                        </a>
+                        <a href="#" onclick="logout(); return false;" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 dark:text-gray-400
+                      hover:bg-gray-100 dark:hover:bg-gray-700">
+                            <span class="material-symbols-outlined">logout</span>
+                            <span>Log Out</span>
+                        </a>
+                    </div>
                 </div>
             </aside>
+
 
             <!-- MAIN -->
             <main class="flex-1 flex flex-col relative">

@@ -56,6 +56,7 @@
             class="w-64 flex-shrink-0 bg-white dark:bg-gray-800 p-6 border-r border-gray-200 dark:border-gray-700 flex flex-col">
             <div class="mb-10">
                 <h1 class="text-xl font-bold text-gray-900 dark:text-white">UNO Spicchio</h1>
+                <p class="text-xs text-text-light/60 dark:text-text-dark/60">Admin Panel</p>
             </div>
 
             <nav class="flex flex-col space-y-2 flex-1">
@@ -80,13 +81,46 @@
                     <span class="material-symbols-outlined">restaurant</span>
                     <span>Кухня</span>
                 </a>
+                <!-- Сотрудники -->
+                <a id="employeesLink" href="employees.html"
+                    class="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300">
+                    <span class="material-symbols-outlined">group</span>
+                    <span>Сотрудники</span>
+                </a>
 
+                <!-- Меню -->
+                <a id="menuLink" href="menu.html" class="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700
+                  text-gray-600 dark:text-gray-300">
+                    <span class="material-symbols-outlined">restaurant_menu</span>
+                    <span>Меню</span>
+                </a>
                 <a id="dashboardLink" href="dashboard.html"
                     class="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300">
                     <span class="material-symbols-outlined">analytics</span>
                     <span>Аналитика</span>
                 </a>
+                <!-- Склад -->
+                <a id="inventoryLink" href="inventory.html" class="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700
+                  text-gray-600 dark:text-gray-300">
+                    <span class="material-symbols-outlined">inventory_2</span>
+                    <span>Склад</span>
+                </a>
             </nav>
+            <!-- Низ сайдбара -->
+            <div class="mt-6">
+                <div class="border-t border-gray-200 dark:border-gray-700 pt-3 space-y-2 text-sm">
+                    <a href="#" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 dark:text-gray-400
+                      hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <span class="material-symbols-outlined text-xl">help</span>
+                        <span>Help</span>
+                    </a>
+                    <a href="#" onclick="logout(); return false;" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 dark:text-gray-400
+                      hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <span class="material-symbols-outlined text-xl">logout</span>
+                        <span>Log Out</span>
+                    </a>
+                </div>
+            </div>
         </aside>
 
         <!-- Main -->

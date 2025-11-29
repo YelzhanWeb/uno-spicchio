@@ -70,68 +70,94 @@
     class="font-display bg-background-light dark:bg-background-dark text-text-primary-light dark:text-text-primary-dark">
     <div class="relative flex min-h-screen w-full">
         <!-- Sidebar -->
+        <!-- Sidebar -->
         <aside
-            class="flex flex-col w-64 bg-surface-light dark:bg-surface-dark border-r border-border-light dark:border-border-dark p-4 shrink-0">
-            <div class="flex flex-col gap-8 h-full">
-                <!-- Brand -->
-                <div class="flex items-center gap-3">
-                    <span
-                        class="material-symbols-outlined fill text-primary text-3xl bg-primary/10 rounded-full p-2 flex items-center justify-center">
-                        pie_chart
-                    </span>
-                    <div class="flex flex-col">
-                        <h1 class="text-base font-bold">UNO Spicchio</h1>
-                        <p class="text-sm text-text-secondary-light dark:text-text-secondary-dark">Admin Panel</p>
-                    </div>
+            class="w-64 flex-shrink-0 bg-white dark:bg-gray-800 p-6 border-r border-gray-200 dark:border-gray-700 flex flex-col">
+            <!-- Верх: бренд -->
+            <div class="mb-10">
+                <h1 class="text-xl font-bold text-gray-900 dark:text-white">UNO Spicchio</h1>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Admin Panel</p>
+            </div>
+
+            <!-- Вкладки -->
+            <nav class="flex flex-col space-y-2 flex-1">
+                <!-- Карточка "UNO Spicchio" -->
+                <div class="px-4 py-3 bg-red-50 dark:bg-gray-700 rounded-lg">
+                    <p class="font-semibold text-primary">UNO Spicchio</p>
                 </div>
 
-                <!-- Nav -->
-                <a href="active-orders.html"
-                    class="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300">
+                <!-- Все заказы -->
+                <a href="active-orders.html" class="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700
+                  text-gray-600 dark:text-gray-300">
                     <span class="material-symbols-outlined">receipt_long</span>
                     <span>Все заказы</span>
                 </a>
 
-                <a id="createOrderLink" href="create-order.html"
-                    class="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300">
+                <!-- Создать заказ -->
+                <a id="createOrderLink" href="create-order.html" class="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700
+                  text-gray-600 dark:text-gray-300">
                     <span class="material-symbols-outlined">add_shopping_cart</span>
                     <span>Создать заказ</span>
                 </a>
 
-                <a id="chefLink" href="chef-orders.html"
-                    class="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300">
+                <!-- Кухня -->
+                <a id="chefLink" href="chef-orders.html" class="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700
+                  text-gray-600 dark:text-gray-300">
                     <span class="material-symbols-outlined">restaurant</span>
                     <span>Кухня</span>
                 </a>
-
-                <!-- НОВОЕ: кнопка "Склад" -->
-                <a id="inventoryLink" href="inventory.html"
+                <!-- Сотрудники -->
+                <a id="employeesLink" href="employees.html"
                     class="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300">
+                    <span class="material-symbols-outlined">group</span>
+                    <span>Сотрудники</span>
+                </a>
+
+                <!-- Меню -->
+                <a id="menuLink" href="menu.html" class="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700
+                  text-gray-600 dark:text-gray-300">
+                    <span class="material-symbols-outlined">restaurant_menu</span>
+                    <span>Меню</span>
+                </a>
+                <!-- Аналитика (АКТИВНАЯ) -->
+                <a id="dashboardLink" href="dashboard.html" class="flex items-center gap-2 px-4 py-3 bg-red-100/50 dark:bg-gray-700/50 rounded-lg
+                  font-medium text-gray-900 dark:text-white">
+                    <span class="material-symbols-outlined">analytics</span>
+                    <span>Аналитика</span>
+                </a>
+                <!-- Склад -->
+                <a id="inventoryLink" href="inventory.html" class="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700
+                  text-gray-600 dark:text-gray-300">
                     <span class="material-symbols-outlined">inventory_2</span>
                     <span>Склад</span>
                 </a>
 
-                <a id="dashboardLink" href="dashboard.html"
-                    class="flex items-center gap-2 px-4 py-3 bg-red-100/50 dark:bg-gray-700/50 rounded-lg font-medium text-gray-900 dark:text-white">
-                    <span class="material-symbols-outlined">analytics</span>
-                    <span>Аналитика</span>
-                </a>
 
-                <!-- User + logout -->
-                <div class="mt-auto pt-4 border-t border-border-light dark:border-border-dark flex flex-col gap-3">
-                    <div class="flex items-center gap-3">
-                        <img alt="User avatar" class="w-10 h-10 rounded-full object-cover"
-                            src="https://i.pravatar.cc/40" />
-                        <div>
-                            <p class="font-semibold text-sm" id="userFullName">Loading...</p>
-                            <p class="text-xs text-text-secondary-light dark:text-text-secondary-dark" id="userRole">...
-                            </p>
-                        </div>
+            </nav>
+
+            <!-- Низ сайдбара -->
+            <div class="mt-6">
+                <div class="border-t border-gray-200 dark:border-gray-700 pt-3 space-y-3 text-sm">
+
+                    <!-- Блок пользователя, чтобы JS мог подставить имя и роль -->
+                    <div class="px-3">
+                        <p id="userFullName" class="font-semibold text-gray-900 dark:text-white">Loading...</p>
+                        <p id="userRole" class="text-xs text-gray-500 dark:text-gray-400">...</p>
                     </div>
-                    <button onclick="logout()"
-                        class="w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors text-left">
-                        Выйти
-                    </button>
+
+                    <!-- Help -->
+                    <a href="#" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 dark:text-gray-400
+                      hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <span class="material-symbols-outlined text-xl">help</span>
+                        <span>Help</span>
+                    </a>
+
+                    <!-- Log Out -->
+                    <a href="#" onclick="logout(); return false;" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 dark:text-gray-400
+                      hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <span class="material-symbols-outlined text-xl">logout</span>
+                        <span>Log Out</span>
+                    </a>
                 </div>
             </div>
         </aside>
