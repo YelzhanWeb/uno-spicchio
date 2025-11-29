@@ -2,13 +2,259 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>UNO Spicchio – Staff Management</title>
+
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet" />
+
+    <!-- Material Icons (как на других страницах) -->
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#E53E3E",                    /* красный, как в других страницах */
+                        "background-light": "#F9FAFB",
+                        "background-dark": "#111827",
+                        "text-light": "#1F2933",
+                        "text-dark": "#F9FAFB",
+                        "muted-light": "#6B7280",
+                        "muted-dark": "#9CA3AF",
+                        "surface-light": "#FFFFFF",
+                        "surface-dark": "#1F2937",
+                        "border-light": "#E5E7EB",
+                        "border-dark": "#374151",
+                        success: "#16A34A",
+                    },
+                    fontFamily: {
+                        display: ["Inter", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.5rem",
+                        lg: "0.75rem",
+                        xl: "1rem",
+                        full: "9999px",
+                    },
+                    boxShadow: {
+                        soft: "0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05)",
+                        "soft-lg":
+                            "0 10px 15px -3px rgba(0, 0, 0, 0.06), 0 4px 6px -4px rgba(0, 0, 0, 0.05)",
+                    },
+                },
+            },
+        };
+    </script>
+
+    <style>
+        .glassmorphism {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .dark .glassmorphism {
+            background: rgba(31, 41, 55, 0.6);
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
 </head>
 
-<body>
-    <h1>Employees Page</h1>
+<body class="font-display bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark">
+    <div class="flex min-h-screen">
+        <!-- Sidebar -->
+        <aside
+            class="w-64 flex-shrink-0 bg-white dark:bg-gray-800 p-6 border-r border-gray-200 dark:border-gray-700 flex flex-col">
+            <!-- Верх: бренд -->
+            <div class="mb-10">
+                <h1 class="text-xl font-bold text-gray-900 dark:text-white">UNO Spicchio</h1>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Admin Panel</p>
+            </div>
+
+            <!-- Вкладки -->
+            <nav class="flex flex-col space-y-2 flex-1">
+                <!-- Карточка "UNO Spicchio" -->
+                <div class="px-4 py-3 bg-red-50 dark:bg-gray-700 rounded-lg">
+                    <p class="font-semibold text-primary">UNO Spicchio</p>
+                </div>
+
+                <!-- Все заказы -->
+                <a href="active-orders.html" class="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700
+                  text-gray-600 dark:text-gray-300">
+                    <span class="material-symbols-outlined">receipt_long</span>
+                    <span>Все заказы</span>
+                </a>
+
+                <!-- Создать заказ -->
+                <a id="createOrderLink" href="create-order.html" class="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700
+                  text-gray-600 dark:text-gray-300">
+                    <span class="material-symbols-outlined">add_shopping_cart</span>
+                    <span>Создать заказ</span>
+                </a>
+
+                <!-- Кухня -->
+                <a id="chefLink" href="chef-orders.html" class="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700
+                  text-gray-600 dark:text-gray-300">
+                    <span class="material-symbols-outlined">restaurant</span>
+                    <span>Кухня</span>
+                </a>
+                <!-- Сотрудники -->
+                <a id="employeesLink" href="employees.html"
+                    class="flex items-center gap-2 px-4 py-3 bg-red-100/50 dark:bg-gray-700/50 rounded-lg font-medium text-gray-900 dark:text-white">
+                    <span class="material-symbols-outlined">group</span>
+                    <span>Сотрудники</span>
+                </a>
+
+                <!-- Меню -->
+                <a id="menuLink" href="menu.html" class="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700
+                  text-gray-600 dark:text-gray-300">
+                    <span class="material-symbols-outlined">restaurant_menu</span>
+                    <span>Меню</span>
+                </a>
+                <!-- Аналитика (АКТИВНАЯ) -->
+                <a id="dashboardLink" href="dashboard.html" class="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700
+                  font-medium text-gray-900 dark:text-white">
+                    <span class="material-symbols-outlined">analytics</span>
+                    <span>Аналитика</span>
+                </a>
+                <!-- Склад -->
+                <a id="inventoryLink" href="inventory.html" class="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700
+                  text-gray-600 dark:text-gray-300">
+                    <span class="material-symbols-outlined">inventory_2</span>
+                    <span>Склад</span>
+                </a>
+
+
+            </nav>
+
+            <!-- Низ сайдбара -->
+            <div class="mt-6">
+                <div class="border-t border-gray-200 dark:border-gray-700 pt-3 space-y-3 text-sm">
+
+                    <!-- Блок пользователя, чтобы JS мог подставить имя и роль -->
+                    <div class="px-3">
+                        <p id="userFullName" class="font-semibold text-gray-900 dark:text-white">Loading...</p>
+                        <p id="userRole" class="text-xs text-gray-500 dark:text-gray-400">...</p>
+                    </div>
+
+                    <!-- Help -->
+                    <a href="#" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 dark:text-gray-400
+                      hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <span class="material-symbols-outlined text-xl">help</span>
+                        <span>Help</span>
+                    </a>
+
+                    <!-- Log Out -->
+                    <a href="#" onclick="logout(); return false;" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 dark:text-gray-400
+                      hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <span class="material-symbols-outlined text-xl">logout</span>
+                        <span>Log Out</span>
+                    </a>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Основной контент -->
+        <main class="flex-1 p-8">
+            <h1 class="text-4xl font-bold text-text-light dark:text-text-dark mb-8">Staff Management</h1>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div
+                    class="bg-surface-light dark:bg-surface-dark p-6 rounded-lg shadow-soft border border-border-light dark:border-white/5">
+                    <p class="text-base font-medium text-muted-light dark:text-muted-dark">Active Staff</p>
+                    <p class="text-3xl font-bold text-text-light dark:text-text-dark mt-2">15</p>
+                </div>
+                <div
+                    class="bg-surface-light dark:bg-surface-dark p-6 rounded-lg shadow-soft border border-border-light dark:border-white/5">
+                    <p class="text-base font-medium text-muted-light dark:text-muted-dark">On Duty</p>
+                    <p class="text-3xl font-bold text-text-light dark:text-text-dark mt-2">8</p>
+                </div>
+                <div
+                    class="bg-surface-light dark:bg-surface-dark p-6 rounded-lg shadow-soft border border-border-light dark:border-white/5">
+                    <p class="text-base font-medium text-muted-light dark:text-muted-dark">Pending Requests</p>
+                    <p class="text-3xl font-bold text-text-light dark:text-text-dark mt-2">3</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-2">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-2xl font-bold text-text-light dark:text-text-dark">Staff Schedule</h2>
+                        <button
+                            class="bg-primary text-white px-4 py-2 rounded-lg font-medium hover:bg-primary/90 transition-colors flex items-center gap-2">
+                            <svg class="lucide lucide-calendar-plus" xmlns="http://www.w3.org/2000/svg" width="20"
+                                height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M8 2v4"></path>
+                                <path d="M16 2v4"></path>
+                                <path d="M21 13V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h8"></path>
+                                <path d="M3 10h18"></path>
+                                <path d="M16 19h6"></path>
+                                <path d="M19 16v6"></path>
+                            </svg>
+                            New Shift
+                        </button>
+                    </div>
+
+                    <div
+                        class="overflow-x-auto bg-surface-light dark:bg-surface-dark rounded-lg shadow-soft-lg border border-border-light dark:border-white/5">
+                        <!-- Таблица расписания (оставлена как была) -->
+                        <!-- ... остальной твой контент без изменений ... -->
+                    </div>
+                </div>
+
+                <div>
+                    <h2 class="text-2xl font-bold text-text-light dark:text-text-dark mb-4">Performance</h2>
+                    <div class="space-y-4">
+                        <div
+                            class="bg-surface-light dark:bg-surface-dark p-4 rounded-lg shadow-soft border border-border-light dark:border-white/5">
+                            <p class="font-semibold text-text-light dark:text-text-dark">Top Performer</p>
+                            <div class="flex items-center gap-3 mt-2">
+                                <img alt="Isabella Gallo" class="w-10 h-10 rounded-full object-cover"
+                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuDKMqhSsHHr5ljcbKsuw0y4Yp_a4p42rvP8X3J7XyUNDMkQeCuuJ9C9TWrPsZqJD50UnlwAyifK_Ua9T3VrjV1lg_Pc_2MQilAf3oWLppHuvpJnhklCHvoyJ6qsgmFwflAPxzS_rQDWmU2jzAfMa7rslN--B0tqM9h5ZN3ryLzRW8FYcrE-6sme8IUC6cA21geEr74H5k15ZhHxel2O3c173rryHdgF80urctL1a6R2e5Y1tN0q4Cw1d0Et6hXkgrvPxbWQaTs3gk8" />
+                                <div>
+                                    <p class="font-medium">Isabella Gallo</p>
+                                    <p class="text-sm text-muted-light dark:text-muted-dark">Highest sales this month
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div
+                            class="bg-surface-light dark:bg-surface-dark p-4 rounded-lg shadow-soft border border-border-light dark:border-white/5">
+                            <p class="font-semibold text-text-light dark:text-text-dark">Payroll Integration</p>
+                            <p class="text-sm text-muted-light dark:text-muted-dark mt-2">
+                                Next payroll date:
+                                <span class="font-medium text-text-light dark:text-text-dark">Oct 31, 2023</span>
+                            </p>
+                            <button
+                                class="w-full mt-3 bg-primary/10 text-primary px-4 py-2 rounded-lg font-medium hover:bg-primary/20 transition-colors flex items-center justify-center gap-2">
+                                <svg class="lucide lucide-download-cloud" xmlns="http://www.w3.org/2000/svg" width="20"
+                                    height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242">
+                                    </path>
+                                    <path d="M12 12v9"></path>
+                                    <path d="m8 17 4 4 4-4"></path>
+                                </svg>
+                                Export Payroll
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
 </body>
 
 </html>
