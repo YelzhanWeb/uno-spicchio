@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="ru" class="light">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>UNO Spicchio — Управление меню</title>
+
+    <!-- Сразу применяем сохранённую тему до рендеринга -->
+    <script>
+        if (!localStorage.getItem('theme')) {
+            localStorage.setItem('theme', 'light');
+        }
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.classList.add('dark');
+        }
+    </script>
+
+    <!-- Шрифты и иконки -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#E53E3E",
+                        "background-light": "#F9FAFB",
+                        "background-dark": "#111827",
+                    },
+                    fontFamily: {
+                        display: ["Inter", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.5rem",
+                        lg: "0.75rem",
+                        xl: "1rem",
+                        full: "9999px",
+                    },
+                },
+            },
+        };
+    </script>
+
+    <style>
+        body {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+
+<body class="font-display bg-background-light dark:bg-background-dark text-gray-800 dark:text-gray-200">
+    <div class="flex h-screen">
+        <!-- SIDEBAR (единый для всего UNO Spicchio) -->
+        <aside
+            class="w-64 flex-shrink-0 bg-white dark:bg-gray-800 p-6 border-r border-gray-200 dark:border-gray-700 flex flex-col">
+            <div class="mb-10 flex items-center gap-3">
+                <span class="material-symbols-outlined text-primary text-3xl">restaurant_menu</span>
+                <h1 class="text-xl font-bold text-gray-900 dark:text-white">UNO Spicchio</h1>
+            </div>
+
+            <nav class="flex flex-col space-y-2 flex-1">
+                <!-- Заголовок блока -->
+                <div class="px-4 py-3 bg-red-50 dark:bg-gray-700 rounded-lg flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">storefront</span>
+                    <p class="font-semibold text-primary">UNO Spicchio</p>
+                </div>
+
+                <!-- Все заказы -->
+                <a href="active-orders.html" class="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-gray-100
+                      dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300">
+                    <span class="material-symbols-outlined">receipt_long</span>
+                    <span>Все заказы</span>
+                </a>
+
+                <!-- Создать заказ -->
+                <a id="createOrderLink" href="create-order.html" class="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-gray-100
+                      dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300">
+                    <span class="material-symbols-outlined">add_shopping_cart</span>
+                    <span>Создать заказ</span>
+                </a>
+
+                <!-- Кухня -->
+                <a id="chefLink" href="chef-orders.html" class="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-gray-100
+                      dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300">
+                    <span class="material-symbols-outlined">restaurant</span>
+                    <span>Кухня</span>
+                </a>
+
+                <!-- Сотрудники -->
+                <a id="employeesLink" href="employees.html" class="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-gray-100
+                      dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300">
+                    <span class="material-symbols-outlined text-lg">group</span>
+                    <span>Сотрудники</span>
+                </a>
+
+                <!-- Меню (активная) -->
+                <a id="menuLink" href="menu.html" class="flex items-center gap-2 px-4 py-3 bg-red-100/50 dark:bg-gray-700/50
+                      rounded-lg font-medium text-gray-900 dark:text-white">
+                    <span class="material-symbols-outlined text-lg">restaurant_menu</span>
+                    <span>Меню</span>
+                </a>
+
+                <!-- Аналитика -->
+                <a id="dashboardLink" href="dashboard.html" class="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-gray-100
+                      dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300">
+                    <span class="material-symbols-outlined">analytics</span>
+                    <span>Аналитика</span>
+                </a>
+
+                <!-- Склад -->
+                <a id="inventoryLink" href="inventory.html" class="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-gray-100
+                      dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300">
+                    <span class="material-symbols-outlined">inventory_2</span>
+                    <span>Склад</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- MAIN -->
+        <main class="flex-1 flex flex-col">
+            <!-- HEADER -->
+            <header
+                class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Управление меню</h1>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                        Просмотр, добавление, редактирование и категоризация блюд.
+                    </p>
+                </div>
+
+                <div class="flex items-center gap-4">
+                    <!-- Кнопка темы -->
+                    <button id="theme-toggle" class="flex items-center gap-2 px-4 py-2 rounded-lg bg-white dark:bg-gray-900
+                               border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-100
+                               text-sm shadow-sm hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+                        <span class="material-symbols-outlined" id="theme-icon">light_mode</span>
+                        <span id="theme-toggle-text">Light</span>
+                    </button>
+
+                    <button onclick="logout()"
+                        class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary transition-colors">
+                        Выход
+                    </button>
+
+                    <div class="w-10 h-10 rounded-full bg-cover bg-center"
+                        style='background-image: url("https://i.pravatar.cc/40");'></div>
+                </div>
+            </header>
+
+            <!-- CONTENT -->
+            <section class="flex-1 p-6 lg:p-8 overflow-y-auto">
+                <div class="flex gap-8 max-w-7xl mx-auto">
+                    <!-- ЛЕВО: категории -->
+                    <aside
+                        class="w-64 flex-shrink-0 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-xl p-4 h-fit">
+                        <div class="flex h-full flex-col justify-between">
+                            <div class="flex flex-col gap-4">
+                                <div>
+                                    <h2 class="text-base font-semibold text-gray-900 dark:text-white">
+                                        Категории меню
+                                    </h2>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">
+                                        Фильтр по разделам
+                                    </p>
+                                </div>
+
+                                <div id="categoryList" class="flex flex-col gap-1">
+                                    <!-- Категории будут загружены из API -->
+                                </div>
+                            </div>
+
+                            <button class="mt-4 flex items-center justify-center gap-2 h-10 px-4 rounded-lg
+                                   bg-primary/10 dark:bg-primary/20 text-primary text-sm font-semibold">
+                                <span class="material-symbols-outlined">add_circle</span>
+                                <span class="truncate">Добавить категорию</span>
+                            </button>
+                        </div>
+                    </aside>
+
+                    <!-- ПРАВО: список блюд -->
+                    <div class="flex-1 flex flex-col gap-6">
+                        <!-- Заголовок + кнопка -->
+                        <div class="flex flex-wrap justify-between items-center gap-4">
+                            <div>
+                                <p class="text-3xl lg:text-4xl font-black text-gray-900 dark:text-white leading-tight">
+                                    Меню ресторана
+                                </p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                    Управляйте карточками блюд и их доступностью в реальном времени.
+                                </p>
+                            </div>
+                            <button class="flex items-center justify-center gap-2 h-10 px-4 rounded-lg
+                                   bg-primary text-white text-sm font-semibold shadow-sm hover:bg-red-600 transition">
+                                <span class="material-symbols-outlined text-lg">add</span>
+                                <span class="truncate">Добавить блюдо</span>
+                            </button>
+                        </div>
+
+                        <!-- Поиск + табы -->
+                        <div class="flex flex-wrap items-center justify-between gap-4">
+                            <!-- Поиск -->
+                            <div class="flex-1 min-w-[260px]">
+                                <label class="flex flex-col h-11 w-full">
+                                    <div
+                                        class="flex w-full flex-1 items-stretch rounded-lg h-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+                                        <div
+                                            class="flex items-center justify-center pl-3 pr-2 text-gray-500 dark:text-gray-400">
+                                            <span class="material-symbols-outlined">search</span>
+                                        </div>
+                                        <input id="searchInput"
+                                            class="form-input flex w-full min-w-0 flex-1 border-0 bg-transparent
+                                                  text-sm text-gray-900 dark:text-white focus:outline-none
+                                                  focus:ring-0 placeholder:text-gray-400 dark:placeholder:text-gray-500 px-2"
+                                            placeholder="Поиск по названию блюда..." />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <!-- Табы Published / Draft / Archived (визуально, логика пока общая) -->
+                            <div class="pb-1 self-end">
+                                <div
+                                    class="flex border-b border-gray-200 dark:border-gray-700 gap-6 text-sm font-semibold">
+                                    <button class="pb-2 border-b-2 border-primary text-primary">
+                                        Published
+                                    </button>
+                                    <button
+                                        class="pb-2 border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-primary">
+                                        Drafts
+                                    </button>
+                                    <button
+                                        class="pb-2 border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-primary">
+                                        Archived
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Карточки блюд -->
+                        <div id="dishesGrid"
+                            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                            <!-- Блюда будут подставляться из JS -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        const API_BASE_URL = "http://localhost:8080/api";
+        let authToken = "";
+        let allDishes = [];
+        let activeCategoryId = null;
+
+        function checkAuth() {
+            authToken = localStorage.getItem("auth_token");
+            if (!authToken) {
+                window.location.href = "login.html";
+                return false;
+            }
+            return true;
+        }
+
+        function logout() {
+            localStorage.removeItem("auth_token");
+            localStorage.removeItem("user_data");
+            window.location.href = "login.html";
+        }
+
+        function renderCategories(categories) {
+            const container = document.getElementById("categoryList");
+            container.innerHTML = "";
+
+            // "Все блюда"
+            const allItem = document.createElement("button");
+            allItem.type = "button";
+            allItem.dataset.categoryId = "";
+            allItem.className =
+                "flex items-center gap-3 px-3 py-2 rounded-lg w-full text-left bg-red-100/60 dark:bg-gray-700/60 text-primary text-sm font-semibold";
+            allItem.innerHTML = `
+            <span class="material-symbols-outlined text-primary text-xl">restaurant_menu</span>
+            <span>Все блюда</span>
+        `;
+            allItem.addEventListener("click", () => loadDishes(null));
+            container.appendChild(allItem);
+
+            // Остальные категории
+            categories.forEach(cat => {
+                const btn = document.createElement("button");
+                btn.type = "button";
+                btn.dataset.categoryId = cat.id;
+                btn.className =
+                    "flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer w-full text-left";
+                btn.innerHTML = `
+                <span class="material-symbols-outlined text-gray-700 dark:text-gray-200 text-xl">
+                    ${cat.icon || "ramen_dining"}
+                </span>
+                <span class="text-sm font-medium text-gray-700 dark:text-gray-200">
+                    ${cat.name}
+                </span>
+            `;
+                btn.addEventListener("click", () => loadDishes(cat.id));
+                container.appendChild(btn);
+            });
+
+            highlightActiveCategory();
+        }
+
+        function highlightActiveCategory() {
+            const buttons = document.querySelectorAll("#categoryList button");
+            buttons.forEach(btn => {
+                const id = btn.dataset.categoryId || null;
+                const isActive =
+                    (activeCategoryId === null && id === "") ||
+                    (activeCategoryId !== null && id && parseInt(id, 10) === activeCategoryId);
+
+                if (isActive) {
+                    btn.classList.add("bg-red-100/60", "dark:bg-gray-700/60", "text-primary");
+                } else {
+                    btn.classList.remove("bg-red-100/60", "dark:bg-gray-700/60", "text-primary");
+                }
+            });
+        }
+
+        function renderDishes(list) {
+            const grid = document.getElementById("dishesGrid");
+            grid.innerHTML = "";
+
+            if (!list.length) {
+                grid.innerHTML = `
+                <div class="col-span-full text-center text-gray-500 dark:text-gray-400 py-10">
+                    Блюда не найдены по текущему фильтру.
+                </div>
+            `;
+                return;
+            }
+
+            list.forEach(dish => {
+                const card = document.createElement("div");
+                card.className =
+                    "flex flex-col rounded-xl bg-white dark:bg-gray-800 shadow-sm overflow-hidden border border-gray-200 dark:border-gray-700";
+
+                const price = typeof dish.price === "number"
+                    ? dish.price.toFixed(2)
+                    : parseFloat(dish.price || 0).toFixed(2);
+
+                card.innerHTML = `
+                <div class="w-full h-40 bg-cover bg-center"
+                     style="background-image: url('${dish.image_url || ""}')"></div>
+                <div class="p-4 flex flex-col flex-1">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="text-gray-900 dark:text-white font-semibold text-lg">
+                            ${dish.name}
+                        </h3>
+                        <p class="text-primary font-bold text-lg">
+                            €${price}
+                        </p>
+                    </div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-4 flex-1">
+                        ${dish.description || ""}
+                    </p>
+                    <div class="flex items-center justify-between mt-auto">
+                        <div class="flex items-center gap-2">
+                            <button
+                                class="flex items-center justify-center w-8 h-8 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200"
+                                type="button">
+                                <span class="material-symbols-outlined text-xl">edit</span>
+                            </button>
+                            <button
+                                class="flex items-center justify-center w-8 h-8 rounded-lg hover:bg-red-50 dark:hover:bg-red-500/10 text-red-600 dark:text-red-400"
+                                type="button">
+                                <span class="material-symbols-outlined text-xl">delete</span>
+                            </button>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <p class="text-sm text-gray-500 dark:text-gray-400">
+                                ${dish.available ? "В наличии" : "Недоступно"}
+                            </p>
+                            <!-- Здесь позже можно сделать toggle с PATCH на бэкенд -->
+                        </div>
+                    </div>
+                </div>
+            `;
+                grid.appendChild(card);
+            });
+        }
+
+        async function loadCategories() {
+            try {
+                const res = await fetch(`${API_BASE_URL}/categories`, {
+                    headers: {
+                        "Authorization": `Bearer ${authToken}`
+                    }
+                });
+                if (!res.ok) throw new Error("Failed to load categories");
+                const data = await res.json();
+                const categories = Array.isArray(data) ? data : (data.data || []);
+                renderCategories(categories);
+            } catch (err) {
+                console.error(err);
+                const container = document.getElementById("categoryList");
+                container.innerHTML = `
+                <div class="text-sm text-red-600 dark:text-red-400 px-3">
+                    Ошибка загрузки категорий
+                </div>
+            `;
+            }
+        }
+
+        async function loadDishes(categoryId = null) {
+            try {
+                activeCategoryId = categoryId === null ? null : Number(categoryId);
+                highlightActiveCategory();
+
+                let url = `${API_BASE_URL}/dishes`;
+                if (categoryId !== null) {
+                    url += `?category=${categoryId}`;
+                }
+
+                const res = await fetch(url, {
+                    headers: {
+                        "Authorization": `Bearer ${authToken}`
+                    }
+                });
+                if (!res.ok) throw new Error("Failed to load dishes");
+                const data = await res.json();
+                allDishes = Array.isArray(data) ? data : (data.data || []);
+                renderDishes(allDishes);
+            } catch (err) {
+                console.error(err);
+                const grid = document.getElementById("dishesGrid");
+                grid.innerHTML = `
+                <div class="col-span-full text-center text-red-600 dark:text-red-400 py-10">
+                    Ошибка загрузки блюд
+                </div>
+            `;
+            }
+        }
+
+        function setupSearch() {
+            const input = document.getElementById("searchInput");
+            if (!input) return;
+
+            input.addEventListener("input", () => {
+                const q = input.value.trim().toLowerCase();
+                if (!q) {
+                    renderDishes(allDishes);
+                    return;
+                }
+                const filtered = allDishes.filter(d =>
+                    (d.name || "").toLowerCase().includes(q) ||
+                    (d.description || "").toLowerCase().includes(q)
+                );
+                renderDishes(filtered);
+            });
+        }
+
+        // Тема (как на других страницах)
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const themeToggleText = document.getElementById('theme-toggle-text');
+        const themeIcon = document.getElementById('theme-icon');
+
+        function applyTheme(mode) {
+            if (mode === 'dark') {
+                document.documentElement.classList.add('dark');
+                if (themeToggleText) themeToggleText.textContent = 'Dark';
+                if (themeIcon) themeIcon.textContent = 'dark_mode';
+            } else {
+                document.documentElement.classList.remove('dark');
+                if (themeToggleText) themeToggleText.textContent = 'Light';
+                if (themeIcon) themeIcon.textContent = 'light_mode';
+            }
+        }
+
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        applyTheme(savedTheme);
+
+        if (themeToggleBtn) {
+            themeToggleBtn.addEventListener('click', () => {
+                const isDark = document.documentElement.classList.contains('dark');
+                const newTheme = isDark ? 'light' : 'dark';
+                localStorage.setItem('theme', newTheme);
+                applyTheme(newTheme);
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            if (!checkAuth()) return;
+            await loadCategories();
+            await loadDishes(null);
+            setupSearch();
+        });
+    </script>
+</body>
+
+</html>
