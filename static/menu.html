@@ -265,6 +265,18 @@
                         class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary"></textarea>
                 </div>
 
+                <!-- URL КАРТИНКИ -->
+                <div>
+                    <label class="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
+                        Ссылка на фото (URL)
+                    </label>
+                    <input id="dishPhotoUrl" type="text" placeholder="https://...jpg"
+                        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary" />
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                        Вставьте публичный URL изображения блюда (например, из MinIO).
+                    </p>
+                </div>
+
                 <div>
                     <label class="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Цена (₸)</label>
                     <input id="dishPrice" type="number" step="0.01" required
@@ -416,15 +428,13 @@
                 activeCategoryId = categoryId === null ? null : Number(categoryId);
                 renderCategories();
 
-                let url = `${API_BASE_URL}/dishes`;
-                const res = await fetch(url, {
+                const res = await fetch(`${API_BASE_URL}/dishes`, {
                     headers: { "Authorization": `Bearer ${authToken}` }
                 });
                 if (!res.ok) throw new Error("Failed to load dishes");
                 const data = await res.json();
                 allDishes = Array.isArray(data) ? data : (data.data || []);
 
-                // Фильтр по категории
                 const filtered = activeCategoryId === null
                     ? allDishes
                     : allDishes.filter(d => d.category_id === activeCategoryId);
@@ -453,10 +463,17 @@
                 const card = document.createElement("div");
                 card.className = "flex flex-col rounded-xl bg-white dark:bg-gray-800 shadow-sm overflow-hidden border border-gray-200 dark:border-gray-700";
 
-                const price = typeof dish.price === "number" ? dish.price.toFixed(2) : parseFloat(dish.price || 0).toFixed(2);
+                const price = typeof dish.price === "number"
+                    ? dish.price.toFixed(2)
+                    : parseFloat(dish.price || 0).toFixed(2);
+
+                const photoUrl = dish.photo_url || dish.photoURL || dish.photo || "";
+                const hasPhoto = !!photoUrl;
 
                 card.innerHTML = `
-                    <div class="w-full h-40 bg-cover bg-center bg-gray-200 dark:bg-gray-700"></div>
+                    <div class="w-full h-40 bg-cover bg-center ${hasPhoto ? "" : "bg-gray-200 dark:bg-gray-700"}"
+                         ${hasPhoto ? `style="background-image: url('${photoUrl}');"` : ""}>
+                    </div>
                     <div class="p-4 flex flex-col flex-1">
                         <div class="flex justify-between items-start mb-2">
                             <h3 class="text-gray-900 dark:text-white font-semibold text-lg">${dish.name}</h3>
@@ -465,18 +482,27 @@
                         <p class="text-sm text-gray-500 dark:text-gray-400 mb-4 flex-1">${dish.description || ""}</p>
                         <div class="flex items-center justify-between mt-auto">
                             <div class="flex items-center gap-2">
-                                <button onclick="editDish(${dish.id})" class="flex items-center justify-center w-8 h-8 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200" type="button">
+                                <button onclick="editDish(${dish.id})"
+                                    class="flex items-center justify-center w-8 h-8 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200"
+                                    type="button">
                                     <span class="material-symbols-outlined text-xl">edit</span>
                                 </button>
-                                <button onclick="deleteDish(${dish.id})" class="flex items-center justify-center w-8 h-8 rounded-lg hover:bg-red-50 dark:hover:bg-red-500/10 text-red-600 dark:text-red-400" type="button">
+                                <button onclick="deleteDish(${dish.id})"
+                                    class="flex items-center justify-center w-8 h-8 rounded-lg hover:bg-red-50 dark:hover:bg-red-500/10 text-red-600 dark:text-red-400"
+                                    type="button">
                                     <span class="material-symbols-outlined text-xl">delete</span>
                                 </button>
                             </div>
-                            <div class="flex items-center gap-2">
-                                <p class="text-sm ${dish.is_active ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-400'}">
-                                    ${dish.is_active ? "Доступно" : "Недоступно"}
-                                </p>
-                            </div>
+                            <button
+                                type="button"
+                                onclick="toggleDishAvailability(${dish.id}, ${dish.is_active ? "true" : "false"})"
+                                class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold
+                                       ${dish.is_active
+                        ? "bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-300"
+                        : "bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300"}">
+                                <span class="w-2 h-2 rounded-full ${dish.is_active ? "bg-green-500" : "bg-gray-400"}"></span>
+                                <span>${dish.is_active ? "Доступно" : "Недоступно"}</span>
+                            </button>
                         </div>
                     </div>
                 `;
@@ -490,21 +516,21 @@
 
             input.addEventListener("input", () => {
                 const q = input.value.trim().toLowerCase();
-                if (!q) {
-                    const filtered = activeCategoryId === null
-                        ? allDishes
-                        : allDishes.filter(d => d.category_id === activeCategoryId);
-                    renderDishes(filtered);
-                    return;
-                }
-                const baseFiltered = activeCategoryId === null
+
+                const base = activeCategoryId === null
                     ? allDishes
                     : allDishes.filter(d => d.category_id === activeCategoryId);
-                const searchFiltered = baseFiltered.filter(d =>
+
+                if (!q) {
+                    renderDishes(base);
+                    return;
+                }
+
+                const filtered = base.filter(d =>
                     (d.name || "").toLowerCase().includes(q) ||
                     (d.description || "").toLowerCase().includes(q)
                 );
-                renderDishes(searchFiltered);
+                renderDishes(filtered);
             });
         }
 
@@ -539,8 +565,9 @@
             const dish = {
                 name: document.getElementById("dishName").value,
                 category_id: parseInt(document.getElementById("dishCategory").value),
-                description: document.getElementById("dishDescription").value,
+                description: document.getElementById("dishDescription").value || null,
                 price: parseFloat(document.getElementById("dishPrice").value),
+                photo_url: (document.getElementById("dishPhotoUrl").value || "").trim() || null,
                 is_active: document.getElementById("dishIsActive").checked
             };
 
@@ -579,9 +606,11 @@
             document.getElementById("dishDescription").value = dish.description || "";
             document.getElementById("dishPrice").value = dish.price;
             document.getElementById("dishIsActive").checked = dish.is_active;
+            document.getElementById("dishPhotoUrl").value = dish.photo_url || "";
 
             dishModal.classList.remove("hidden");
         }
+
         async function deleteDish(id) {
             if (!confirm("Удалить это блюдо? Это действие нельзя отменить.")) {
                 return;
@@ -630,7 +659,6 @@
                 const created = await res.json();
                 const newCat = Array.isArray(created) ? created[0] : (created.data || created);
 
-                // Обновляем локальный список и UI
                 allCategories.push(newCat);
                 renderCategories();
                 fillCategorySelect();
@@ -655,13 +683,11 @@
 
                 if (!res.ok) throw new Error("Failed to toggle dish");
 
-                // Обновляем локальные данные
                 const dish = allDishes.find(d => d.id === id);
                 if (dish) {
                     dish.is_active = !currentState;
                 }
 
-                // Перерисовываем с учётом текущего фильтра
                 const filtered = activeCategoryId === null
                     ? allDishes
                     : allDishes.filter(d => d.category_id === activeCategoryId);
@@ -670,91 +696,6 @@
                 console.error(err);
                 alert("Ошибка изменения доступности блюда");
             }
-        }
-
-        // Переопределяем renderDishes, чтобы добавить переключатель доступности
-        function renderDishes(list) {
-            const grid = document.getElementById("dishesGrid");
-            grid.innerHTML = "";
-
-            if (!list.length) {
-                grid.innerHTML = `
-                    <div class="col-span-full text-center text-gray-500 dark:text-gray-400 py-10">
-                        Блюда не найдены по текущему фильтру.
-                    </div>
-                `;
-                return;
-            }
-
-            list.forEach(dish => {
-                const card = document.createElement("div");
-                card.className = "flex flex-col rounded-xl bg-white dark:bg-gray-800 shadow-sm overflow-hidden border border-gray-200 dark:border-gray-700";
-
-                const price = typeof dish.price === "number"
-                    ? dish.price.toFixed(2)
-                    : parseFloat(dish.price || 0).toFixed(2);
-
-                card.innerHTML = `
-                    <div class="w-full h-40 bg-cover bg-center bg-gray-200 dark:bg-gray-700"></div>
-                    <div class="p-4 flex flex-col flex-1">
-                        <div class="flex justify-between items-start mb-2">
-                            <h3 class="text-gray-900 dark:text-white font-semibold text-lg">${dish.name}</h3>
-                            <p class="text-primary font-bold text-lg">${price} ₸</p>
-                        </div>
-                        <p class="text-sm text-gray-500 dark:text-gray-400 mb-4 flex-1">${dish.description || ""}</p>
-                        <div class="flex items-center justify-between mt-auto">
-                            <div class="flex items-center gap-2">
-                                <button onclick="editDish(${dish.id})"
-                                    class="flex items-center justify-center w-8 h-8 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200"
-                                    type="button">
-                                    <span class="material-symbols-outlined text-xl">edit</span>
-                                </button>
-                                <button onclick="deleteDish(${dish.id})"
-                                    class="flex items-center justify-center w-8 h-8 rounded-lg hover:bg-red-50 dark:hover:bg-red-500/10 text-red-600 dark:text-red-400"
-                                    type="button">
-                                    <span class="material-symbols-outlined text-xl">delete</span>
-                                </button>
-                            </div>
-                            <button
-                                type="button"
-                                onclick="toggleDishAvailability(${dish.id}, ${dish.is_active ? "true" : "false"})"
-                                class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold
-                                       ${dish.is_active
-                        ? "bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-300"
-                        : "bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300"}">
-                                <span class="w-2 h-2 rounded-full ${dish.is_active ? "bg-green-500" : "bg-gray-400"}"></span>
-                                <span>${dish.is_active ? "Доступно" : "Недоступно"}</span>
-                            </button>
-                        </div>
-                    </div>
-                `;
-                grid.appendChild(card);
-            });
-        }
-
-        // ========== ПОИСК (с учётом категорий) ==========
-        function setupSearch() {
-            const input = document.getElementById("searchInput");
-            if (!input) return;
-
-            input.addEventListener("input", () => {
-                const q = input.value.trim().toLowerCase();
-
-                const base = activeCategoryId === null
-                    ? allDishes
-                    : allDishes.filter(d => d.category_id === activeCategoryId);
-
-                if (!q) {
-                    renderDishes(base);
-                    return;
-                }
-
-                const filtered = base.filter(d =>
-                    (d.name || "").toLowerCase().includes(q) ||
-                    (d.description || "").toLowerCase().includes(q)
-                );
-                renderDishes(filtered);
-            });
         }
 
         // ========== ТЕМА ==========

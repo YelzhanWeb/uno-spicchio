@@ -22,9 +22,8 @@ import (
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
-// добавь ЭТО:
+// убираем стандартную дату/время, чтобы не было дубля с нашим логгером
 func init() {
-	// убираем стандартную дату/время, чтобы не было дубля
 	log.SetFlags(0)
 }
 
@@ -99,6 +98,7 @@ func main() {
 	ingredientService := usecase.NewIngredientService(ingredientRepo)
 	supplyService := usecase.NewSupplyService(supplyRepo)
 	tableService := usecase.NewTableService(tableRepo)
+	categoryService := usecase.NewCategoryService(categoryRepo)
 	analyticsService := usecase.NewAnalyticsService(analyticsRepo)
 	logger.Success("✓ Services initialized")
 
@@ -112,8 +112,9 @@ func main() {
 		ingredientService,
 		supplyService,
 		tableService,
-		categoryRepo,
+		categoryService,
 		analyticsService,
+		storage, // MinIO как ports.FileStorage
 		tokenManager,
 	)
 
@@ -127,8 +128,8 @@ func main() {
 		logger.Warning("Static directory '%s' does not exist", staticDir)
 	} else {
 		logger.Info("Serving static files from: %s", staticDir)
-		fs := http.FileServer(http.Dir(staticDir))
-		r.Handle("/static/*", http.StripPrefix("/static/", fs))
+		fileServer := http.FileServer(http.Dir(staticDir))
+		r.Handle("/static/*", http.StripPrefix("/static/", fileServer))
 
 		// Redirect root to login page
 		r.Get("/", func(w http.ResponseWriter, r *http.Request) {
@@ -169,10 +170,10 @@ func main() {
 	logger.Warning("⚠ Shutting down server...")
 
 	// Graceful shutdown
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
-	if err := server.Shutdown(ctx); err != nil {
+	if err := server.Shutdown(shutdownCtx); err != nil {
 		logger.Fatal("Server forced to shutdown: %v", err)
 	}
 

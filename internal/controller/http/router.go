@@ -20,6 +20,7 @@ type Router struct {
 	tableHandler      *handlers.TableHandler
 	categoryHandler   *handlers.CategoryHandler
 	analyticsHandler  *handlers.AnalyticsHandler
+	fileHandler       *handlers.FileHandler
 	tokenManager      *jwt.TokenManager
 }
 
@@ -33,6 +34,7 @@ func NewRouter(
 	tableService ports.TableService,
 	categoryService ports.CategoryService,
 	analyticsService ports.AnalyticsService,
+	fileStorage ports.FileStorage,
 	tokenManager *jwt.TokenManager,
 ) *Router {
 	return &Router{
@@ -45,6 +47,7 @@ func NewRouter(
 		tableHandler:      handlers.NewTableHandler(tableService),
 		categoryHandler:   handlers.NewCategoryHandler(categoryService),
 		analyticsHandler:  handlers.NewAnalyticsHandler(analyticsService),
+		fileHandler:       handlers.NewFileHandler(fileStorage, "uno-spicchio"),
 		tokenManager:      tokenManager,
 	}
 }
@@ -183,6 +186,13 @@ func (rt *Router) Setup() *chi.Mux {
 			// Tables analytics
 			r.Get("/tables/utilization", rt.analyticsHandler.GetTableUtilization)
 
+		})
+		// File upload routes (Admin only)
+		r.Route("/api/uploads", func(r chi.Router) {
+			r.Use(middleware.RequireRole(domain.RoleAdmin))
+
+			// Загрузка картинок блюд
+			r.Post("/dishes", rt.fileHandler.UploadDishPhoto)
 		})
 
 	})
