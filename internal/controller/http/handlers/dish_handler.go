@@ -94,7 +94,6 @@ func (h *DishHandler) Update(w http.ResponseWriter, r *http.Request) {
 
 	response.Success(w, dish)
 }
-
 func (h *DishHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idStr)
@@ -104,6 +103,10 @@ func (h *DishHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := h.dishService.Delete(r.Context(), id); err != nil {
+		if err == domain.ErrDishNotFound {
+			response.NotFound(w, "dish not found")
+			return
+		}
 		response.InternalError(w, "failed to delete dish")
 		return
 	}

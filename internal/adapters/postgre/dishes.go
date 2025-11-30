@@ -122,11 +122,25 @@ func (r *DishRepository) Update(ctx context.Context, dish *domain.Dish) error {
 	)
 	return err
 }
-
 func (r *DishRepository) Delete(ctx context.Context, id int) error {
-	query := `DELETE FROM dishes WHERE id = $1`
-	_, err := r.db.ExecContext(ctx, query, id)
-	return err
+	// было:
+	// query := `DELETE FROM dishes WHERE id = $1`
+	// _, err := r.db.ExecContext(ctx, query, id)
+	// return err
+
+	query := `UPDATE dishes SET is_active = false WHERE id = $1`
+
+	res, err := r.db.ExecContext(ctx, query, id)
+	if err != nil {
+		return err
+	}
+
+	affected, _ := res.RowsAffected()
+	if affected == 0 {
+		return domain.ErrDishNotFound
+	}
+
+	return nil
 }
 
 func (r *DishRepository) GetIngredients(ctx context.Context, dishID int) ([]domain.DishIngredient, error) {

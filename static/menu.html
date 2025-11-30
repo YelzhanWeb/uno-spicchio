@@ -6,7 +6,6 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>UNO Spicchio — Управление меню</title>
 
-    <!-- Сразу применяем сохранённую тему до рендеринга -->
     <script>
         if (!localStorage.getItem('theme')) {
             localStorage.setItem('theme', 'light');
@@ -16,12 +15,10 @@
         }
     </script>
 
-    <!-- Шрифты и иконки -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet" />
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 
-    <!-- Tailwind -->
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script>
         tailwind.config = {
@@ -56,12 +53,16 @@
         .material-symbols-outlined {
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
+
+        .modal-backdrop {
+            backdrop-filter: blur(4px);
+        }
     </style>
 </head>
 
 <body class="font-display bg-background-light dark:bg-background-dark text-gray-800 dark:text-gray-200">
     <div class="flex h-screen">
-        <!-- SIDEBAR (единый для всего UNO Spicchio) -->
+        <!-- SIDEBAR -->
         <aside
             class="w-64 flex-shrink-0 bg-white dark:bg-gray-800 p-6 border-r border-gray-200 dark:border-gray-700 flex flex-col">
             <div class="mb-10 flex items-center gap-3">
@@ -70,55 +71,47 @@
             </div>
 
             <nav class="flex flex-col space-y-2 flex-1">
-                <!-- Заголовок блока -->
                 <div class="px-4 py-3 bg-red-50 dark:bg-gray-700 rounded-lg flex items-center gap-2">
                     <span class="material-symbols-outlined text-primary">storefront</span>
                     <p class="font-semibold text-primary">UNO Spicchio</p>
                 </div>
 
-                <!-- Все заказы -->
                 <a href="active-orders.html" class="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-gray-100
                       dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300">
                     <span class="material-symbols-outlined">receipt_long</span>
                     <span>Все заказы</span>
                 </a>
 
-                <!-- Создать заказ -->
                 <a id="createOrderLink" href="create-order.html" class="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-gray-100
                       dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300">
                     <span class="material-symbols-outlined">add_shopping_cart</span>
                     <span>Создать заказ</span>
                 </a>
 
-                <!-- Кухня -->
                 <a id="chefLink" href="chef-orders.html" class="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-gray-100
                       dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300">
                     <span class="material-symbols-outlined">restaurant</span>
                     <span>Кухня</span>
                 </a>
 
-                <!-- Сотрудники -->
                 <a id="employeesLink" href="employees.html" class="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-gray-100
                       dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300">
                     <span class="material-symbols-outlined text-lg">group</span>
                     <span>Сотрудники</span>
                 </a>
 
-                <!-- Меню (активная) -->
                 <a id="menuLink" href="menu.html" class="flex items-center gap-2 px-4 py-3 bg-red-100/50 dark:bg-gray-700/50
                       rounded-lg font-medium text-gray-900 dark:text-white">
                     <span class="material-symbols-outlined text-lg">restaurant_menu</span>
                     <span>Меню</span>
                 </a>
 
-                <!-- Аналитика -->
                 <a id="dashboardLink" href="dashboard.html" class="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-gray-100
                       dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300">
                     <span class="material-symbols-outlined">analytics</span>
                     <span>Аналитика</span>
                 </a>
 
-                <!-- Склад -->
                 <a id="inventoryLink" href="inventory.html" class="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-gray-100
                       dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300">
                     <span class="material-symbols-outlined">inventory_2</span>
@@ -140,7 +133,6 @@
                 </div>
 
                 <div class="flex items-center gap-4">
-                    <!-- Кнопка темы -->
                     <button id="theme-toggle" class="flex items-center gap-2 px-4 py-2 rounded-lg bg-white dark:bg-gray-900
                                border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-100
                                text-sm shadow-sm hover:bg-gray-100 dark:hover:bg-gray-800 transition">
@@ -180,8 +172,9 @@
                                 </div>
                             </div>
 
-                            <button class="mt-4 flex items-center justify-center gap-2 h-10 px-4 rounded-lg
-                                   bg-primary/10 dark:bg-primary/20 text-primary text-sm font-semibold">
+                            <button id="addCategoryBtn"
+                                class="mt-4 flex items-center justify-center gap-2 h-10 px-4 rounded-lg
+                                   bg-primary/10 dark:bg-primary/20 text-primary text-sm font-semibold hover:bg-primary/20 transition">
                                 <span class="material-symbols-outlined">add_circle</span>
                                 <span class="truncate">Добавить категорию</span>
                             </button>
@@ -200,16 +193,15 @@
                                     Управляйте карточками блюд и их доступностью в реальном времени.
                                 </p>
                             </div>
-                            <button class="flex items-center justify-center gap-2 h-10 px-4 rounded-lg
+                            <button id="addDishBtn" class="flex items-center justify-center gap-2 h-10 px-4 rounded-lg
                                    bg-primary text-white text-sm font-semibold shadow-sm hover:bg-red-600 transition">
                                 <span class="material-symbols-outlined text-lg">add</span>
                                 <span class="truncate">Добавить блюдо</span>
                             </button>
                         </div>
 
-                        <!-- Поиск + табы -->
+                        <!-- Поиск -->
                         <div class="flex flex-wrap items-center justify-between gap-4">
-                            <!-- Поиск -->
                             <div class="flex-1 min-w-[260px]">
                                 <label class="flex flex-col h-11 w-full">
                                     <div
@@ -226,24 +218,6 @@
                                     </div>
                                 </label>
                             </div>
-
-                            <!-- Табы Published / Draft / Archived (визуально, логика пока общая) -->
-                            <div class="pb-1 self-end">
-                                <div
-                                    class="flex border-b border-gray-200 dark:border-gray-700 gap-6 text-sm font-semibold">
-                                    <button class="pb-2 border-b-2 border-primary text-primary">
-                                        Published
-                                    </button>
-                                    <button
-                                        class="pb-2 border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-primary">
-                                        Drafts
-                                    </button>
-                                    <button
-                                        class="pb-2 border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-primary">
-                                        Archived
-                                    </button>
-                                </div>
-                            </div>
                         </div>
 
                         <!-- Карточки блюд -->
@@ -257,10 +231,106 @@
         </main>
     </div>
 
+    <!-- MODAL: Добавить/Редактировать блюдо -->
+    <div id="dishModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 modal-backdrop">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-md w-full mx-4 p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h2 id="dishModalTitle" class="text-lg font-semibold text-gray-900 dark:text-white">Добавить блюдо</h2>
+                <button id="closeDishModal"
+                    class="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                    <span class="material-symbols-outlined text-gray-600 dark:text-gray-300">close</span>
+                </button>
+            </div>
+
+            <form id="dishForm" class="space-y-4">
+                <input type="hidden" id="dishId" />
+
+                <div>
+                    <label class="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Название</label>
+                    <input id="dishName" type="text" required
+                        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary" />
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Категория</label>
+                    <select id="dishCategory" required
+                        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary">
+                        <option value="">Выберите категорию</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Описание</label>
+                    <textarea id="dishDescription" rows="3"
+                        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Цена (₸)</label>
+                    <input id="dishPrice" type="number" step="0.01" required
+                        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary" />
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <input type="checkbox" id="dishIsActive"
+                        class="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary" />
+                    <label for="dishIsActive" class="text-sm font-medium text-gray-700 dark:text-gray-300">Доступно для
+                        заказа</label>
+                </div>
+
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" id="cancelDishModal"
+                        class="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                        Отмена
+                    </button>
+                    <button type="submit"
+                        class="px-4 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-red-600 transition">
+                        Сохранить
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: Добавить категорию -->
+    <div id="categoryModal"
+        class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 modal-backdrop">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-md w-full mx-4 p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Добавить категорию</h2>
+                <button id="closeCategoryModal"
+                    class="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                    <span class="material-symbols-outlined text-gray-600 dark:text-gray-300">close</span>
+                </button>
+            </div>
+
+            <form id="categoryForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Название
+                        категории</label>
+                    <input id="categoryName" type="text" required
+                        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary" />
+                </div>
+
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" id="cancelCategoryModal"
+                        class="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                        Отмена
+                    </button>
+                    <button type="submit"
+                        class="px-4 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-red-600 transition">
+                        Создать
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
         const API_BASE_URL = "http://localhost:8080/api";
         let authToken = "";
         let allDishes = [];
+        let allCategories = [];
         let activeCategoryId = null;
 
         function checkAuth() {
@@ -278,59 +348,92 @@
             window.location.href = "login.html";
         }
 
-        function renderCategories(categories) {
+        // ========== КАТЕГОРИИ ==========
+        async function loadCategories() {
+            try {
+                const res = await fetch(`${API_BASE_URL}/categories`, {
+                    headers: { "Authorization": `Bearer ${authToken}` }
+                });
+                if (!res.ok) throw new Error("Failed to load categories");
+                const data = await res.json();
+                allCategories = Array.isArray(data) ? data : (data.data || []);
+                renderCategories();
+                fillCategorySelect();
+            } catch (err) {
+                console.error(err);
+                alert("Ошибка загрузки категорий");
+            }
+        }
+
+        function renderCategories() {
             const container = document.getElementById("categoryList");
             container.innerHTML = "";
 
-            // "Все блюда"
             const allItem = document.createElement("button");
             allItem.type = "button";
             allItem.dataset.categoryId = "";
-            allItem.className =
-                "flex items-center gap-3 px-3 py-2 rounded-lg w-full text-left bg-red-100/60 dark:bg-gray-700/60 text-primary text-sm font-semibold";
+            allItem.className = activeCategoryId === null
+                ? "flex items-center gap-3 px-3 py-2 rounded-lg w-full text-left bg-red-100/60 dark:bg-gray-700/60 text-primary text-sm font-semibold"
+                : "flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer w-full text-left text-gray-700 dark:text-gray-200 text-sm font-medium";
             allItem.innerHTML = `
-            <span class="material-symbols-outlined text-primary text-xl">restaurant_menu</span>
-            <span>Все блюда</span>
-        `;
+                <span class="material-symbols-outlined text-xl">restaurant_menu</span>
+                <span>Все блюда</span>
+            `;
             allItem.addEventListener("click", () => loadDishes(null));
             container.appendChild(allItem);
 
-            // Остальные категории
-            categories.forEach(cat => {
+            allCategories.forEach(cat => {
                 const btn = document.createElement("button");
                 btn.type = "button";
                 btn.dataset.categoryId = cat.id;
-                btn.className =
-                    "flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer w-full text-left";
+                const isActive = activeCategoryId === cat.id;
+                btn.className = isActive
+                    ? "flex items-center gap-3 px-3 py-2 rounded-lg bg-red-100/60 dark:bg-gray-700/60 text-primary w-full text-left text-sm font-semibold"
+                    : "flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer w-full text-left text-gray-700 dark:text-gray-200 text-sm font-medium";
                 btn.innerHTML = `
-                <span class="material-symbols-outlined text-gray-700 dark:text-gray-200 text-xl">
-                    ${cat.icon || "ramen_dining"}
-                </span>
-                <span class="text-sm font-medium text-gray-700 dark:text-gray-200">
-                    ${cat.name}
-                </span>
-            `;
+                    <span class="material-symbols-outlined text-xl">ramen_dining</span>
+                    <span>${cat.name}</span>
+                `;
                 btn.addEventListener("click", () => loadDishes(cat.id));
                 container.appendChild(btn);
             });
-
-            highlightActiveCategory();
         }
 
-        function highlightActiveCategory() {
-            const buttons = document.querySelectorAll("#categoryList button");
-            buttons.forEach(btn => {
-                const id = btn.dataset.categoryId || null;
-                const isActive =
-                    (activeCategoryId === null && id === "") ||
-                    (activeCategoryId !== null && id && parseInt(id, 10) === activeCategoryId);
-
-                if (isActive) {
-                    btn.classList.add("bg-red-100/60", "dark:bg-gray-700/60", "text-primary");
-                } else {
-                    btn.classList.remove("bg-red-100/60", "dark:bg-gray-700/60", "text-primary");
-                }
+        function fillCategorySelect() {
+            const select = document.getElementById("dishCategory");
+            select.innerHTML = '<option value="">Выберите категорию</option>';
+            allCategories.forEach(cat => {
+                const opt = document.createElement("option");
+                opt.value = cat.id;
+                opt.textContent = cat.name;
+                select.appendChild(opt);
             });
+        }
+
+        // ========== БЛЮДА ==========
+        async function loadDishes(categoryId = null) {
+            try {
+                activeCategoryId = categoryId === null ? null : Number(categoryId);
+                renderCategories();
+
+                let url = `${API_BASE_URL}/dishes`;
+                const res = await fetch(url, {
+                    headers: { "Authorization": `Bearer ${authToken}` }
+                });
+                if (!res.ok) throw new Error("Failed to load dishes");
+                const data = await res.json();
+                allDishes = Array.isArray(data) ? data : (data.data || []);
+
+                // Фильтр по категории
+                const filtered = activeCategoryId === null
+                    ? allDishes
+                    : allDishes.filter(d => d.category_id === activeCategoryId);
+
+                renderDishes(filtered);
+            } catch (err) {
+                console.error(err);
+                alert("Ошибка загрузки блюд");
+            }
         }
 
         function renderDishes(list) {
@@ -339,113 +442,46 @@
 
             if (!list.length) {
                 grid.innerHTML = `
-                <div class="col-span-full text-center text-gray-500 dark:text-gray-400 py-10">
-                    Блюда не найдены по текущему фильтру.
-                </div>
-            `;
+                    <div class="col-span-full text-center text-gray-500 dark:text-gray-400 py-10">
+                        Блюда не найдены по текущему фильтру.
+                    </div>
+                `;
                 return;
             }
 
             list.forEach(dish => {
                 const card = document.createElement("div");
-                card.className =
-                    "flex flex-col rounded-xl bg-white dark:bg-gray-800 shadow-sm overflow-hidden border border-gray-200 dark:border-gray-700";
+                card.className = "flex flex-col rounded-xl bg-white dark:bg-gray-800 shadow-sm overflow-hidden border border-gray-200 dark:border-gray-700";
 
-                const price = typeof dish.price === "number"
-                    ? dish.price.toFixed(2)
-                    : parseFloat(dish.price || 0).toFixed(2);
+                const price = typeof dish.price === "number" ? dish.price.toFixed(2) : parseFloat(dish.price || 0).toFixed(2);
 
                 card.innerHTML = `
-                <div class="w-full h-40 bg-cover bg-center"
-                     style="background-image: url('${dish.image_url || ""}')"></div>
-                <div class="p-4 flex flex-col flex-1">
-                    <div class="flex justify-between items-start mb-2">
-                        <h3 class="text-gray-900 dark:text-white font-semibold text-lg">
-                            ${dish.name}
-                        </h3>
-                        <p class="text-primary font-bold text-lg">
-                            €${price}
-                        </p>
-                    </div>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-4 flex-1">
-                        ${dish.description || ""}
-                    </p>
-                    <div class="flex items-center justify-between mt-auto">
-                        <div class="flex items-center gap-2">
-                            <button
-                                class="flex items-center justify-center w-8 h-8 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200"
-                                type="button">
-                                <span class="material-symbols-outlined text-xl">edit</span>
-                            </button>
-                            <button
-                                class="flex items-center justify-center w-8 h-8 rounded-lg hover:bg-red-50 dark:hover:bg-red-500/10 text-red-600 dark:text-red-400"
-                                type="button">
-                                <span class="material-symbols-outlined text-xl">delete</span>
-                            </button>
+                    <div class="w-full h-40 bg-cover bg-center bg-gray-200 dark:bg-gray-700"></div>
+                    <div class="p-4 flex flex-col flex-1">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-gray-900 dark:text-white font-semibold text-lg">${dish.name}</h3>
+                            <p class="text-primary font-bold text-lg">${price} ₸</p>
                         </div>
-                        <div class="flex items-center gap-2">
-                            <p class="text-sm text-gray-500 dark:text-gray-400">
-                                ${dish.available ? "В наличии" : "Недоступно"}
-                            </p>
-                            <!-- Здесь позже можно сделать toggle с PATCH на бэкенд -->
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mb-4 flex-1">${dish.description || ""}</p>
+                        <div class="flex items-center justify-between mt-auto">
+                            <div class="flex items-center gap-2">
+                                <button onclick="editDish(${dish.id})" class="flex items-center justify-center w-8 h-8 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200" type="button">
+                                    <span class="material-symbols-outlined text-xl">edit</span>
+                                </button>
+                                <button onclick="deleteDish(${dish.id})" class="flex items-center justify-center w-8 h-8 rounded-lg hover:bg-red-50 dark:hover:bg-red-500/10 text-red-600 dark:text-red-400" type="button">
+                                    <span class="material-symbols-outlined text-xl">delete</span>
+                                </button>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <p class="text-sm ${dish.is_active ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-400'}">
+                                    ${dish.is_active ? "Доступно" : "Недоступно"}
+                                </p>
+                            </div>
                         </div>
                     </div>
-                </div>
-            `;
+                `;
                 grid.appendChild(card);
             });
-        }
-
-        async function loadCategories() {
-            try {
-                const res = await fetch(`${API_BASE_URL}/categories`, {
-                    headers: {
-                        "Authorization": `Bearer ${authToken}`
-                    }
-                });
-                if (!res.ok) throw new Error("Failed to load categories");
-                const data = await res.json();
-                const categories = Array.isArray(data) ? data : (data.data || []);
-                renderCategories(categories);
-            } catch (err) {
-                console.error(err);
-                const container = document.getElementById("categoryList");
-                container.innerHTML = `
-                <div class="text-sm text-red-600 dark:text-red-400 px-3">
-                    Ошибка загрузки категорий
-                </div>
-            `;
-            }
-        }
-
-        async function loadDishes(categoryId = null) {
-            try {
-                activeCategoryId = categoryId === null ? null : Number(categoryId);
-                highlightActiveCategory();
-
-                let url = `${API_BASE_URL}/dishes`;
-                if (categoryId !== null) {
-                    url += `?category=${categoryId}`;
-                }
-
-                const res = await fetch(url, {
-                    headers: {
-                        "Authorization": `Bearer ${authToken}`
-                    }
-                });
-                if (!res.ok) throw new Error("Failed to load dishes");
-                const data = await res.json();
-                allDishes = Array.isArray(data) ? data : (data.data || []);
-                renderDishes(allDishes);
-            } catch (err) {
-                console.error(err);
-                const grid = document.getElementById("dishesGrid");
-                grid.innerHTML = `
-                <div class="col-span-full text-center text-red-600 dark:text-red-400 py-10">
-                    Ошибка загрузки блюд
-                </div>
-            `;
-            }
         }
 
         function setupSearch() {
@@ -455,10 +491,265 @@
             input.addEventListener("input", () => {
                 const q = input.value.trim().toLowerCase();
                 if (!q) {
-                    renderDishes(allDishes);
+                    const filtered = activeCategoryId === null
+                        ? allDishes
+                        : allDishes.filter(d => d.category_id === activeCategoryId);
+                    renderDishes(filtered);
                     return;
                 }
-                const filtered = allDishes.filter(d =>
+                const baseFiltered = activeCategoryId === null
+                    ? allDishes
+                    : allDishes.filter(d => d.category_id === activeCategoryId);
+                const searchFiltered = baseFiltered.filter(d =>
+                    (d.name || "").toLowerCase().includes(q) ||
+                    (d.description || "").toLowerCase().includes(q)
+                );
+                renderDishes(searchFiltered);
+            });
+        }
+
+        // ========== МОДАЛКИ ==========
+        const dishModal = document.getElementById("dishModal");
+        const categoryModal = document.getElementById("categoryModal");
+
+        document.getElementById("addDishBtn").addEventListener("click", () => {
+            document.getElementById("dishModalTitle").textContent = "Добавить блюдо";
+            document.getElementById("dishForm").reset();
+            document.getElementById("dishId").value = "";
+            document.getElementById("dishIsActive").checked = true;
+            dishModal.classList.remove("hidden");
+        });
+
+        document.getElementById("closeDishModal").addEventListener("click", () => dishModal.classList.add("hidden"));
+        document.getElementById("cancelDishModal").addEventListener("click", () => dishModal.classList.add("hidden"));
+
+        document.getElementById("addCategoryBtn").addEventListener("click", () => {
+            document.getElementById("categoryForm").reset();
+            categoryModal.classList.remove("hidden");
+        });
+
+        document.getElementById("closeCategoryModal").addEventListener("click", () => categoryModal.classList.add("hidden"));
+        document.getElementById("cancelCategoryModal").addEventListener("click", () => categoryModal.classList.add("hidden"));
+
+        // ========== CRUD БЛЮДА ==========
+        document.getElementById("dishForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const id = document.getElementById("dishId").value;
+            const dish = {
+                name: document.getElementById("dishName").value,
+                category_id: parseInt(document.getElementById("dishCategory").value),
+                description: document.getElementById("dishDescription").value,
+                price: parseFloat(document.getElementById("dishPrice").value),
+                is_active: document.getElementById("dishIsActive").checked
+            };
+
+            try {
+                const url = id ? `${API_BASE_URL}/dishes/${id}` : `${API_BASE_URL}/dishes`;
+                const method = id ? "PUT" : "POST";
+
+                const res = await fetch(url, {
+                    method,
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify(dish)
+                });
+
+                if (!res.ok) throw new Error("Failed to save dish");
+
+                dishModal.classList.add("hidden");
+                await loadDishes(activeCategoryId);
+                alert(id ? "Блюдо обновлено" : "Блюдо создано");
+            } catch (err) {
+                console.error(err);
+                alert("Ошибка сохранения блюда");
+            }
+        });
+
+        async function editDish(id) {
+            const dish = allDishes.find(d => d.id === id);
+            if (!dish) return;
+
+            document.getElementById("dishModalTitle").textContent = "Редактировать блюдо";
+            document.getElementById("dishId").value = dish.id;
+            document.getElementById("dishName").value = dish.name;
+            document.getElementById("dishCategory").value = dish.category_id;
+            document.getElementById("dishDescription").value = dish.description || "";
+            document.getElementById("dishPrice").value = dish.price;
+            document.getElementById("dishIsActive").checked = dish.is_active;
+
+            dishModal.classList.remove("hidden");
+        }
+        async function deleteDish(id) {
+            if (!confirm("Удалить это блюдо? Это действие нельзя отменить.")) {
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API_BASE_URL}/dishes/${id}`, {
+                    method: "DELETE",
+                    headers: {
+                        "Authorization": `Bearer ${authToken}`,
+                    },
+                });
+
+                if (!res.ok) throw new Error("Failed to delete dish");
+
+                await loadDishes(activeCategoryId);
+                alert("Блюдо удалено");
+            } catch (err) {
+                console.error(err);
+                alert("Ошибка удаления блюда");
+            }
+        }
+
+        // ========== CRUD КАТЕГОРИИ ==========
+        document.getElementById("categoryForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const nameInput = document.getElementById("categoryName");
+            const name = nameInput.value.trim();
+            if (!name) return;
+
+            const payload = { name };
+
+            try {
+                const res = await fetch(`${API_BASE_URL}/categories`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${authToken}`,
+                    },
+                    body: JSON.stringify(payload),
+                });
+
+                if (!res.ok) throw new Error("Failed to create category");
+
+                const created = await res.json();
+                const newCat = Array.isArray(created) ? created[0] : (created.data || created);
+
+                // Обновляем локальный список и UI
+                allCategories.push(newCat);
+                renderCategories();
+                fillCategorySelect();
+
+                categoryModal.classList.add("hidden");
+                alert("Категория создана");
+            } catch (err) {
+                console.error(err);
+                alert("Ошибка создания категории");
+            }
+        });
+
+        // ========== ПЕРЕКЛЮЧЕНИЕ ДОСТУПНОСТИ БЛЮДА ==========
+        async function toggleDishAvailability(id, currentState) {
+            try {
+                const res = await fetch(`${API_BASE_URL}/dishes/${id}/toggle`, {
+                    method: "PATCH",
+                    headers: {
+                        "Authorization": `Bearer ${authToken}`,
+                    },
+                });
+
+                if (!res.ok) throw new Error("Failed to toggle dish");
+
+                // Обновляем локальные данные
+                const dish = allDishes.find(d => d.id === id);
+                if (dish) {
+                    dish.is_active = !currentState;
+                }
+
+                // Перерисовываем с учётом текущего фильтра
+                const filtered = activeCategoryId === null
+                    ? allDishes
+                    : allDishes.filter(d => d.category_id === activeCategoryId);
+                renderDishes(filtered);
+            } catch (err) {
+                console.error(err);
+                alert("Ошибка изменения доступности блюда");
+            }
+        }
+
+        // Переопределяем renderDishes, чтобы добавить переключатель доступности
+        function renderDishes(list) {
+            const grid = document.getElementById("dishesGrid");
+            grid.innerHTML = "";
+
+            if (!list.length) {
+                grid.innerHTML = `
+                    <div class="col-span-full text-center text-gray-500 dark:text-gray-400 py-10">
+                        Блюда не найдены по текущему фильтру.
+                    </div>
+                `;
+                return;
+            }
+
+            list.forEach(dish => {
+                const card = document.createElement("div");
+                card.className = "flex flex-col rounded-xl bg-white dark:bg-gray-800 shadow-sm overflow-hidden border border-gray-200 dark:border-gray-700";
+
+                const price = typeof dish.price === "number"
+                    ? dish.price.toFixed(2)
+                    : parseFloat(dish.price || 0).toFixed(2);
+
+                card.innerHTML = `
+                    <div class="w-full h-40 bg-cover bg-center bg-gray-200 dark:bg-gray-700"></div>
+                    <div class="p-4 flex flex-col flex-1">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-gray-900 dark:text-white font-semibold text-lg">${dish.name}</h3>
+                            <p class="text-primary font-bold text-lg">${price} ₸</p>
+                        </div>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mb-4 flex-1">${dish.description || ""}</p>
+                        <div class="flex items-center justify-between mt-auto">
+                            <div class="flex items-center gap-2">
+                                <button onclick="editDish(${dish.id})"
+                                    class="flex items-center justify-center w-8 h-8 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200"
+                                    type="button">
+                                    <span class="material-symbols-outlined text-xl">edit</span>
+                                </button>
+                                <button onclick="deleteDish(${dish.id})"
+                                    class="flex items-center justify-center w-8 h-8 rounded-lg hover:bg-red-50 dark:hover:bg-red-500/10 text-red-600 dark:text-red-400"
+                                    type="button">
+                                    <span class="material-symbols-outlined text-xl">delete</span>
+                                </button>
+                            </div>
+                            <button
+                                type="button"
+                                onclick="toggleDishAvailability(${dish.id}, ${dish.is_active ? "true" : "false"})"
+                                class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold
+                                       ${dish.is_active
+                        ? "bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-300"
+                        : "bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300"}">
+                                <span class="w-2 h-2 rounded-full ${dish.is_active ? "bg-green-500" : "bg-gray-400"}"></span>
+                                <span>${dish.is_active ? "Доступно" : "Недоступно"}</span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // ========== ПОИСК (с учётом категорий) ==========
+        function setupSearch() {
+            const input = document.getElementById("searchInput");
+            if (!input) return;
+
+            input.addEventListener("input", () => {
+                const q = input.value.trim().toLowerCase();
+
+                const base = activeCategoryId === null
+                    ? allDishes
+                    : allDishes.filter(d => d.category_id === activeCategoryId);
+
+                if (!q) {
+                    renderDishes(base);
+                    return;
+                }
+
+                const filtered = base.filter(d =>
                     (d.name || "").toLowerCase().includes(q) ||
                     (d.description || "").toLowerCase().includes(q)
                 );
@@ -466,35 +757,36 @@
             });
         }
 
-        // Тема (как на других страницах)
-        const themeToggleBtn = document.getElementById('theme-toggle');
-        const themeToggleText = document.getElementById('theme-toggle-text');
-        const themeIcon = document.getElementById('theme-icon');
+        // ========== ТЕМА ==========
+        const themeToggleBtn = document.getElementById("theme-toggle");
+        const themeToggleText = document.getElementById("theme-toggle-text");
+        const themeIcon = document.getElementById("theme-icon");
 
         function applyTheme(mode) {
-            if (mode === 'dark') {
-                document.documentElement.classList.add('dark');
-                if (themeToggleText) themeToggleText.textContent = 'Dark';
-                if (themeIcon) themeIcon.textContent = 'dark_mode';
+            if (mode === "dark") {
+                document.documentElement.classList.add("dark");
+                if (themeToggleText) themeToggleText.textContent = "Dark";
+                if (themeIcon) themeIcon.textContent = "dark_mode";
             } else {
-                document.documentElement.classList.remove('dark');
-                if (themeToggleText) themeToggleText.textContent = 'Light';
-                if (themeIcon) themeIcon.textContent = 'light_mode';
+                document.documentElement.classList.remove("dark");
+                if (themeToggleText) themeToggleText.textContent = "Light";
+                if (themeIcon) themeIcon.textContent = "light_mode";
             }
         }
 
-        const savedTheme = localStorage.getItem('theme') || 'light';
+        const savedTheme = localStorage.getItem("theme") || "light";
         applyTheme(savedTheme);
 
         if (themeToggleBtn) {
-            themeToggleBtn.addEventListener('click', () => {
-                const isDark = document.documentElement.classList.contains('dark');
-                const newTheme = isDark ? 'light' : 'dark';
-                localStorage.setItem('theme', newTheme);
+            themeToggleBtn.addEventListener("click", () => {
+                const isDark = document.documentElement.classList.contains("dark");
+                const newTheme = isDark ? "light" : "dark";
+                localStorage.setItem("theme", newTheme);
                 applyTheme(newTheme);
             });
         }
 
+        // ========== ИНИЦИАЛИЗАЦИЯ ==========
         document.addEventListener("DOMContentLoaded", async () => {
             if (!checkAuth()) return;
             await loadCategories();
