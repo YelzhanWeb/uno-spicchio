@@ -1,19 +1,27 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru" class="light">
 
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>UNO Spicchio – Staff Management</title>
+    <title>UNO Spicchio — Сотрудники</title>
 
-    <link href="https://fonts.googleapis.com" rel="preconnect" />
-    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet" />
+    <!-- Тема по умолчанию -->
+    <script>
+        if (!localStorage.getItem("theme")) {
+            localStorage.setItem("theme", "light");
+        }
+        if (localStorage.getItem("theme") === "dark") {
+            document.documentElement.classList.add("dark");
+        }
+    </script>
 
-    <!-- Material Icons (как на других страницах) -->
+    <!-- Шрифты и иконки -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet" />
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 
+    <!-- Tailwind -->
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script>
         tailwind.config = {
@@ -21,18 +29,9 @@
             theme: {
                 extend: {
                     colors: {
-                        primary: "#E53E3E",                    /* красный, как в других страницах */
+                        primary: "#E53E3E",
                         "background-light": "#F9FAFB",
                         "background-dark": "#111827",
-                        "text-light": "#1F2933",
-                        "text-dark": "#F9FAFB",
-                        "muted-light": "#6B7280",
-                        "muted-dark": "#9CA3AF",
-                        "surface-light": "#FFFFFF",
-                        "surface-dark": "#1F2937",
-                        "border-light": "#E5E7EB",
-                        "border-dark": "#374151",
-                        success: "#16A34A",
                     },
                     fontFamily: {
                         display: ["Inter", "sans-serif"],
@@ -43,218 +42,677 @@
                         xl: "1rem",
                         full: "9999px",
                     },
-                    boxShadow: {
-                        soft: "0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05)",
-                        "soft-lg":
-                            "0 10px 15px -3px rgba(0, 0, 0, 0.06), 0 4px 6px -4px rgba(0, 0, 0, 0.05)",
-                    },
                 },
             },
         };
     </script>
 
     <style>
-        .glassmorphism {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-        }
-
-        .dark .glassmorphism {
-            background: rgba(31, 41, 55, 0.6);
+        body {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         .material-symbols-outlined {
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
+
+        .badge {
+            @apply inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full text-xs font-medium;
+        }
     </style>
 </head>
 
-<body class="font-display bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark">
-    <div class="flex min-h-screen">
-        <!-- Sidebar -->
+<body class="font-display bg-background-light dark:bg-background-dark text-gray-800 dark:text-gray-200">
+    <div class="flex h-screen">
+        <!-- SIDEBAR (тот же, что в menu.html) -->
         <aside
             class="w-64 flex-shrink-0 bg-white dark:bg-gray-800 p-6 border-r border-gray-200 dark:border-gray-700 flex flex-col">
-            <!-- Верх: бренд -->
-            <div class="mb-10">
+            <div class="mb-10 flex items-center gap-3">
+                <span class="material-symbols-outlined text-primary text-3xl">restaurant_menu</span>
                 <h1 class="text-xl font-bold text-gray-900 dark:text-white">UNO Spicchio</h1>
-                <p class="text-sm text-gray-500 dark:text-gray-400">Admin Panel</p>
             </div>
 
-            <!-- Вкладки -->
             <nav class="flex flex-col space-y-2 flex-1">
-                <!-- Карточка "UNO Spicchio" -->
-                <div class="px-4 py-3 bg-red-50 dark:bg-gray-700 rounded-lg">
+                <div class="px-4 py-3 bg-red-50 dark:bg-gray-700 rounded-lg flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">storefront</span>
                     <p class="font-semibold text-primary">UNO Spicchio</p>
                 </div>
 
-                <!-- Все заказы -->
-                <a href="active-orders.html" class="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700
-                  text-gray-600 dark:text-gray-300">
+                <a href="active-orders.html" class="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-gray-100
+                dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300">
                     <span class="material-symbols-outlined">receipt_long</span>
                     <span>Все заказы</span>
                 </a>
 
-                <!-- Создать заказ -->
-                <a id="createOrderLink" href="create-order.html" class="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700
-                  text-gray-600 dark:text-gray-300">
+                <a id="createOrderLink" href="create-order.html" class="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-gray-100
+                dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300">
                     <span class="material-symbols-outlined">add_shopping_cart</span>
                     <span>Создать заказ</span>
                 </a>
 
-                <!-- Кухня -->
-                <a id="chefLink" href="chef-orders.html" class="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700
-                  text-gray-600 dark:text-gray-300">
+                <a id="chefLink" href="chef-orders.html" class="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-gray-100
+                dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300">
                     <span class="material-symbols-outlined">restaurant</span>
                     <span>Кухня</span>
                 </a>
-                <!-- Сотрудники -->
-                <a id="employeesLink" href="employees.html"
-                    class="flex items-center gap-2 px-4 py-3 bg-red-100/50 dark:bg-gray-700/50 rounded-lg font-medium text-gray-900 dark:text-white">
-                    <span class="material-symbols-outlined">group</span>
+
+                <a id="employeesLink" href="employees.html" class="flex items-center gap-2 px-4 py-3 bg-red-100/50 dark:bg-gray-700/50
+                rounded-lg font-medium text-gray-900 dark:text-white">
+                    <span class="material-symbols-outlined text-lg">group</span>
                     <span>Сотрудники</span>
                 </a>
 
-                <!-- Меню -->
-                <a id="menuLink" href="menu.html" class="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700
-                  text-gray-600 dark:text-gray-300">
-                    <span class="material-symbols-outlined">restaurant_menu</span>
+                <a id="menuLink" href="menu.html" class="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-gray-100
+                dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300">
+                    <span class="material-symbols-outlined text-lg">restaurant_menu</span>
                     <span>Меню</span>
                 </a>
-                <!-- Аналитика (АКТИВНАЯ) -->
-                <a id="dashboardLink" href="dashboard.html" class="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700
-                  font-medium text-gray-900 dark:text-white">
+
+                <a id="dashboardLink" href="dashboard.html" class="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-gray-100
+                dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300">
                     <span class="material-symbols-outlined">analytics</span>
                     <span>Аналитика</span>
                 </a>
-                <!-- Склад -->
-                <a id="inventoryLink" href="inventory.html" class="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700
-                  text-gray-600 dark:text-gray-300">
+
+                <a id="inventoryLink" href="inventory.html" class="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-gray-100
+                dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300">
                     <span class="material-symbols-outlined">inventory_2</span>
                     <span>Склад</span>
                 </a>
-
-
             </nav>
-
-            <!-- Низ сайдбара -->
-            <div class="mt-6">
-                <div class="border-t border-gray-200 dark:border-gray-700 pt-3 space-y-3 text-sm">
-
-                    <!-- Блок пользователя, чтобы JS мог подставить имя и роль -->
-                    <div class="px-3">
-                        <p id="userFullName" class="font-semibold text-gray-900 dark:text-white">Loading...</p>
-                        <p id="userRole" class="text-xs text-gray-500 dark:text-gray-400">...</p>
-                    </div>
-
-                    <!-- Help -->
-                    <a href="#" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 dark:text-gray-400
-                      hover:bg-gray-100 dark:hover:bg-gray-700">
-                        <span class="material-symbols-outlined text-xl">help</span>
-                        <span>Help</span>
-                    </a>
-
-                    <!-- Log Out -->
-                    <a href="#" onclick="logout(); return false;" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 dark:text-gray-400
-                      hover:bg-gray-100 dark:hover:bg-gray-700">
-                        <span class="material-symbols-outlined text-xl">logout</span>
-                        <span>Log Out</span>
-                    </a>
-                </div>
-            </div>
         </aside>
 
-        <!-- Основной контент -->
-        <main class="flex-1 p-8">
-            <h1 class="text-4xl font-bold text-text-light dark:text-text-dark mb-8">Staff Management</h1>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div
-                    class="bg-surface-light dark:bg-surface-dark p-6 rounded-lg shadow-soft border border-border-light dark:border-white/5">
-                    <p class="text-base font-medium text-muted-light dark:text-muted-dark">Active Staff</p>
-                    <p class="text-3xl font-bold text-text-light dark:text-text-dark mt-2">15</p>
-                </div>
-                <div
-                    class="bg-surface-light dark:bg-surface-dark p-6 rounded-lg shadow-soft border border-border-light dark:border-white/5">
-                    <p class="text-base font-medium text-muted-light dark:text-muted-dark">On Duty</p>
-                    <p class="text-3xl font-bold text-text-light dark:text-text-dark mt-2">8</p>
-                </div>
-                <div
-                    class="bg-surface-light dark:bg-surface-dark p-6 rounded-lg shadow-soft border border-border-light dark:border-white/5">
-                    <p class="text-base font-medium text-muted-light dark:text-muted-dark">Pending Requests</p>
-                    <p class="text-3xl font-bold text-text-light dark:text-text-dark mt-2">3</p>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div class="lg:col-span-2">
-                    <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-2xl font-bold text-text-light dark:text-text-dark">Staff Schedule</h2>
-                        <button
-                            class="bg-primary text-white px-4 py-2 rounded-lg font-medium hover:bg-primary/90 transition-colors flex items-center gap-2">
-                            <svg class="lucide lucide-calendar-plus" xmlns="http://www.w3.org/2000/svg" width="20"
-                                height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M8 2v4"></path>
-                                <path d="M16 2v4"></path>
-                                <path d="M21 13V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h8"></path>
-                                <path d="M3 10h18"></path>
-                                <path d="M16 19h6"></path>
-                                <path d="M19 16v6"></path>
-                            </svg>
-                            New Shift
-                        </button>
-                    </div>
-
-                    <div
-                        class="overflow-x-auto bg-surface-light dark:bg-surface-dark rounded-lg shadow-soft-lg border border-border-light dark:border-white/5">
-                        <!-- Таблица расписания (оставлена как была) -->
-                        <!-- ... остальной твой контент без изменений ... -->
-                    </div>
-                </div>
-
+        <!-- MAIN -->
+        <main class="flex-1 flex flex-col">
+            <!-- HEADER -->
+            <header
+                class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
                 <div>
-                    <h2 class="text-2xl font-bold text-text-light dark:text-text-dark mb-4">Performance</h2>
-                    <div class="space-y-4">
+                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Сотрудники</h1>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                        Управление аккаунтами, ролями и доступами персонала.
+                    </p>
+                </div>
+
+                <div class="flex items-center gap-4">
+                    <button id="theme-toggle" class="flex items-center gap-2 px-4 py-2 rounded-lg bg-white dark:bg-gray-900
+                       border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-100
+                       text-sm shadow-sm hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+                        <span class="material-symbols-outlined" id="theme-icon">light_mode</span>
+                        <span id="theme-toggle-text">Light</span>
+                    </button>
+
+                    <button onclick="logout()"
+                        class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary transition-colors">
+                        Выход
+                    </button>
+
+                    <div class="w-10 h-10 rounded-full bg-cover bg-center"
+                        style='background-image: url("https://i.pravatar.cc/40");'></div>
+                </div>
+            </header>
+
+            <!-- CONTENT -->
+            <section class="flex-1 p-6 lg:p-8 overflow-y-auto">
+                <div class="flex gap-8 max-w-7xl mx-auto">
+                    <!-- ЛЕВАЯ ЧАСТЬ: статистика + таблица -->
+                    <div class="w-full lg:w-3/5 xl:w-2/3 flex flex-col gap-6">
+                        <!-- Заголовок + кнопка -->
+                        <div class="flex flex-wrap justify-between items-center gap-4">
+                            <div>
+                                <p class="text-3xl lg:text-4xl font-black text-gray-900 dark:text-white leading-tight">
+                                    Управление персоналом
+                                </p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                    Добавляйте новых сотрудников, редактируйте роли и статусы.
+                                </p>
+                            </div>
+                            <button id="newUserBtn" class="flex items-center justify-center gap-2 h-10 px-4 rounded-lg
+                           bg-primary text-white text-sm font-semibold shadow-sm hover:bg-red-600 transition">
+                                <span class="material-symbols-outlined text-lg">add</span>
+                                <span class="truncate">Добавить сотрудника</span>
+                            </button>
+                        </div>
+
+                        <!-- Карточка: количество сотрудников -->
                         <div
-                            class="bg-surface-light dark:bg-surface-dark p-4 rounded-lg shadow-soft border border-border-light dark:border-white/5">
-                            <p class="font-semibold text-text-light dark:text-text-dark">Top Performer</p>
-                            <div class="flex items-center gap-3 mt-2">
-                                <img alt="Isabella Gallo" class="w-10 h-10 rounded-full object-cover"
-                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuDKMqhSsHHr5ljcbKsuw0y4Yp_a4p42rvP8X3J7XyUNDMkQeCuuJ9C9TWrPsZqJD50UnlwAyifK_Ua9T3VrjV1lg_Pc_2MQilAf3oWLppHuvpJnhklCHvoyJ6qsgmFwflAPxzS_rQDWmU2jzAfMa7rslN--B0tqM9h5ZN3ryLzRW8FYcrE-6sme8IUC6cA21geEr74H5k15ZhHxel2O3c173rryHdgF80urctL1a6R2e5Y1tN0q4Cw1d0Et6hXkgrvPxbWQaTs3gk8" />
-                                <div>
-                                    <p class="font-medium">Isabella Gallo</p>
-                                    <p class="text-sm text-muted-light dark:text-muted-dark">Highest sales this month
-                                    </p>
-                                </div>
+                            class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 flex items-center gap-6">
+                            <div
+                                class="flex items-center justify-center w-12 h-12 rounded-lg bg-primary/10 text-primary">
+                                <span class="material-symbols-outlined text-3xl">groups</span>
+                            </div>
+                            <div class="flex flex-col">
+                                <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Всего сотрудников</p>
+                                <p id="totalUsers" class="text-3xl font-bold text-gray-900 dark:text-white">0</p>
                             </div>
                         </div>
 
+                        <!-- Фильтры -->
+                        <div class="flex flex-col gap-4">
+                            <div class="flex-1 min-w-[260px]">
+                                <label class="flex flex-col h-11 w-full">
+                                    <div
+                                        class="flex w-full flex-1 items-stretch rounded-lg h-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+                                        <div
+                                            class="flex items-center justify-center pl-3 pr-2 text-gray-500 dark:text-gray-400">
+                                            <span class="material-symbols-outlined">search</span>
+                                        </div>
+                                        <input id="searchInput" class="form-input flex w-full min-w-0 flex-1 border-0 bg-transparent
+                                text-sm text-gray-900 dark:text-white focus:outline-none
+                                focus:ring-0 placeholder:text-gray-400 dark:placeholder:text-gray-500 px-2"
+                                            placeholder="Поиск по логину сотрудника..." />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="flex flex-wrap items-center gap-3">
+                                <select id="roleFilter" class="h-9 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900
+                             text-sm text-gray-800 dark:text-gray-100 px-3">
+                                    <option value="all">Роль: Все</option>
+                                    <option value="admin">Админ</option>
+                                    <option value="manager">Менеджер</option>
+                                    <option value="waiter">Официант</option>
+                                    <option value="cook">Повар</option>
+                                </select>
+
+                                <select id="statusFilter" class="h-9 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900
+                             text-sm text-gray-800 dark:text-gray-100 px-3">
+                                    <option value="all">Статус: Все</option>
+                                    <option value="active">Только активные</option>
+                                    <option value="inactive">Только неактивные</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Таблица сотрудников -->
                         <div
-                            class="bg-surface-light dark:bg-surface-dark p-4 rounded-lg shadow-soft border border-border-light dark:border-white/5">
-                            <p class="font-semibold text-text-light dark:text-text-dark">Payroll Integration</p>
-                            <p class="text-sm text-muted-light dark:text-muted-dark mt-2">
-                                Next payroll date:
-                                <span class="font-medium text-text-light dark:text-text-dark">Oct 31, 2023</span>
-                            </p>
-                            <button
-                                class="w-full mt-3 bg-primary/10 text-primary px-4 py-2 rounded-lg font-medium hover:bg-primary/20 transition-colors flex items-center justify-center gap-2">
-                                <svg class="lucide lucide-download-cloud" xmlns="http://www.w3.org/2000/svg" width="20"
-                                    height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                    stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242">
-                                    </path>
-                                    <path d="M12 12v9"></path>
-                                    <path d="m8 17 4 4 4-4"></path>
-                                </svg>
-                                Export Payroll
-                            </button>
+                            class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+                            <table class="w-full text-left">
+                                <thead
+                                    class="bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
+                                    <tr>
+                                        <th
+                                            class="p-4 text-xs font-semibold text-gray-500 dark:text-gray-400 tracking-wider uppercase">
+                                            Логин
+                                        </th>
+                                        <th
+                                            class="p-4 text-xs font-semibold text-gray-500 dark:text-gray-400 tracking-wider uppercase">
+                                            Роль
+                                        </th>
+                                        <th
+                                            class="p-4 text-xs font-semibold text-gray-500 dark:text-gray-400 tracking-wider uppercase">
+                                            Статус
+                                        </th>
+                                        <th
+                                            class="p-4 text-xs font-semibold text-gray-500 dark:text-gray-400 tracking-wider uppercase">
+                                            Создан
+                                        </th>
+                                        <th
+                                            class="p-4 text-xs font-semibold text-gray-500 dark:text-gray-400 tracking-wider uppercase text-right">
+                                            Действия
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody id="usersTableBody" class="divide-y divide-gray-200 dark:divide-gray-700">
+                                    <!-- строки добавляются из JS -->
+                                </tbody>
+                            </table>
+
+                            <div id="usersEmptyState"
+                                class="hidden p-6 text-center text-sm text-gray-500 dark:text-gray-400">
+                                Сотрудники не найдены по текущим фильтрам.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ПРАВАЯ ЧАСТЬ: форма -->
+                    <div class="w-full lg:w-2/5 xl:w-1/3">
+                        <div
+                            class="sticky top-8 flex flex-col gap-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+                            <div class="flex flex-col gap-1">
+                                <h2 id="formTitle" class="text-2xl font-bold text-gray-900 dark:text-white">
+                                    Добавить сотрудника
+                                </h2>
+                                <p id="formSubtitle" class="text-sm text-gray-500 dark:text-gray-400">
+                                    Создайте новый аккаунт и назначьте роль.
+                                </p>
+                            </div>
+
+                            <form id="userForm" class="flex flex-col gap-6">
+                                <input type="hidden" id="userId" />
+
+                                <!-- Личные данные -->
+                                <div class="flex flex-col gap-4">
+                                    <h3
+                                        class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                                        Личные данные
+                                    </h3>
+
+                                    <div>
+                                        <label for="userUsername"
+                                            class="block text-sm font-medium text-gray-800 dark:text-gray-100 mb-1">
+                                            Логин (username)
+                                        </label>
+                                        <input id="userUsername" type="text" required class="form-input w-full rounded-lg border-gray-300 dark:border-gray-600
+                                bg-white dark:bg-gray-900 text-gray-900 dark:text-white
+                                focus:ring-primary focus:border-primary" />
+                                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                                            Используется для входа в систему.
+                                        </p>
+                                    </div>
+
+                                    <div>
+                                        <label for="userPassword"
+                                            class="block text-sm font-medium text-gray-800 dark:text-gray-100 mb-1">
+                                            Пароль
+                                        </label>
+                                        <input id="userPassword" type="password" class="form-input w-full rounded-lg border-gray-300 dark:border-gray-600
+                                bg-white dark:bg-gray-900 text-gray-900 dark:text-white
+                                focus:ring-primary focus:border-primary" />
+                                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                                            Для нового сотрудника — обязательно (минимум 6 символов). При редактировании
+                                            можно
+                                            оставить пустым, чтобы не менять пароль.
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <!-- Роли и права -->
+                                <div class="flex flex-col gap-4">
+                                    <h3
+                                        class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                                        Роль и права
+                                    </h3>
+
+                                    <div>
+                                        <label for="userRole"
+                                            class="block text-sm font-medium text-gray-800 dark:text-gray-100 mb-1">
+                                            Роль
+                                        </label>
+                                        <select id="userRole" required class="form-select w-full rounded-lg border-gray-300 dark:border-gray-600
+                                 bg-white dark:bg-gray-900 text-gray-900 dark:text-white
+                                 focus:ring-primary focus:border-primary">
+                                            <option value="">Выберите роль</option>
+                                            <option value="admin">Админ</option>
+                                            <option value="manager">Менеджер</option>
+                                            <option value="waiter">Официант</option>
+                                            <option value="cook">Повар</option>
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <label for="userPhotoKey"
+                                            class="block text-sm font-medium text-gray-800 dark:text-gray-100 mb-1">
+                                            Photo key
+                                        </label>
+                                        <input id="userPhotoKey" type="text" class="form-input w-full rounded-lg border-gray-300 dark:border-gray-600
+                                bg-white dark:bg-gray-900 text-gray-900 dark:text-white
+                                focus:ring-primary focus:border-primary" placeholder="например, photo_admin" />
+                                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                                            Ключ/идентификатор аватара (поле <code>photo_key</code> в БД).
+                                        </p>
+                                    </div>
+
+                                    <div class="flex items-center gap-2 pt-2">
+                                        <input id="userIsActive" type="checkbox"
+                                            class="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary" />
+                                        <label for="userIsActive"
+                                            class="text-sm font-medium text-gray-800 dark:text-gray-100">
+                                            Аккаунт активен
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Кнопки -->
+                                <div class="flex items-center gap-4 pt-2 border-t border-gray-200 dark:border-gray-700">
+                                    <button type="button" id="cancelUserBtn"
+                                        class="w-full flex items-center justify-center rounded-lg h-10 px-4
+                               bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 text-sm font-semibold
+                               border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+                                        Отмена
+                                    </button>
+                                    <button type="submit" id="submitUserBtn" class="w-full flex items-center justify-center rounded-lg h-10 px-4
+                               bg-primary text-white text-sm font-semibold shadow-sm hover:bg-red-600 transition">
+                                        Создать аккаунт
+                                    </button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
-            </div>
+            </section>
         </main>
     </div>
+
+    <script>
+        const API_BASE_URL = "http://localhost:8080/api";
+        let authToken = "";
+        let allUsers = [];
+        let activeRoleFilter = "all";
+        let activeStatusFilter = "all";
+
+        function checkAuth() {
+            authToken = localStorage.getItem("auth_token");
+            if (!authToken) {
+                window.location.href = "login.html";
+                return false;
+            }
+            return true;
+        }
+
+        function logout() {
+            localStorage.removeItem("auth_token");
+            localStorage.removeItem("user_data");
+            window.location.href = "login.html";
+        }
+
+        const roleLabels = {
+            admin: "Админ",
+            manager: "Менеджер",
+            waiter: "Официант",
+            cook: "Повар",
+        };
+
+        function formatDate(value) {
+            if (!value) return "";
+            const d = new Date(value);
+            if (Number.isNaN(d.getTime())) return "";
+            return d.toLocaleString("ru-RU", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+            });
+        }
+
+        async function loadUsers() {
+            try {
+                const res = await fetch(`${API_BASE_URL}/users`, {
+                    headers: { "Authorization": `Bearer ${authToken}` },
+                });
+                if (!res.ok) throw new Error("Failed to load users");
+
+                const data = await res.json();
+                allUsers = Array.isArray(data) ? data : (data.data || []);
+                document.getElementById("totalUsers").textContent = allUsers.length.toString();
+                applyFiltersAndRender();
+            } catch (err) {
+                console.error(err);
+                alert("Ошибка загрузки сотрудников");
+            }
+        }
+
+        function applyFiltersAndRender() {
+            const searchValue = (document.getElementById("searchInput").value || "").toLowerCase();
+
+            let list = [...allUsers];
+
+            if (activeRoleFilter !== "all") {
+                list = list.filter(u => u.role === activeRoleFilter);
+            }
+
+            if (activeStatusFilter !== "all") {
+                list = list.filter(u => activeStatusFilter === "active" ? u.is_active : !u.is_active);
+            }
+
+            if (searchValue) {
+                list = list.filter(u =>
+                    (u.username || "").toLowerCase().includes(searchValue)
+                );
+            }
+
+            renderUsers(list);
+        }
+
+        function renderUsers(list) {
+            const tbody = document.getElementById("usersTableBody");
+            const empty = document.getElementById("usersEmptyState");
+            tbody.innerHTML = "";
+
+            if (!list.length) {
+                empty.classList.remove("hidden");
+                return;
+            }
+            empty.classList.add("hidden");
+
+            list.forEach(user => {
+                const tr = document.createElement("tr");
+                tr.className = "hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors";
+
+                const firstLetter = (user.username || "?").charAt(0).toUpperCase();
+                const roleText = roleLabels[user.role] || user.role;
+
+                tr.innerHTML = `
+        <td class="p-4 text-sm text-gray-900 dark:text-white">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full flex items-center justify-center bg-primary/10 text-primary text-sm font-semibold">
+              ${firstLetter}
+            </div>
+            <div class="flex flex-col">
+              <span class="font-medium">${user.username}</span>
+              <span class="text-xs text-gray-400 dark:text-gray-500">ID: ${user.id}</span>
+            </div>
+          </div>
+        </td>
+        <td class="p-4 text-sm text-gray-800 dark:text-gray-100">
+          <span class="inline-flex items-center gap-2 px-2 py-0.5 rounded-full text-xs font-medium
+                       bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-100">
+            <span class="material-symbols-outlined text-xs">badge</span>
+            <span>${roleText}</span>
+          </span>
+        </td>
+        <td class="p-4 text-sm">
+          <span class="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full text-xs font-medium
+                       ${user.is_active
+                        ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
+                        : "bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300"}">
+            <span class="w-2 h-2 rounded-full ${user.is_active ? "bg-green-500" : "bg-gray-400"}"></span>
+            <span>${user.is_active ? "Активен" : "Неактивен"}</span>
+          </span>
+        </td>
+        <td class="p-4 text-sm text-gray-500 dark:text-gray-400">
+          ${formatDate(user.created_at)}
+        </td>
+        <td class="p-4">
+          <div class="flex justify-end gap-2">
+            <button type="button"
+                    class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200"
+                    onclick="editUser(${user.id})">
+              <span class="material-symbols-outlined text-lg">edit</span>
+            </button>
+            <button type="button"
+                    class="p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-500/10 text-red-600 dark:text-red-400"
+                    onclick="deleteUser(${user.id})">
+              <span class="material-symbols-outlined text-lg">delete</span>
+            </button>
+          </div>
+        </td>
+      `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function resetForm() {
+            const form = document.getElementById("userForm");
+            form.reset();
+            document.getElementById("userId").value = "";
+            document.getElementById("userIsActive").checked = true;
+
+            document.getElementById("formTitle").textContent = "Добавить сотрудника";
+            document.getElementById("formSubtitle").textContent = "Создайте новый аккаунт и назначьте роль.";
+            document.getElementById("submitUserBtn").textContent = "Создать аккаунт";
+        }
+
+        function fillFormForEdit(user) {
+            document.getElementById("userId").value = user.id;
+            document.getElementById("userUsername").value = user.username || "";
+            document.getElementById("userPassword").value = "";
+            document.getElementById("userRole").value = user.role || "";
+            document.getElementById("userPhotoKey").value = user.photo_key || "";
+            document.getElementById("userIsActive").checked = !!user.is_active;
+
+            document.getElementById("formTitle").textContent = "Редактировать сотрудника";
+            document.getElementById("formSubtitle").textContent = `Измените данные аккаунта ${user.username}.`;
+            document.getElementById("submitUserBtn").textContent = "Сохранить изменения";
+        }
+
+        async function editUser(id) {
+            const user = allUsers.find(u => u.id === id);
+            if (!user) return;
+            fillFormForEdit(user);
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+
+        async function deleteUser(id) {
+            const user = allUsers.find(u => u.id === id);
+            const name = user ? user.username : `ID ${id}`;
+            if (!confirm(`Удалить сотрудника ${name}?`)) return;
+
+            try {
+                const res = await fetch(`${API_BASE_URL}/users/${id}`, {
+                    method: "DELETE",
+                    headers: { "Authorization": `Bearer ${authToken}` },
+                });
+                if (!res.ok) throw new Error("Failed to delete user");
+                await loadUsers();
+                alert("Сотрудник удалён");
+                if (document.getElementById("userId").value === String(id)) {
+                    resetForm();
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Ошибка удаления сотрудника");
+            }
+        }
+
+        document.getElementById("userForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const id = document.getElementById("userId").value;
+            const username = document.getElementById("userUsername").value.trim();
+            const password = document.getElementById("userPassword").value;
+            const role = document.getElementById("userRole").value;
+            const photoKey = document.getElementById("userPhotoKey").value.trim() || "photo_default";
+            const isActive = document.getElementById("userIsActive").checked;
+
+            if (!username || username.length < 3) {
+                alert("Логин должен содержать минимум 3 символа");
+                return;
+            }
+            if (!role) {
+                alert("Выберите роль");
+                return;
+            }
+
+            try {
+                let url;
+                let method;
+                let body;
+
+                if (!id) {
+                    if (!password || password.length < 6) {
+                        alert("Пароль для нового сотрудника должен содержать минимум 6 символов");
+                        return;
+                    }
+                    url = `${API_BASE_URL}/users`;
+                    method = "POST";
+                    body = JSON.stringify({
+                        username,
+                        password,
+                        role,
+                        photo_key: photoKey,
+                    });
+                } else {
+                    url = `${API_BASE_URL}/users/${id}`;
+                    method = "PUT";
+                    body = JSON.stringify({
+                        username,
+                        role,
+                        photo_key: photoKey,
+                        is_active: isActive,
+                    });
+                }
+
+                const res = await fetch(url, {
+                    method,
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${authToken}`,
+                    },
+                    body,
+                });
+
+                if (!res.ok) {
+                    const errText = await res.text();
+                    throw new Error(errText || "Request failed");
+                }
+
+                await loadUsers();
+                resetForm();
+                alert(id ? "Данные сотрудника обновлены" : "Сотрудник создан");
+            } catch (err) {
+                console.error(err);
+                alert("Ошибка сохранения сотрудника");
+            }
+        });
+
+        document.getElementById("newUserBtn").addEventListener("click", () => {
+            resetForm();
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+
+        document.getElementById("cancelUserBtn").addEventListener("click", () => {
+            resetForm();
+        });
+
+        document.getElementById("searchInput").addEventListener("input", applyFiltersAndRender);
+        document.getElementById("roleFilter").addEventListener("change", (e) => {
+            activeRoleFilter = e.target.value;
+            applyFiltersAndRender();
+        });
+        document.getElementById("statusFilter").addEventListener("change", (e) => {
+            activeStatusFilter = e.target.value;
+            applyFiltersAndRender();
+        });
+
+        // ТЕМА
+        const themeToggleBtn = document.getElementById("theme-toggle");
+        const themeToggleText = document.getElementById("theme-toggle-text");
+        const themeIcon = document.getElementById("theme-icon");
+
+        function applyTheme(mode) {
+            if (mode === "dark") {
+                document.documentElement.classList.add("dark");
+                if (themeToggleText) themeToggleText.textContent = "Dark";
+                if (themeIcon) themeIcon.textContent = "dark_mode";
+            } else {
+                document.documentElement.classList.remove("dark");
+                if (themeToggleText) themeToggleText.textContent = "Light";
+                if (themeIcon) themeIcon.textContent = "light_mode";
+            }
+        }
+
+        const savedTheme = localStorage.getItem("theme") || "light";
+        applyTheme(savedTheme);
+
+        if (themeToggleBtn) {
+            themeToggleBtn.addEventListener("click", () => {
+                const isDark = document.documentElement.classList.contains("dark");
+                const newTheme = isDark ? "light" : "dark";
+                localStorage.setItem("theme", newTheme);
+                applyTheme(newTheme);
+            });
+        }
+
+        // ИНИЦИАЛИЗАЦИЯ
+        document.addEventListener("DOMContentLoaded", async () => {
+            if (!checkAuth()) return;
+            await loadUsers();
+        });
+    </script>
+
 </body>
 
 </html>

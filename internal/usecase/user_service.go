@@ -50,7 +50,6 @@ func (s *UserService) GetByID(ctx context.Context, id int) (*domain.User, error)
 	}
 	return user, nil
 }
-
 func (s *UserService) Update(ctx context.Context, user *domain.User) error {
 	existing, err := s.userRepo.GetByID(ctx, user.ID)
 	if err != nil {
@@ -58,6 +57,11 @@ func (s *UserService) Update(ctx context.Context, user *domain.User) error {
 	}
 	if existing == nil {
 		return domain.ErrUserNotFound
+	}
+
+	// Не трогаем пароль, если его не передали
+	if user.PasswordHash == "" {
+		user.PasswordHash = existing.PasswordHash
 	}
 
 	return s.userRepo.Update(ctx, user)
