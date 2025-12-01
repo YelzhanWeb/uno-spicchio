@@ -7,6 +7,7 @@ import (
 	"github.com/YelzhanWeb/uno-spicchio/internal/domain"
 	"github.com/YelzhanWeb/uno-spicchio/internal/ports"
 	"github.com/YelzhanWeb/uno-spicchio/pkg/logger"
+	"github.com/YelzhanWeb/uno-spicchio/pkg/receipt"
 )
 
 type OrderService struct {
@@ -238,10 +239,10 @@ func (s *OrderService) UpdateStatus(ctx context.Context, id int, newStatus domai
 	s.logger.Success("✓ Order #%d status updated: %s → %s", id, order.Status, newStatus)
 	return nil
 }
-
 func (s *OrderService) CloseOrder(ctx context.Context, id int) error {
 	s.logger.Order("Closing order #%d", id)
 
+	// 1. Берём заказ из репозитория (без items)
 	order, err := s.orderRepo.GetByID(ctx, id)
 	if err != nil {
 		s.logger.Error("Failed to get order #%d: %v", id, err)
@@ -252,29 +253,51 @@ func (s *OrderService) CloseOrder(ctx context.Context, id int) error {
 		return domain.ErrOrderNotFound
 	}
 
-	// Проверяем, что заказ в статусе ready
+	// 2. Проверяем, что заказ в статусе ready
 	if order.Status != domain.OrderReady {
 		s.logger.Error("Order #%d must be in 'ready' status to close, current: %s", id, order.Status)
 		return fmt.Errorf("order must be in ready status to close, current status: %s", order.Status)
 	}
 
-	// Обновляем статус заказа на "оплачен"
+	// 3. Обновляем статус заказа на "оплачен"
 	if err := s.orderRepo.UpdateStatus(ctx, id, domain.OrderPaid); err != nil {
 		s.logger.Error("Failed to update order status: %v", err)
 		return err
 	}
-
 	s.logger.Success("✓ Order #%d marked as paid", id)
 
-	// Освобождаем стол
+	// 4. Освобождаем стол
 	if err := s.tableRepo.UpdateStatus(ctx, order.TableNumber, domain.TableFree); err != nil {
 		s.logger.Error("Failed to free table #%d: %v", order.TableNumber, err)
 		return err
 	}
-
 	s.logger.Success("✓ Table #%d freed", order.TableNumber)
-	s.logger.Order("Order #%d closed successfully (Total: %.2f ₸)", id, order.Total)
 
+	// 5. Подтягиваем полный заказ с позициями для чека
+	fullOrder, err := s.GetByID(ctx, id)
+	if err != nil {
+		// сам заказ уже закрыт, поэтому только логируем
+		s.logger.Error("Order #%d closed, but failed to reload for receipt: %v", id, err)
+		return nil
+	}
+
+	// 6. Имя официанта для чека
+	waiterName := "Unknown"
+	if fullOrder != nil && fullOrder.Waiter != nil && fullOrder.Waiter.Username != "" {
+		waiterName = fullOrder.Waiter.Username
+	}
+
+	// 7. Генерация PDF-чека в папку "receipts"
+	if fullOrder != nil {
+		if _, err := receipt.GenerateOrderReceiptPDF(fullOrder, waiterName, "receipts"); err != nil {
+			s.logger.Error("Order #%d closed, but failed to generate receipt: %v", id, err)
+			// не ломаем закрытие заказа, просто логируем
+		} else {
+			s.logger.Success("✓ Receipt PDF generated for order #%d", id)
+		}
+	}
+
+	s.logger.Order("Order #%d closed successfully (Total: %.2f ₸)", id, order.Total)
 	return nil
 }
 
