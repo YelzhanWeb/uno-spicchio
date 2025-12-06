@@ -115,13 +115,16 @@ func (rt *Router) Setup() *chi.Mux {
 			r.Get("/{id}", rt.orderHandler.GetByID)
 
 			// Waiter и Admin могут создавать заказы
-			r.With(middleware.RequireRole(domain.RoleWaiter, domain.RoleAdmin)).Post("/", rt.orderHandler.Create)
+			r.With(middleware.RequireRole(domain.RoleWaiter, domain.RoleAdmin)).
+				Post("/", rt.orderHandler.Create)
 
 			// Waiter и Admin могут закрывать заказы (переводить в paid и освобождать стол)
-			r.With(middleware.RequireRole(domain.RoleWaiter, domain.RoleAdmin)).Put("/{id}/close", rt.orderHandler.CloseOrder)
+			r.With(middleware.RequireRole(domain.RoleWaiter, domain.RoleAdmin)).
+				Put("/{id}/close", rt.orderHandler.CloseOrder)
 
 			// Cook, Manager и Admin могут менять статус заказов
-			r.With(middleware.RequireRole(domain.RoleCook, domain.RoleManager, domain.RoleAdmin)).Put("/{id}/status", rt.orderHandler.UpdateStatus)
+			r.With(middleware.RequireRole(domain.RoleCook, domain.RoleManager, domain.RoleAdmin)).
+				Put("/{id}/status", rt.orderHandler.UpdateStatus)
 		})
 
 		// Ingredient routes (Admin only)
@@ -148,7 +151,8 @@ func (rt *Router) Setup() *chi.Mux {
 			r.Get("/{id}", rt.tableHandler.GetByID)
 
 			// Waiter и Admin могут обновлять статус стола
-			r.With(middleware.RequireRole(domain.RoleWaiter, domain.RoleAdmin)).Put("/{id}/status", rt.tableHandler.UpdateStatus)
+			r.With(middleware.RequireRole(domain.RoleWaiter, domain.RoleAdmin)).
+				Put("/{id}/status", rt.tableHandler.UpdateStatus)
 
 			// Admin only
 			r.Group(func(r chi.Router) {
@@ -162,8 +166,12 @@ func (rt *Router) Setup() *chi.Mux {
 		r.Route("/api/analytics", func(r chi.Router) {
 			r.Use(middleware.RequireRole(domain.RoleAdmin, domain.RoleManager))
 
-			// Dashboard - main endpoint
-			r.Get("/dashboard", rt.analyticsHandler.GetDashboard)
+			// Метрики за сегодня (если нужно отдельно)
+			r.Get("/today-metrics", rt.analyticsHandler.GetTodayMetrics)
+
+			// Главный эндпоинт для дашборда:
+			// /api/analytics/dashboard?period=today|yesterday|current_month
+			r.Get("/dashboard", rt.analyticsHandler.GetDashboardMetrics)
 
 			// Sales analytics
 			r.Get("/sales/summary", rt.analyticsHandler.GetSalesSummary)
@@ -185,8 +193,8 @@ func (rt *Router) Setup() *chi.Mux {
 
 			// Tables analytics
 			r.Get("/tables/utilization", rt.analyticsHandler.GetTableUtilization)
-
 		})
+
 		// File upload routes (Admin only)
 		r.Route("/api/uploads", func(r chi.Router) {
 			r.Use(middleware.RequireRole(domain.RoleAdmin))
@@ -194,7 +202,6 @@ func (rt *Router) Setup() *chi.Mux {
 			// Загрузка картинок блюд
 			r.Post("/dishes", rt.fileHandler.UploadDishPhoto)
 		})
-
 	})
 
 	return r

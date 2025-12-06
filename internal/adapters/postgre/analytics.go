@@ -154,35 +154,33 @@ func (r *AnalyticsRepository) GetWaiterPerformance(ctx context.Context, from, to
 	return performance, rows.Err()
 }
 
-func (r *AnalyticsRepository) GetOrderStats(ctx context.Context, from, to time.Time) (*domain.OrderStats, error) {
+func (r *AnalyticsRepository) GetOrderStats(
+	ctx context.Context,
+	from, to time.Time,
+) (*domain.OrderStats, error) {
+
+	// Считаем ВСЕ заказы за период + сколько из них paid
 	query := `
-		SELECT 
-			COUNT(*) as total_orders,
-			SUM(CASE WHEN status = 'paid' THEN 1 ELSE 0 END) as completed_orders,
-			EXTRACT(HOUR FROM created_at) as hour,
-			COUNT(*) as hour_count
-		FROM orders
-		WHERE created_at >= $1 AND created_at < $2
-		GROUP BY EXTRACT(HOUR FROM created_at)
-		ORDER BY hour_count DESC
-		LIMIT 1`
+        SELECT 
+            COUNT(*) AS total_orders,
+            COALESCE(SUM(CASE WHEN status = 'paid' THEN 1 ELSE 0 END), 0) AS completed_orders
+        FROM orders
+        WHERE created_at >= $1 AND created_at < $2;
+    `
 
 	stats := &domain.OrderStats{}
-	var peakHour int
-	var hourCount int
 
 	err := r.db.QueryRowContext(ctx, query, from, to).Scan(
-		&stats.TotalOrders,
-		&stats.CompletedOrders,
-		&peakHour,
-		&hourCount,
+		&stats.TotalOrders,     // все заказы (любой статус)
+		&stats.CompletedOrders, // только paid
 	)
-
 	if err != nil && err != sql.ErrNoRows {
 		return nil, err
 	}
 
-	stats.PeakHour = peakHour
+	// Если нужны PeakHour и т.п. — можно потом отдельным запросом посчитать.
+	// Пока просто 0, чтобы структура была валидной.
+	stats.PeakHour = 0
 
 	return stats, nil
 }
